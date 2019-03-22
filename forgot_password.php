@@ -6,27 +6,40 @@
 
 	$errorMessage = "";
 	$email = "";
-	$password = "";
-
 	
     if (\Utilities\Common::IsSubmitForm())
 	{
 		
 		$email = \Utilities\Common::GetRequest("Email");
-		$password = \Utilities\Common::GetRequest("Password");
 		
-		
-		$user = \Classes\User::GetUserLogin($email, $password);
-		
-		
-		if ($user == null) {
-			$errorMessage = "Invalid Login";
+		if ($email == "")
+		{
+			$errorMessage = "Please enter your email address";
 		}
 		else {
-			echo "Logged In";
-			header('Location: index.php');
-			exit;
+			$user = \Classes\User::GetUserByEmailAddress($email);
+			
+			if ($user != null) {
+				// save user
+				
+				$resetCode = \Utilities\Common::GetGuid();
+				
+				$user->resetCode = $resetCode;
+				$objectSave = $user->Save();
+				
+				$message = "To reset your password click the following link: ".SITE_URL."/reset_password.php?r=".$resetCode;
+				$message = $message."\n\n\nCode Url: /reset_password.php?r = ".$resetCode;
+				$message = $message."\n\n\nCode: ".$resetCode;
+				
+				\Utilities\Common::SendEmail($user->email, "Reset Password", $message);
+			}
+			
+			header("Location: forgot_password_message.php");
+			die();
+			
 		}
+		
+
 		
 	}
 		// Add head section to page from tools.php
@@ -44,11 +57,11 @@
 		<main class="container">
 	<section>
 	<br/>
-	<h1>Welcome!</h1>
+	<h1>Forgot Password</h1>
 
 		
 				
-		<form action="default.php" method="post">
+		<form action="forgot_password.php" method="post">
 			
 			<input type="hidden" name="SubmitForm" value="1">
 			
@@ -57,26 +70,13 @@
 			<?php } ?>
 	
 			
-		
 			<div class="form-group">
 				<label for="Password">Email:</label>
 				<input type="email" class="form-control" name="Email" id="Email" maxlength="250" value="<?php echo htmlspecialchars($email) ?>">
 			</div>
-			
-			<div class="form-group">
-				<label for="Password">Password:</label>
-				<input type="password" class="form-control" name="Password" id="Password" maxlength="50" value="<?php echo htmlspecialchars($password) ?>">
-			</div>
-			
-			<button type="submit" class="btn btn-primary">Login</button>
+						
+			<button type="submit" class="btn btn-primary">Send Link</button>  
 		</form>
-			<br/>
-			<a href="signup.php" class="btn btn-primary">Sign up</a>
-
-			<div class="mt-2">
-					<a href="forgot_password.php">Forgot Your Password?</a>
-			</div>
-
 	</section>
 	</div>
 </main>
