@@ -1,35 +1,24 @@
 <?php
-    // Contains database connection info
-	require "config.php";
+
+	require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/header.php';
+	require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/footer.php';
 	
-	// Contains utility functions
-	require "tools.php";
+	$header = new \Template\Header();
+	echo $header->Bind();
 	
-	
-	// Add head section to page from tools.php
-	add_head();
-?>
-<body>
-    <header>
-    </header>
-    
-    <nav>
-        
-    </nav>
-        
-    <main class="container">
-        <div class="alert alert-success" role="alert">
+?>	
+
+        <section>
+
+			<h2>Forgot Password</h2>
+			
+			<div class="alert alert-success" role="alert">
         	If the email you entered is associated with a user account in our system, you can expect to receive a password reset email shortly.
         </div>
-    </main>
+
+		</section>
     
-    <footer>
-        
-    </footer>
-    
-    <?php 
-        // Add optional bootstrap jQuery, popper.js, and bootstrap.js to page from tools.php
-        bootstrap_optional();
-    ?>
-</body>
-</html>
+<?php
+	$footer = new \Template\Footer();
+	echo $footer->Bind();
+?>
