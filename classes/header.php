@@ -40,7 +40,12 @@
 						<header>
 						
 							<div class="row">
-								<div class="col">
+							
+								<div class="col-md-6">
+									<div class="logo"><a href="/"><img src="/images/logo.png" alt="Job Matcher" width="" height="" alt="" /></a></div>
+								</div>
+
+								<div class="col-md-6">
 									<div class="float-right"><a href="signup.php" class="btn btn-signup">Sign up</a></div>
 								</div>
 							</div>
