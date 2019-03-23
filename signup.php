@@ -30,7 +30,8 @@
 				
 				//get updated user and send email
 				$user = new \Classes\User($objectSave->objectId);
-				$message = "To verify your email address click the following link: ".SITE_URL."/verify_account.php?v=".$user->verifyCode."\n\n\nCode Url: /verify_account.php?v = ".$user->verifyCode."\n\n\nCode: ".$user->verifyCode;
+				//Blair - v added to start of link to avoid issues with email clients interpreting start of sequence as unicode char
+				$message = "To verify your email address click the following link: ".SITE_URL."/verify_account.php?v=v".$user->verifyCode."\n\n\nCode Url: /verify_account.php?v = ".$user->verifyCode."\n\n\nCode: ".$user->verifyCode;
 				\Utilities\Common::SendEmail($email, "Joining Job Matcher", $message);
 				
 				header("Location: signup_message.php");

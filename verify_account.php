@@ -6,6 +6,13 @@
 	
 	
 	$verifyCode = \Utilities\Common::GetRequest("v");
+	//now trim the 'v' at the start of the verify code, placed there to prevent issues with email clients interpreting
+	//a sequence starting with = then hexadecimal characters as a unicode char
+	//(check not already done as this page will be loaded more than once during password setting process)
+	if (substr($verifyCode,0,1) == 'v') {
+		$verifyCode = substr($verifyCode,1);
+	}
+
 
     // get user based on Verify Code where not already verified
 	$user = \Classes\User::GetUserByVerifyCode($verifyCode);
