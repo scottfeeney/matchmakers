@@ -1,5 +1,25 @@
-.tempheading{
-    color: lightblue;
+h1,h2,h3,h4,h5,h6{
+    font-family: 'Amiko', sans-serif;
+}
+
+p{
+    font-family: 'Fira Sans', sans-serif;
+}
+
+
+header, footer{
+    height: 250px;
+    background-color: lightblue;
+}
+
+#headerTxt{
+    height: 80px;
+}
+
+#about p{
+    line-height: 2em;
+}
+
+.footerCol{
     text-align: center;
-    margin-top: 350px;
 }
