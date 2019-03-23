@@ -2,7 +2,8 @@
 
 	require_once $_SERVER['DOCUMENT_ROOT'] . '/utilities/common.php';
 	require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/user.php';
-	require_once "tools.php";
+	require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/header.php';
+	require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/footer.php';
 
 	$errorMessage = "";
 	$email = "";
@@ -42,24 +43,18 @@
 
 		
 	}
-		// Add head section to page from tools.php
-	add_head();
 
-	bootstrap_optional();	
-?>
+	
+	$header = new \Template\Header();
+	echo $header->Bind();
+	
+?>		
 
-<body>
-<header>
-</header>
-<nav>
-</nav>
-	<div>
-		<main class="container">
 	<section>
-	<br/>
-	<h1>Forgot Password</h1>
 
-		
+		<h1>Forgot Password</h1>
+
+		<p>Enter your email address below.</p>
 				
 		<form action="forgot_password.php" method="post">
 			
@@ -77,10 +72,10 @@
 						
 			<button type="submit" class="btn btn-primary">Send Link</button>  
 		</form>
+
 	</section>
-	</div>
-</main>
-<footer>
-</footer>
-</body>
-</html>
+
+<?php
+	$footer = new \Template\Footer();
+	echo $footer->Bind();
+?>	

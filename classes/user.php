@@ -39,6 +39,7 @@
 					$this->verified = $row['Verified'];
 					$this->enteredDetails = $row['EnteredDetails'];
 					$this->password = $row['Password'];
+					$this->resetCode = $row['ResetCode'];
 					
 					//print_r($result);
 				} 
@@ -81,14 +82,14 @@
 				if ($errorMessage == "") {
 					
 					$sql = "insert into user";
-					$sql .= " (UserType, Email, Active, VerifyCode, Verified, EnteredDetails, Password, Created)";
+					$sql .= " (UserType, Email, Active, VerifyCode, Verified, EnteredDetails, Password, ResetCode, Created)";
 					$sql .= " values";
-					$sql .= " (?, ?, ?, ?, ?, ?, ?, UTC_TIMESTAMP())";
+					$sql .= " (?, ?, ?, ?, ?, ?, ?, ?, UTC_TIMESTAMP())";
 	
 					$conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);	
 					
 					if($stmt = $conn->prepare($sql)) {
-						$stmt->bind_param("isisiis", $this->userType, $this->email, $this->active, $this->verifyCode, $this->verified, $this->enteredDetails, $this->password);
+						$stmt->bind_param("isisiiss", $this->userType, $this->email, $this->active, $this->verifyCode, $this->verified, $this->enteredDetails, $this->password, $this->resetCode);
 						$stmt->execute();
 						$objectId = $stmt->insert_id;
 					} 
@@ -116,13 +117,14 @@
 				$sql .= " Verified = ?,";
 				$sql .= " EnteredDetails = ?,";
 				$sql .= " Password = ?,";
+				$sql .= " ResetCode = ?,";
 				$sql .= " Modified = UTC_TIMESTAMP()";
 				$sql .= " where UserId = ?";
 
 				$conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);	
 				
 				if($stmt = $conn->prepare($sql)) {
-					$stmt->bind_param("isisiisi", $this->userType, $this->email, $this->active, $this->verifyCode, $this->verified, $this->enteredDetails, $this->password, $this->userId);
+					$stmt->bind_param("isisiissi", $this->userType, $this->email, $this->active, $this->verifyCode, $this->verified, $this->enteredDetails, $this->password, $this->resetCode, $this->userId);
 					$stmt->execute();
 				} 
 				else {
@@ -188,6 +190,59 @@
 			}
 			
 		}
+		
+		// get user by email
+		public static function GetUserByEmailAddress($email) 
+		{
+			if ($email != "")
+			{
+				$sql = "select UserId from user where Email = ? and Verified = 1 and Active = 1";
+					
+				$conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);
+				
+				$stmt = $conn->prepare($sql);
+				$stmt->bind_param("s", $email);
+				$stmt->execute();
+				$result = mysqli_stmt_get_result($stmt);
+				$stmt->close();
+				$conn->close();
+				
+				if ($result->num_rows == 1) {
+					$row = mysqli_fetch_array($result);
+					return new User($row['UserId']);
+				}
+			}
+			
+			return null;
+			
+		}
+		
+		// get user by reset Code
+		public static function GetUserByResetCode($resetCode) 
+		{
+			if (strlen($resetCode) == 36)
+			{
+				$sql = "select UserId from user where ResetCode = ? and Verified = 1 and Active = 1";
+					
+				$conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);
+				
+				$stmt = $conn->prepare($sql);
+				$stmt->bind_param("s", $resetCode);
+				$stmt->execute();
+				$result = mysqli_stmt_get_result($stmt);
+				$stmt->close();
+				$conn->close();
+				
+				if ($result->num_rows == 1) {
+					$row = mysqli_fetch_array($result);
+					return new User($row['UserId']);
+				}
+			}
+			
+			return null;
+			
+		}
+		
 
 		// get user for login
 		public static function GetUserLogin($email, $password) {

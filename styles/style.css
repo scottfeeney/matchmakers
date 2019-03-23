@@ -7,10 +7,53 @@ p{
 }
 
 
-header, footer{
-    height: 250px;
-    background-color: lightblue;
+html, body {
+  height: 100%;
+  overflow-x: hidden;
 }
+
+header {
+	background-color: #000000;
+	height: 60px;
+}
+footer {
+	background-color: #000000;
+	height: 100px;
+}
+
+.main-container {
+	min-height: calc( 100% - 160px );
+}
+
+.page-container {
+	max-width: 1000px;
+	margin: 0 auto;
+	padding: 40px;
+}
+
+.home-banner {
+	background-color: #ff0000;
+	height: 340px;
+}
+
+.main-banner {
+	background-color: #ffff00;
+	height: 160px;
+}
+
+.btn-signup {
+	border: 1px solid #ffffff;
+	border-radius: 5px;
+	color: #ffffff;
+	margin-top: 10px;
+	margin-right: 20px;
+}
+
+.btn-signup:hover{
+	color: #ffffff;
+}
+
+
 
 #headerTxt{
     height: 80px;

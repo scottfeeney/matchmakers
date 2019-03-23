@@ -3,7 +3,8 @@
 	require_once $_SERVER['DOCUMENT_ROOT'] . '/utilities/common.php';
 	require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/user.php';
 	require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/object_save.php';
-	require_once "tools.php";
+	require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/header.php';
+	require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/footer.php';
 	
 	$errorMessage = "";
 	$email = "";
@@ -45,22 +46,16 @@
 		
 	}
 		
-	// Add head section to page from tools.php
-	add_head();
+	$header = new \Template\Header();
+	echo $header->Bind();
 ?>	
 
-<body>
-    <header>
 
-    </header>
-    
-    <nav>
-        
-    </nav>
-        
-    <main class="container">
         <section>
-            <h1>Welcome!</h1>
+            
+			<h2>Sign Up</h2>
+			
+			<p>Select your account type and enter your email address below.</p>
 
 			<form action="signup.php" method="post">
 				
@@ -87,16 +82,9 @@
 				
 			</form>
 		</section>
-    </main>
-    
-    <footer>
-        
-    </footer>
-    
-    <?php 
-        // Add optional bootstrap jQuery, popper.js, and bootstrap.js to page from tools.php
-        bootstrap_optional();
-    ?>
-</body>
-</html>
+
+<?php
+	$footer = new \Template\Footer();
+	echo $footer->Bind();
+?>
 

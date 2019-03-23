@@ -1,35 +1,25 @@
 <?php
-    // Contains database connection info
-	require "config.php";
+
+	require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/header.php';
+	require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/footer.php';
 	
-	// Contains utility functions
-	require "tools.php";
+	$header = new \Template\Header();
+	echo $header->Bind();
 	
-	
-	// Add head section to page from tools.php
-	add_head();
+?>	
+
+
+        <section>
+            
+			<h2>Sign Up</h2>
+				
+			<div class="alert alert-success" role="alert">
+				You have been sent an email.
+			</div>
+    
+		</section>
+    
+<?php
+	$footer = new \Template\Footer();
+	echo $footer->Bind();
 ?>
-<body>
-    <header>
-    </header>
-    
-    <nav>
-        
-    </nav>
-        
-    <main class="container">
-        <div class="alert alert-success" role="alert">
-        	You have been sent an email.
-        </div>
-    </main>
-    
-    <footer>
-        
-    </footer>
-    
-    <?php 
-        // Add optional bootstrap jQuery, popper.js, and bootstrap.js to page from tools.php
-        bootstrap_optional();
-    ?>
-</body>
-</html>

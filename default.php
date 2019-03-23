@@ -2,7 +2,8 @@
 
 	require_once $_SERVER['DOCUMENT_ROOT'] . '/utilities/common.php';
 	require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/user.php';
-	require_once "tools.php";
+	require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/header.php';
+	require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/footer.php';
 
 	$errorMessage = "";
 	$email = "";
@@ -23,31 +24,27 @@
 			$errorMessage = "Invalid Login";
 		}
 		else {
-			echo "Logged In";
-			header('Location: index.php');
+
+			header('Location: home.php');
 			exit;
 		}
 		
 	}
-		// Add head section to page from tools.php
-	add_head();
 
-	bootstrap_optional();	
+	
+	$header = new \Template\Header();
+	$header->showHomeBanner = true;
+	$header->showMainBanner = false;
+	echo $header->Bind();
+	
 ?>
 
-<body>
-<header>
-</header>
-<nav>
-</nav>
-	<div>
-		<main class="container">
-	<section>
-	<br/>
-	<h1>Welcome!</h1>
 
-		
-				
+	<section>
+
+	
+		<h2>Have an account, Login</h2>
+
 		<form action="default.php" method="post">
 			
 			<input type="hidden" name="SubmitForm" value="1">
@@ -69,18 +66,16 @@
 			</div>
 			
 			<button type="submit" class="btn btn-primary">Login</button>
+		
 		</form>
-			<br/>
-			<a href="signup.php" class="btn btn-primary">Sign up</a>
 
-			<div class="mt-2">
-					<a href="forgot_password.php">Forgot Your Password?</a>
-			</div>
+		<div class="mt-2">
+			<a href="forgot_password.php">Forgot Your Password?</a>
+		</div>
+		
+	</section>		
 
-	</section>
-	</div>
-</main>
-<footer>
-</footer>
-</body>
-</html>
+<?php
+	$footer = new \Template\Footer();
+	echo $footer->Bind();
+?>

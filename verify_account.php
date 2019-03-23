@@ -3,6 +3,10 @@
 	require_once $_SERVER['DOCUMENT_ROOT'] . '/utilities/common.php';
 	require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/user.php';
 	require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/object_save.php';
+	require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/header.php';
+	require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/footer.php';
+	
+	
 	
 	
 	$verifyCode = \Utilities\Common::GetRequest("v");
@@ -62,45 +66,56 @@
 		
 	}
 
+	$header = new \Template\Header();
+	echo $header->Bind();
+	
+?>	
+
+
+<section>
+
+	<h2>Verify Account</h2>
+
+	<?php if ($user == null) { ?>
+
+		<p>Invalid code supplied.</p>
+
+	<?php } else { ?>
+
+		<p>Your account has been verified, please create your password below.</p>
+		
+		
+		<form action="verify_account.php" method="post">
+			
+			<input type="hidden" name="SubmitForm" value="1">
+			<input type="hidden" name="v" value="<?php echo htmlspecialchars($verifyCode) ?>">
+			
+			<?php if ($errorMessage != "") { ?>
+				<p><?php echo $errorMessage ?></p>
+			<?php } ?>	
+			
+		
+			<div class="form-group">
+				<label for="Password">Password:</label>
+				<input type="Password" class="form-control" name="Password" id="Password" maxlength="50" value="<?php echo htmlspecialchars($password) ?>">
+			</div>
+			
+			<div class="form-group">
+				<label for="ConfirmPassword">Confirm Password:</label>
+				<input type="password" class="form-control" name="ConfirmPassword" id="ConfirmPassword" maxlength="50" value="<?php echo htmlspecialchars($confirmPassword) ?>">
+			</div>
+			
+			<button type="submit" class="btn btn-primary">Submit</button>
+			
+		</form>
+
+	<?php } ?>
+	
+<?php
+	$footer = new \Template\Footer();
+	echo $footer->Bind();
 ?>
-
-
-
-
-<?php if ($user == null) { ?>
-
-	<p>Invalid Code</p>
-
-<?php } else { ?>
-
-	<p>Create Password</p>
 	
-	
-	<form action="verify_account.php" method="post">
-		
-		<input type="hidden" name="SubmitForm" value="1">
-		<input type="hidden" name="v" value="<?php echo htmlspecialchars($verifyCode) ?>">
-		
-		<?php if ($errorMessage != "") { ?>
-			<p><?php echo $errorMessage ?></p>
-		<?php } ?>	
-		
-	
-		<div class="form-group">
-			<label for="Password">Password:</label>
-			<input type="Password" class="form-control" name="Password" id="Password" maxlength="50" value="<?php echo htmlspecialchars($password) ?>">
-		</div>
-		
-		<div class="form-group">
-			<label for="ConfirmPassword">Confirm Password:</label>
-			<input type="password" class="form-control" name="ConfirmPassword" id="ConfirmPassword" maxlength="50" value="<?php echo htmlspecialchars($confirmPassword) ?>">
-		</div>
-		
-		<button type="submit" class="btn btn-default">Submit</button>
-		
-	</form>
-
-<?php } ?>
 
 
 
