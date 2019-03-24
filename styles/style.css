@@ -36,6 +36,14 @@ footer {
 	padding: 40px;
 }
 
+@media (max-width: 767px)
+{
+	.page-container {
+		padding: 20px;
+	}
+	
+}
+
 .home-banner {
 	background-color: #ff0000;
 	height: 340px;
