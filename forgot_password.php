@@ -32,6 +32,11 @@
 				$message = $message."\n\n\nCode Url: /reset_password.php?r = ".$resetCode;
 				$message = $message."\n\n\nCode: ".$resetCode;
 				
+				$message = "We got a request to reset your password.\n";
+				$message .= "You can reset your password by clicking on the following link: ".SITE_URL."/reset_password.php?r=r".$resetCode."\n";
+				$message .= "\nIf for some reason the link does not work for you, please visit on the following link ".SITE_URL."/reset_password.php and enter the following reset code: ".$resetCode;
+				$message .= "\nJob Matcher Team\n";
+				
 				\Utilities\Common::SendEmail($user->email, "Reset Password", $message);
 			}
 			

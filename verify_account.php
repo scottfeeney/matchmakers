@@ -78,7 +78,17 @@
 
 	<?php if ($user == null) { ?>
 
-		<p>Invalid code supplied.</p>
+		<?php if ($verifyCode != "") { ?>
+			<p>Invalid code supplied.</p>
+		<?php } ?>	
+		
+		<form action="verify_account.php" method="get">
+			<div class="form-group">
+				<label for="v">Verification Code:</label>
+				<input type="text" class="form-control" name="v" maxlength="36" value="<?php echo htmlspecialchars($verifyCode) ?>">
+			</div>
+			<button type="submit" class="btn btn-primary">Submit</button>
+		</form>
 
 	<?php } else { ?>
 

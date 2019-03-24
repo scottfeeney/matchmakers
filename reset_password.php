@@ -67,7 +67,19 @@
 
 		<?php if ($user == null) { ?>
 
+			
+		<?php if ($resetCode != "") { ?>
 			<p>Invalid code supplied.</p>
+		<?php } ?>	
+		
+		<form action="reset_password.php" method="get">
+			<div class="form-group">
+				<label for="r">Reset Code:</label>
+				<input type="text" class="form-control" name="r" maxlength="36" value="<?php echo htmlspecialchars($resetCode) ?>">
+			</div>
+			<button type="submit" class="btn btn-primary">Submit</button>
+		</form>
+		
 
 		<?php } else { ?>
 
