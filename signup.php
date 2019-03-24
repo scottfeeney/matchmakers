@@ -33,10 +33,10 @@
 				$user = new \Classes\User($objectSave->objectId);
 				//Blair - v added to start of link to avoid issues with email clients interpreting start of sequence as unicode char
 				
-				$message = "Thank you for signing up with Job Matcher.\n";
-				$message .= "Before you can continue, please verify your email address by clicking on the following link: ".SITE_URL."/verify_account.php?v=v".$user->verifyCode."\n";
-				$message .= "\nIf for some reason the link does not work for you, please visit on the following link ".SITE_URL."/verify_account.php and enter the following verification code: ".$user->verifyCode;
-				$message .= "\nJob Matcher Team\n";
+				$message = "Thank you for signing up with Job Matcher.\n\n";
+				$message .= "Before you can continue, please verify your email address by clicking on the following link: ".SITE_URL."/verify_account.php?v=v".$user->verifyCode."\n\n";
+				$message .= "\n\nIf for some reason the link does not work for you, please visit on the following link ".SITE_URL."/verify_account.php and enter the following verification code: ".$user->verifyCode;
+				$message .= "\n\nJob Matcher Team\n";
 				
 				\Utilities\Common::SendEmail($email, "Joining Job Matcher", $message);
 				
