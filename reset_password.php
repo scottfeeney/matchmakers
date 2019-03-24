@@ -7,6 +7,12 @@
 	require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/footer.php';
 	
 	$resetCode = \Utilities\Common::GetRequest("r");
+	//now trim the 'r' at the start of the reset code, placed there to prevent issues with email clients interpreting
+	//a sequence starting with = then hexadecimal characters as a unicode char
+	//(check not already done as this page will be loaded more than once during password setting process)
+	if (substr($resetCode,0,1) == 'r') {
+		$resetCode = substr($resetCode,1);
+	}
 
     // get user based on Verify Code where not already verified
 	$user = \Classes\User::GetUserByResetCode($resetCode);
