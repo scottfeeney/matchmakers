@@ -2,6 +2,8 @@
 	
 	namespace Utilities;
 	
+	require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/user.php';
+	
 	class Common {
 
 		public static function GetRequest($Value) {
@@ -14,6 +16,38 @@
 			}
 			else {
 				return false;			
+			}
+		}
+		
+		public static function GetSessionUser() {
+			
+			session_start();
+			if(isset($_SESSION["UserId"]) && !empty($_SESSION["UserId"])) {
+				$user = new \Classes\User($_SESSION["UserId"]);
+				
+				$pageName = basename($_SERVER['PHP_SELF']);
+				
+				if ($user->enteredDetails == false) 
+				{
+					if ($user->userType == 1 && $pageName != "employer_details.php")
+					{
+						header('Location: /employer_details.php');
+						exit;
+					}
+					else if ($user->userType == 2 && $pageName != "job_seeker_details.php")
+					{
+						header('Location: /job_seeker_details.php');
+						exit;
+					}
+				}
+				
+				return $user;
+				
+			}
+			else {
+				
+				header('Location: /');
+				exit;
 			}
 		}
 		

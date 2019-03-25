@@ -24,6 +24,9 @@
 			$errorMessage = "Invalid Login";
 		}
 		else {
+			
+			session_start();
+			$_SESSION["UserId"] = $user->userId;
 
 			header('Location: home.php');
 			exit;

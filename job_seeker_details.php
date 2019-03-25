@@ -16,7 +16,7 @@
 
         <section>
 
-			<h2>Home</h2>
+			<h2>Job Seeker Details</h2>
 			
 			
 

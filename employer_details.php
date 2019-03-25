@@ -16,7 +16,7 @@
 
         <section>
 
-			<h2>Home</h2>
+			<h2>Employer Details</h2>
 			
 			
 
