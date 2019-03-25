@@ -38,7 +38,7 @@ CREATE TABLE `employer` (
   UNIQUE KEY `EmployerId_UNIQUE` (`EmployerId`),
   KEY `UserId_idx` (`UserId`),
   CONSTRAINT `UserId` FOREIGN KEY (`UserId`) REFERENCES `user` (`UserId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -58,7 +58,7 @@ CREATE TABLE `location` (
   UNIQUE KEY `LocationId_UNIQUE` (`LocationId`),
   UNIQUE KEY `Name_UNIQUE` (`Name`),
   UNIQUE KEY `Shortname_UNIQUE` (`Shortname`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -67,21 +67,21 @@ CREATE TABLE `location` (
 
 DROP TABLE IF EXISTS `user`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
- SET character_set_client = utf8mb4 ;
+ SET character_set_client = utf8mb4;
 CREATE TABLE `user` (
   `UserId` int(11) NOT NULL AUTO_INCREMENT,
   `UserType` int(11) DEFAULT NULL,
   `Email` varchar(250) DEFAULT NULL,
   `Active` tinyint(1) DEFAULT NULL,
   `Password` varchar(200) DEFAULT NULL,
-  `VerifyCode` varchar(36) CHARACTER SET utf8mb4 DEFAULT NULL,
+  `VerifyCode` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
   `Verified` tinyint(1) DEFAULT NULL,
   `EnteredDetails` tinyint(1) DEFAULT NULL,
   `ResetCode` varchar(36) DEFAULT NULL,
   `Created` datetime DEFAULT NULL,
   `Modified` datetime DEFAULT NULL,
   PRIMARY KEY (`UserId`)
-) ENGINE=InnoDB AUTO_INCREMENT=36 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=36 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
