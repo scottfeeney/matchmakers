@@ -40,7 +40,7 @@
 				$errorMessage = "Passwords do not match";
 			}
 			
-			if ($errorMessage == "" and strlen($password) < 7) {
+			if ($errorMessage == "" and strlen($password) < 6) {
 				$errorMessage = "Password length must be at least 6 charcaters";
 			}
 			
@@ -79,7 +79,7 @@
 	<?php if ($user == null) { ?>
 
 		<?php if ($verifyCode != "") { ?>
-			<p>Invalid code supplied.</p>
+			<div class="alert alert-danger" role="alert">Invalid code supplied.</div>
 		<?php } ?>	
 		
 		<form action="verify_account.php" method="get">
@@ -101,7 +101,7 @@
 			<input type="hidden" name="v" value="<?php echo htmlspecialchars($verifyCode) ?>">
 			
 			<?php if ($errorMessage != "") { ?>
-				<p><?php echo $errorMessage ?></p>
+				<div class="alert alert-danger" role="alert"><?php echo $errorMessage ?></div>
 			<?php } ?>	
 			
 		

@@ -21,7 +21,7 @@
 			// save user
 			$user = new \Classes\User();
 			$user->email = $email;
-			$user->userType = $userType;
+			$user->userType = ($userType == "1" ? "1" : "2"); //make sure user can only enter 1 or 2;
 			$objectSave = $user->Save();
 			
 			if ($objectSave->hasError) {

@@ -36,7 +36,7 @@
 				$errorMessage = "Passwords do not match";
 			}
 			
-			if ($errorMessage == "" and strlen($password) < 7) {
+			if ($errorMessage == "" and strlen($password) < 6) {
 				$errorMessage = "Password length must be at least 6 charcaters";
 			}
 			
@@ -75,7 +75,7 @@
 
 			
 		<?php if ($resetCode != "") { ?>
-			<p>Invalid code supplied.</p>
+			<div class="alert alert-danger" role="alert">Invalid code supplied.</div>
 		<?php } ?>	
 		
 		<form action="reset_password.php" method="get">
@@ -98,7 +98,7 @@
 				<input type="hidden" name="r" value="<?php echo htmlspecialchars($resetCode) ?>">
 				
 				<?php if ($errorMessage != "") { ?>
-					<p><?php echo $errorMessage ?></p>
+					<div class="alert alert-danger" role="alert"><?php echo $errorMessage ?></div>
 				<?php } ?>	
 				
 			
