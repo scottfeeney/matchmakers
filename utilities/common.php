@@ -2,7 +2,11 @@
 	
 	namespace Utilities;
 	
-	require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/user.php';
+	if ($_SERVER['DOCUMENT_ROOT'] != '') {
+		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/user.php';
+	} else {
+		require_once './wwwroot/classes/user.php';
+	}
 	
 	class Common {
 

@@ -2,8 +2,14 @@
 	
 	namespace Classes;
 	
-	require_once $_SERVER['DOCUMENT_ROOT'] . '/config.php';
-	require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/object_save.php';
+	
+	if ($_SERVER['DOCUMENT_ROOT'] != '') {
+		require_once $_SERVER['DOCUMENT_ROOT'] . '/config.php';
+		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/object_save.php';
+	} else {
+		require_once './wwwroot/config.php';
+		require_once './wwwroot/classes/object_save.php';
+	}
 	
 	class User {
 	

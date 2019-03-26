@@ -1,10 +1,17 @@
 <?php
-
-	require_once $_SERVER['DOCUMENT_ROOT'] . '/utilities/common.php';
-	require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/user.php';
-	require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/object_save.php';
-	require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/header.php';
-	require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/footer.php';
+	if ($_SERVER['DOCUMENT_ROOT'] != '') {
+		require_once $_SERVER['DOCUMENT_ROOT'] . '/utilities/common.php';
+		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/user.php';
+		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/object_save.php';
+		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/header.php';
+		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/footer.php';
+	} else {
+		require_once './wwwroot/utilities/common.php';
+		require_once './wwwroot/classes/user.php';
+		require_once './wwwroot/classes/object_save.php';
+		require_once './wwwroot/classes/header.php';
+		require_once './wwwroot/classes/footer.php';
+	}
 	
 	$errorMessage = "";
 	$email = "";
