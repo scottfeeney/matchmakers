@@ -76,9 +76,10 @@ footer {
 
 #about p{
     line-height: 2em;
+    text-align: justify;
 }
 
-#about h1 {
+#about h1, #about h3 {
     text-align: center;
 }
 
