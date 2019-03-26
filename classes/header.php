@@ -4,7 +4,7 @@
 	
 	class Header {
 
-		public $showHomeBanner = false;
+		public $isHomePage = false;
 		public $showMainBanner = true;
 		public $isSignedIn = false;
 	
@@ -32,12 +32,17 @@
 							  crossorigin="anonymous">
 							  
 						<link rel="stylesheet" href="/styles/style.css">
-
 						<title>Job Matcher</title>
 					</head>
 					
 					
-					<body>
+					<body';
+					
+						if($this->isHomePage) {
+							$html .= ' class="home-page"';
+						}
+					
+						$html .= '>
 						<header>
 						
 							<div class="row">
@@ -54,7 +59,7 @@
 									}
 									else
 									{
-										$html .= '<div class="float-right"><a href="signup.php" class="btn btn-signup">Sign up</a></div>';
+										$html .= '<div class="float-right"><a href="signup.php" class="btn btn-signup">Sign Up</a></div>';
 									}
 									
 								$html .= '</div>
@@ -64,12 +69,7 @@
 
 						<div class="main-container">';
 						
-							if ($this->showHomeBanner) {
-								$html .= '<div class="home-banner">
-							
-								</div>';
-							}
-							
+						
 							if ($this->showMainBanner) {
 								$html .= '<div class="main-banner">
 							
