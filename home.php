@@ -23,6 +23,14 @@
 
 			<h2>Home Page</h2>
 			
+			<p>Welcome to Job Matcher</p>
+			
+			<?php if ($user->userType == 1) { ?>
+			
+				<p><a href="employer_details.php">Click here</a> to update your details.</p>
+
+			<?php } ?>
+			
 			
 
 		</section>
