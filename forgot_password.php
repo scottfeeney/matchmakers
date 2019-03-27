@@ -55,38 +55,42 @@
 		
 	}
 
-	
 	$header = new \Template\Header();
+	$header->isHomePage = true;
+	$header->showMainBanner = false;
 	echo $header->Bind();
+
 	
 ?>		
 
 	<section>
+		<div class="jumbotron jumbotron-fluid">
+			<div class="container">
+				<h1>Forgot Password</h1>
 
-		<h1>Forgot Password</h1>
-
-		<p>Enter your email address below.</p>
-				
-		<form action="forgot_password.php" method="post">
-			
-			<input type="hidden" name="SubmitForm" value="1">
-			
-			<?php if ($errorMessage != "") { ?>
-				<div class="alert alert-danger" role="alert"><?php echo $errorMessage ?></div>
-			<?php } ?>
-	
-			
-			<div class="form-group">
-				<label for="Password">Email:</label>
-				<input type="email" class="form-control" name="Email" id="Email" maxlength="250" value="<?php echo htmlspecialchars($email) ?>">
-			</div>
+				<p>Enter your email address below.</p>
+							
+				<form action="forgot_password.php" method="post">
 						
-			<button type="submit" class="btn btn-primary">Send Link</button>  
-		</form>
-
+					<input type="hidden" name="SubmitForm" value="1">
+					
+					<?php if ($errorMessage != "") { ?>
+						<div class="alert alert-danger" role="alert"><?php echo $errorMessage ?></div>
+					<?php } ?>
+				
+					
+					<div class="form-group">
+						<label for="Password">Email:</label>
+						<input type="email" class="form-control" name="Email" id="Email" maxlength="250" value="<?php echo htmlspecialchars($email) ?>">
+					</div>
+								
+					<button type="submit" class="btn btn-primary">Send Link</button>  
+				</form>
+			</div>
+		</div>
 	</section>
 
 <?php
 	$footer = new \Template\Footer();
 	echo $footer->Bind();
-?>	
+?>
