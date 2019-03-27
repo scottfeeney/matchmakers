@@ -8,19 +8,24 @@
 	}
 	
 	$header = new \Template\Header();
+	$header->isHomePage = true;
+	$header->showMainBanner = false;
 	echo $header->Bind();
+	
 	
 ?>	
 
 
         <section>
-            
-			<h2>Sign Up</h2>
+            <div class="jumbotron jumbotron-fluid">
+				<div class="container">
+				<h2>Sign Up</h2>
 				
-			<div class="alert alert-success" role="alert">
-				You have been sent an email.
+				<div class="alert alert-success" role="alert">
+					You have been sent an email.
+				</div>
+				</div>
 			</div>
-    
 		</section>
     
 <?php

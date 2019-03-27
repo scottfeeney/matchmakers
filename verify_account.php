@@ -74,13 +74,16 @@
 	}
 
 	$header = new \Template\Header();
+	$header->isHomePage = true;
+	$header->showMainBanner = false;
 	echo $header->Bind();
 	
 ?>	
 
 
 <section>
-
+	<div class="jumbotron jumbotron-fluid">
+	<div class="container">
 	<h2>Verify Account</h2>
 
 	<?php if ($user == null) { ?>
@@ -125,7 +128,9 @@
 			<button type="submit" class="btn btn-primary">Submit</button>
 			
 		</form>
-
+	</div>
+	</div>
+</section>
 	<?php } ?>
 	
 <?php
