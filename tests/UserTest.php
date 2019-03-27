@@ -5,29 +5,15 @@ use PHPUnit\Framework\TestCase;
 
 
 final class UserTest extends TestCase {
+
+    private $idsToDelete = array();
+
     public function testConstructorUserIdZeroGivenZero() {
         $this->assertEquals(0, (new \Classes\User(0))->userId);
     }
 
     public function testConstructorUserIdZeroGivenNegative() {
         $this->assertEquals(0, (new \Classes\User(-1))->userId);
-    }
-
-    public function testUserFields() {
-        //Will of course only work if there is a DB record
-        //with the following values
-        //A more complex test would specifically put these values
-        //in the DB first - but would also need to make sure
-        //there isn't already a record with that ID
-        $user = new \Classes\User(2);
-        $this->assertEquals('s3669208!1@student.rmit.edu.au', $user->email);
-        $this->assertEquals('$2y$10$fu0iNNeins4UHY3JeD1oc.cdv5xVf6z0ZeYmVrhv7Vjg0LJbF36By', $user->password);
-        $this->assertEquals(1, $user->userType);
-        $this->assertEquals(1, $user->active);
-        $this->assertEquals('143AD590-3599-4E5A-B8E6-E62160250061', $user->verifyCode);
-        $this->assertEquals(1, $user->verified);
-        $this->assertEquals(0, $user->enteredDetails);
-        $this->assertEquals(NULL, $user->resetCode);
     }
 
     public function testConstructorDBServerInaccessible() {
@@ -42,8 +28,56 @@ final class UserTest extends TestCase {
         $this->assertEquals(true, $objSave->hasError);
     }
 
-    public function testSaveNewUser() {
-        //$user = new \Classes\User
+    private function saveNewUser() {
+        $user = new \Classes\User(0);
+        $user->userType = 1;
+        $user->email = "unit@tester.com";
+        $user->active = 1;
+        $user->password = NULL;
+        $user->verifyCode = '65630340-1718-4A7E-8EE3-39DC3D448ED0';
+        $user->verified = 0;
+        $user->enteredDetails = 0;
+        $user->resetCode = NULL;
+        $objSave = $user-save();
+        $idsToDelete[] = $objSave->objectId;
+        return $objSave->objectId;
+    }
+
+    public function testSaveGetUser() {
+        $oid = $this->saveNewUser();
+        $user = new \Classes\User($oid);
+        $this->assertEquals('unit@tester.com', $user->email);
+        $this->assertEquals(NULL, $user->password);
+        $this->assertEquals(1, $user->userType);
+        $this->assertEquals(1, $user->active);
+        $this->assertEquals('65630340-1718-4A7E-8EE3-39DC3D448ED0', $user->verifyCode);
+        $this->assertEquals(0, $user->verified);
+        $this->assertEquals(0, $user->enteredDetails);
+        $this->assertEquals(NULL, $user->resetCode);
+    }
+
+    public function testUpdateUser() {
+        $oid = $this->saveNewUser();
+        $user = new \Classes\User($oid);
+        $user->email = "reallyunittesting@test.com";
+        $oid2 = $user->save();
+        $user2 = new \Classes\User($oid2);
+        $this->assertEquals($oid, $oid2);
+        $this->assertEquals("reallyunittesting@test.com", $user2->email);
+    }
+
+    public function tearDown() {
+        //delete all records created by test process
+        $conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);
+        foreach ($idsToDelete as $currId) {
+            $sql = "delete from user where id = ?";
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("i", $currId);
+            $stmt->execute();
+            $result = mysqli_stmt_get_result($stmt);
+			$stmt->close();
+        }
+        $conn->close();
     }
 
 }
