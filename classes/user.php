@@ -23,8 +23,10 @@
 		public $password;
 		
 		public function __construct($userId = 0) {
-        
-			if ($userId != 0) {
+		
+			//changed from != to > - probably would never come up but still
+			//assuming we agree a negative number is an invalid userid
+			if ($userId > 0) {
 			
 				$sql = "select * from user where UserId = ?";
 				
