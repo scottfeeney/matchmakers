@@ -17,6 +17,12 @@
 		public $userId;
 		public $companyName;
 		public $locationId;
+		public $givenname;
+		public $surname;
+		public $phone;
+		public $otherGivenname;
+		public $otherSurname;
+		public $otherPhone;
 				
 		public function __construct($employerId = 0) {
         
@@ -53,6 +59,12 @@
 			$object->userId = $row['UserId'];
 			$object->companyName = $row['CompanyName'];
 			$object->locationId = $row['LocationId'];
+			$object->surname = $row['Surname'];
+			$object->givenname = $row['Givenname'];
+			$object->phone = $row['Phone'];
+			$object->otherSurname = $row['OtherSurname'];
+			$object->otherGivenname = $row['OtherGivenname'];
+			$object->otherPhone = $row['OtherPhone'];
 		}
 		
 	
@@ -71,14 +83,14 @@
 				if ($errorMessage == "") {
 					
 					$sql = "insert into employer";
-					$sql .= " (UserId, CompanyName, LocationId, Created)";
+					$sql .= " (UserId, CompanyName, LocationId, Surname, Givenname, Phone, OtherSurname, OtherGivenname, OtherPhone, Created)";
 					$sql .= " values";
-					$sql .= " (?, ?, ?, UTC_TIMESTAMP())";
+					$sql .= " (?, ?, ?, ?, ?, ?, ?, ?, ?, UTC_TIMESTAMP())";
 	
 					$conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);	
 					
 					if($stmt = $conn->prepare($sql)) {
-						$stmt->bind_param("isi", $this->userId, $this->companyName, $this->locationId);
+						$stmt->bind_param("isissssss", $this->userId, $this->companyName, $this->locationId, $this->surname, $this->givenname, $this->phone, $this->otherSurname, $this->otherGivenname, $this->otherPhone);
 						$stmt->execute();
 						$objectId = $stmt->insert_id;
 					} 
@@ -93,8 +105,7 @@
 			
 			}
 			else {
-			
-			
+
 				// Edit employer
 				
 				$sql = "update employer";
@@ -102,13 +113,19 @@
 				$sql .= " UserId = ?,";
 				$sql .= " CompanyName = ?,";
 				$sql .= " LocationId = ?,";
+				$sql .= " Surname = ?,";
+				$sql .= " Givenname = ?,";
+				$sql .= " Phone = ?,";
+				$sql .= " OtherSurname = ?,";
+				$sql .= " OtherGivenname = ?,";
+				$sql .= " OtherPhone = ?,";
 				$sql .= " Modified = UTC_TIMESTAMP()";
 				$sql .= " where EmployerId = ?";
 
 				$conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);	
 				
 				if($stmt = $conn->prepare($sql)) {
-					$stmt->bind_param("isii", $this->userId, $this->companyName, $this->locationId, $this->employerId);
+					$stmt->bind_param("isissssssi", $this->userId, $this->companyName, $this->locationId, $this->surname, $this->givenname, $this->phone, $this->otherSurname, $this->otherGivenname, $this->otherPhone, $this->employerId);
 					$stmt->execute();
 				} 
 				else {

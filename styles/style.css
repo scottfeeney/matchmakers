@@ -50,6 +50,21 @@ footer {
 	
 }
 
+.btn-primary {
+	background-color: #0a1933;
+    border-color: #0a1933;	
+}
+
+.btn-primary:hover {
+	background-color: #070923;
+    border-color: #070923;	
+}
+
+.btn-primary:not(:disabled):not(.disabled).active, .btn-primary:not(:disabled):not(.disabled):active, .show>.btn-primary.dropdown-toggle {
+	background-color: #070923;
+    border-color: #070923;	
+}
+
 
 /*
 	Image source: https://www.pexels.com/photo/photo-of-group-of-people-in-a-meeting-1661004/
