@@ -51,10 +51,34 @@ footer {
 }
 
 
+/*
+	Image source: https://www.pexels.com/photo/photo-of-group-of-people-in-a-meeting-1661004/
+*/
 .main-banner {
-	background-color: #ffff00;
-	height: 160px;
+	height: 230px;
+	background-image: url(/images/page_banner.jpg);
+	background-size: cover;
 }
+
+.page-banner-text-outer {
+	display: table; 
+	width: 100%;
+}	
+
+
+.page-banner-text {
+	height: 230px;
+	display: table-cell;
+	vertical-align: middle;
+	text-align: center;
+}
+
+.main-banner h1{
+	color: #ffffff;
+	font-size: 3.2em;
+	margin: 0;
+}
+
 
 .btn-signup {
 	border: 1px solid #ffffff;

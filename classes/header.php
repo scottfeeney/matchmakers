@@ -72,7 +72,11 @@
 						
 							if ($this->showMainBanner) {
 								$html .= '<div class="main-banner">
-							
+									<div class="page-banner-text-outer">
+										<div class="page-banner-text">
+											<h1>Finding the job that\'s right for you</h1>
+										</div>
+									</div>
 								</div>';
 							}
 							
