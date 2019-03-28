@@ -17,12 +17,25 @@
 		public $userId;
 		public $companyName;
 		public $locationId;
-		public $givenname;
-		public $surname;
-		public $phone;
-		public $otherGivenname;
-		public $otherSurname;
-		public $otherPhone;
+		public $title;
+		public $firstName;
+		public $lastName;
+		public $phoneAreaCode;
+		public $phoneNumber;
+		public $mobileNumber;
+		public $otherTitle;
+		public $otherFirstName;
+		public $otherLastName;
+		public $otherPhoneAreaCode;
+		public $otherPhoneNumber;
+		public $address1;
+		public $address2;
+		public $city;
+		public $state;
+		public $postcode;
+		public $companyType;
+		public $companySize;
+		public $expectedGrowth;
 				
 		public function __construct($employerId = 0) {
         
@@ -59,17 +72,29 @@
 			$object->userId = $row['UserId'];
 			$object->companyName = $row['CompanyName'];
 			$object->locationId = $row['LocationId'];
-			$object->surname = $row['Surname'];
-			$object->givenname = $row['Givenname'];
-			$object->phone = $row['Phone'];
-			$object->otherSurname = $row['OtherSurname'];
-			$object->otherGivenname = $row['OtherGivenname'];
-			$object->otherPhone = $row['OtherPhone'];
+			$object->title = $row['Title'];
+			$object->firstName = $row['FirstName'];
+			$object->lastName = $row['LastName'];
+			$object->phoneAreaCode = $row['PhoneAreaCode'];
+			$object->phoneNumber = $row['PhoneNumber'];
+			$object->mobileNumber = $row['MobileNumber'];
+			$object->otherTitle = $row['OtherTitle'];
+			$object->otherFirstName = $row['OtherFirstName'];
+			$object->otherLastName = $row['OtherLastName'];
+			$object->otherPhoneAreaCode = $row['OtherPhoneAreaCode'];
+			$object->otherPhoneNumber = $row['OtherPhoneNumber'];
+			$object->address1 = $row['Address1'];
+			$object->address2 = $row['Address2'];
+			$object->city = $row['City'];
+			$object->state = $row['State'];
+			$object->postcode = $row['Postcode'];
+			$object->companyType = $row['CompanyType'];
+			$object->companySize = $row['CompanySize'];
+			$object->expectedGrowth = $row['ExpectedGrowth'];
 		}
 		
 	
 		public function Save() {
-		
 		
 			$errorMessage = "";
 			$objectId = $this->employerId;
@@ -83,14 +108,28 @@
 				if ($errorMessage == "") {
 					
 					$sql = "insert into employer";
-					$sql .= " (UserId, CompanyName, LocationId, Surname, Givenname, Phone, OtherSurname, OtherGivenname, OtherPhone, Created)";
+					$sql .= " (UserId, CompanyName, LocationId,";
+					$sql .= " Title, FirstName, LastName, PhoneAreaCode, PhoneNumber, MobileNumber,";
+					$sql .= " OtherTitle, OtherFirstName, OtherLastName, OtherPhoneAreaCode, OtherPhoneNumber,";
+					$sql .= " Address1, Address2, City, State, Postcode,";
+					$sql .= " CompanyType, CompanySize, ExpectedGrowth,";
+					$sql .= " Created)";
 					$sql .= " values";
-					$sql .= " (?, ?, ?, ?, ?, ?, ?, ?, ?, UTC_TIMESTAMP())";
+					$sql .= " (?, ?, ?,";
+					$sql .= " ?, ?, ?, ?, ?, ?,";
+					$sql .= " ?, ?, ?, ?, ?,";
+					$sql .= " ?, ?, ?, ?, ?,";
+					$sql .= " ?, ?, ?,";
+					$sql .= " UTC_TIMESTAMP())";
 	
 					$conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);	
 					
 					if($stmt = $conn->prepare($sql)) {
-						$stmt->bind_param("isissssss", $this->userId, $this->companyName, $this->locationId, $this->surname, $this->givenname, $this->phone, $this->otherSurname, $this->otherGivenname, $this->otherPhone);
+						$stmt->bind_param("isisssssssssssssssssss", $this->userId, $this->companyName, $this->locationId, 
+								$this->title, $this->firstName, $this->lastName, $this->phoneAreaCode, $this->phoneNumber, $this->mobileNumber,
+								$this->otherTitle, $this->otherFirstName, $this->otherLastName, $this->otherPhoneAreaCode, $this->otherPhoneNumber,
+								$this->address1, $this->address2, $this->city, $this->state, $this->postcode,
+								$this->companyType, $this->companySize, $this->expectedGrowth);
 						$stmt->execute();
 						$objectId = $stmt->insert_id;
 					} 
@@ -113,19 +152,37 @@
 				$sql .= " UserId = ?,";
 				$sql .= " CompanyName = ?,";
 				$sql .= " LocationId = ?,";
-				$sql .= " Surname = ?,";
-				$sql .= " Givenname = ?,";
-				$sql .= " Phone = ?,";
-				$sql .= " OtherSurname = ?,";
-				$sql .= " OtherGivenname = ?,";
-				$sql .= " OtherPhone = ?,";
+				$sql .= " Title = ?,";
+				$sql .= " FirstName = ?,";
+				$sql .= " LastName = ?,";
+				$sql .= " PhoneAreaCode = ?,";
+				$sql .= " PhoneNumber = ?,";
+				$sql .= " MobileNumber = ?,";
+				$sql .= " OtherTitle = ?,";
+				$sql .= " OtherFirstName = ?,";
+				$sql .= " OtherLastName = ?,";
+				$sql .= " OtherPhoneAreaCode = ?,";
+				$sql .= " OtherPhoneNumber = ?,";
+				$sql .= " Address1 = ?,";
+				$sql .= " Address2 = ?,";
+				$sql .= " City = ?,";
+				$sql .= " State = ?,";
+				$sql .= " Postcode = ?,";
+				$sql .= " CompanyType = ?,";
+				$sql .= " CompanySize = ?,";
+				$sql .= " ExpectedGrowth = ?,";
 				$sql .= " Modified = UTC_TIMESTAMP()";
 				$sql .= " where EmployerId = ?";
 
 				$conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);	
 				
 				if($stmt = $conn->prepare($sql)) {
-					$stmt->bind_param("isissssssi", $this->userId, $this->companyName, $this->locationId, $this->surname, $this->givenname, $this->phone, $this->otherSurname, $this->otherGivenname, $this->otherPhone, $this->employerId);
+					$stmt->bind_param("isisssssssssssssssssssi", $this->userId, $this->companyName, $this->locationId, 
+							$this->title, $this->firstName, $this->lastName, $this->phoneAreaCode, $this->phoneNumber, $this->mobileNumber,
+							$this->otherTitle, $this->otherFirstName, $this->otherLastName, $this->otherPhoneAreaCode, $this->otherPhoneNumber,
+							$this->address1, $this->address2, $this->city, $this->state, $this->postcode,
+							$this->companyType, $this->companySize, $this->expectedGrowth,
+							$this->employerId);
 					$stmt->execute();
 				} 
 				else {
@@ -147,7 +204,7 @@
 		public static function GetEmployerByUserId($userId) 
 		{
 			
-			$sql = "select EmployerId from Employer where UserId = ?";
+			$sql = "select EmployerId from employer where UserId = ?";
 				
 			$conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);
 			
@@ -167,6 +224,33 @@
 			return null;
 			
 		}
+		
+		
+		public static function GetTitles() 
+		{
+			return array("Mr", "Ms", "Miss", "Mrs", "Dr");
+		}
+		
+		public static function GetStates() 
+		{
+			return array("ACT", "NSW", "NT", "QLD", "SA", "TAS", "VIC", "WA");
+		}
+		
+		public static function GetCompanyTypes() 
+		{
+			return array("Accountancy", "Health", "Information Technology", "Marketing", "Sales");
+		}
+
+		public static function GetCompanySizes() 
+		{
+			return array("0-9", "10-49", "50-99", "100-499", "500-999", "1000-9999", "10000+");
+		}
+		
+		public static function GetExpectedGrowths() 
+		{
+			return array("1-4", "5-9", "10-19", "20-49", "50+");
+		}
+
 	
 	
 	}

@@ -65,6 +65,12 @@ footer {
     border-color: #070923;	
 }
 
+.form-section {
+	font-weight: bold;
+	margin: 30px 0 10px 0;
+	color: #0a1933;
+}
+
 
 /*
 	Image source: https://www.pexels.com/photo/photo-of-group-of-people-in-a-meeting-1661004/
