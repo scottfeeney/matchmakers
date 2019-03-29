@@ -88,7 +88,7 @@
 		}
 		
 		if ($phoneAreaCode == "") {
-			$errorMessages[] = "Please enter your Phone Area Code";
+			$errorMessages[] = "Please enter your Area Code";
 		}
 		
 		if ($phoneNumber == "") {
@@ -247,7 +247,7 @@
 			
 			<p>Please enter your details below.</p>
 			
-			<form action="employer_details.php" method="post">
+			<form action="employer_details.php" method="post" class="needs-validation" novalidate>
 			
 				<input type="hidden" name="SubmitForm" value="1">
 				
@@ -267,18 +267,21 @@
 									<option value="<?php echo $titleItem; ?>" <?php if ($titleItem == $title) {echo "selected";} ?>><?php echo $titleItem; ?></option>
 								<?php } ?>
 							</select>
+							<div class="invalid-feedback">Please select your Title</div>
 						</div>
 					</div>
 					<div class="col-sm-5">
 						<div class="form-group">
 							<label for="FirstName">*First Name:</label>
 							<input type="text" class="form-control" name="FirstName" id="FirstName" maxlength="50" value="<?php echo htmlspecialchars($firstName) ?>" required>
+							<div class="invalid-feedback">Please enter your First Name</div>
 						</div>
 					</div>
 					<div class="col-sm-5">
 						<div class="form-group">
 							<label for="LastName">*Last Name:</label>
 							<input type="text" class="form-control" name="LastName" id="LastName" maxlength="50" value="<?php echo htmlspecialchars($lastName) ?>" required>
+							<div class="invalid-feedback">Please enter your Last Name</div>
 						</div>
 					</div>
 				</div>
@@ -288,18 +291,21 @@
 						<div class="form-group">
 							<label for="PhoneAreaCode">*Area Code:</label>
 							<input type="tel" class="form-control" name="PhoneAreaCode" id="PhoneAreaCode" maxlength="2" value="<?php echo htmlspecialchars($phoneAreaCode) ?>" required>
+							<div class="invalid-feedback">Please enter your Area Code</div>
 						</div>
 					</div>
 					<div class="col-sm-10">
 						<div class="form-group">
 							<label for="PhoneNumber">*Phone Number:</label>
 							<input type="tel" class="form-control" name="PhoneNumber" id="PhoneNumber" maxlength="8" value="<?php echo htmlspecialchars($phoneNumber) ?>" required>
+							<div class="invalid-feedback">Please enter your Phone Number</div>
 						</div>
 					</div>
 				</div>
 				<div class="form-group">
 					<label for="PhoneNumber">*Mobile Number:</label>
 					<input type="tel" class="form-control" name="MobileNumber" id="MobileNumber" maxlength="10" value="<?php echo htmlspecialchars($mobileNumber) ?>" required>
+					<div class="invalid-feedback">Please enter your Mobile Number</div>
 				</div>
 				
 				<div class="form-section">Company Details</div>
@@ -307,6 +313,7 @@
 				<div class="form-group">
 					<label for="CompanyName">*Company Name:</label>
 					<input type="text" class="form-control" name="CompanyName" id="CompanyName" maxlength="100" value="<?php echo htmlspecialchars($companyName) ?>"  required>
+					<div class="invalid-feedback">Please enter a Company Name</div>
 				</div>
 				
 				<div class="form-group">
@@ -317,6 +324,7 @@
 							<option value="<?php echo $companyTypeItem; ?>" <?php if ($companyTypeItem == $companyType) {echo "selected";} ?>><?php echo $companyTypeItem; ?></option>
 						<?php } ?>
 					</select>
+					<div class="invalid-feedback">Please select a Company Type</div>
 				</div>
 				
 				<div class="form-group">
@@ -327,6 +335,7 @@
 							<option value="<?php echo $companySizeItem; ?>" <?php if ($companySizeItem == $companySize) {echo "selected";} ?>><?php echo $companySizeItem; ?></option>
 						<?php } ?>
 					</select>
+					<div class="invalid-feedback">Please select a Company Size</div>
 				</div>
 				
 				<div class="form-group">
@@ -337,6 +346,7 @@
 							<option value="<?php echo $expectedGrowthItem; ?>" <?php if ($expectedGrowthItem == $expectedGrowth) {echo "selected";} ?>><?php echo $expectedGrowthItem; ?></option>
 						<?php } ?>
 					</select>
+					<div class="invalid-feedback">Please select an Expected Growth</div>
 				</div>
 				
 				<div class="form-group">
@@ -347,6 +357,7 @@
 							<option value="<?php echo $location->locationId; ?>" <?php if ($location->locationId == $locationId) {echo "selected";} ?>><?php echo $location->name; ?></option>
 						<?php } ?>
 					</select>
+					<div class="invalid-feedback">Please select a Location</div>
 				</div>
 				
 				<div class="form-section">Address</div>
@@ -354,6 +365,7 @@
 				<div class="form-group">
 					<label for="Address1">*Street Address 1:</label>
 					<input type="text" class="form-control" name="Address1" id="Address1" maxlength="100" value="<?php echo htmlspecialchars($address1) ?>" required>
+					<div class="invalid-feedback">Please enter a Street Address 1</div>
 				</div>
 				
 				<div class="form-group">
@@ -366,6 +378,7 @@
 						<div class="form-group">
 							<label for="City">*City:</label>
 							<input type="text" class="form-control" name="City" id="City" maxlength="100" value="<?php echo htmlspecialchars($city) ?>" required>
+							<div class="invalid-feedback">Please enter a City</div>
 						</div>
 					</div>
 					<div class="col-sm-3">
@@ -377,12 +390,14 @@
 									<option value="<?php echo $stateItem; ?>" <?php if ($stateItem == $state) {echo "selected";} ?>><?php echo $stateItem; ?></option>
 								<?php } ?>
 							</select>
+							<div class="invalid-feedback">Please select a State</div>
 						</div>
 					</div>
 					<div class="col-sm-3">
 						<div class="form-group">
 							<label for="Postcode">*Postcode:</label>
 							<input type="text" class="form-control" name="Postcode" id="Postcode" maxlength="6" value="<?php echo htmlspecialchars($postcode) ?>" required>
+							<div class="invalid-feedback">Please enter a Postcode</div>
 						</div>
 					</div>
 				</div>				
@@ -436,7 +451,6 @@
 				
 			</form>
 			
-
 		</section>
     
 <?php

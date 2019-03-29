@@ -31,6 +31,7 @@
 		else {
 			
 			session_start();
+			session_unset();
 			$_SESSION["UserId"] = $user->userId;
 			header('Location: home.php');
 			exit;
