@@ -48,52 +48,83 @@
 
 <section>
 	<div class="jumbotron jumbotron-fluid">
+	
 		<div class="container">
+		
 			<div id="about" class="mb-3">
-				<h1>About Job Matcher</h1>
-				<p>Tired of spending hours reading job ads or resumes? Why not let us do it for you? Join today either as an employer or a job seeker, tell us 
-				a bit about you (or your company) and your requirements, and we will do our best to provide you with a list of possible candidates (if you're 
-				an employer) or positions (if you're a job seeker).</p>
+			
+				<div class="row">
 				
-				<h3>How does it work?</h3>
-				<p>Our system uses state of the art matchmaking algorithms to match the skills, experience, location, and desired job type (Full Time, Part Time,
-				etc.) of job seekers to position requirements set by potential employers, in order to find both parties the perfect match!</p>
+					<div class="home-text-spacer"></div>
+				
+					<div class="home-text-content">
+				
+							<h2>About Job Matcher</h2>
+							<p>Tired of spending hours reading job ads or resumes? Why not let us do it for you? Join today either as an employer or a job seeker, tell us 
+							a bit about you (or your company) and your requirements, and we will do our best to provide you with a list of possible candidates (if you're 
+							an employer) or positions (if you're a job seeker).</p>
+						
+					</div>
+					
+					<div class="home-text-spacer"></div>
+					
+					<div class="home-text-content home-text-content-two">
+					
+							<h2>How does it work?</h2>
+							<p>Our system uses state of the art matchmaking algorithms to match the skills, experience, location, and desired job type (Full Time, Part Time,
+							etc.) of job seekers to position requirements set by potential employers, in order to find both parties the perfect match!</p>
+						
+					</div>
+					
+					<div class="home-text-spacer"></div>
+										
+				</div>
+				
 			</div>
 
 			<div class="text-center">
-				<div class="row mb-5">
+				<div class="row mb-5 mt-5">
 					<div class="col-12">
 						<a class="btn btn-primary btn-lg" role="button" href="signup.php">Sign Up</a>
 					</div>
 				</div>
 				
-				<h2>Have an account?</h2>
-				<h3>Login</h3>
-			</div>
+				<h2>Login to your Account</h2>
 
-			<form action="default.php" method="post" class="mt-3">
-				
-				<input type="hidden" name="SubmitForm" value="1">
-				
-				<?php if ($errorMessage != "") { ?>
-					<div class="alert alert-danger" role="alert"><?php echo $errorMessage ?></div>
-				<?php } ?>
-		
-				<div class="form-group">
-					<input type="email" class="form-control" name="Email" id="Email" maxlength="250" placeholder="Email" value="<?php echo htmlspecialchars($email) ?>">
-				</div>
-				
-				<div class="form-group">
-					<input type="password" class="form-control" name="Password" id="Password" maxlength="50" placeholder="Password" value="<?php echo htmlspecialchars($password) ?>">
-				</div>
-				
-				<button type="submit" class="btn btn-success">Login</button>
+			</div>
 			
-			</form>
+			<div class="row">
+			
+				<div class="col-lg-6 ml-lg-auto mr-lg-auto">
 
-			<div class="mt-2 forgot-password">
-				<a href="forgot_password.php">Forgot Your Password?</a>
+					<form action="default.php" method="post" class="mt-3">
+						
+						<input type="hidden" name="SubmitForm" value="1">
+						
+						<?php if ($errorMessage != "") { ?>
+							<div class="alert alert-danger" role="alert"><?php echo $errorMessage ?></div>
+						<?php } ?>
+				
+						<div class="form-group">
+							<input type="email" class="form-control" name="Email" id="Email" maxlength="250" placeholder="Email" value="<?php echo htmlspecialchars($email) ?>">
+						</div>
+						
+						<div class="form-group">
+							<input type="password" class="form-control" name="Password" id="Password" maxlength="50" placeholder="Password" value="<?php echo htmlspecialchars($password) ?>">
+						</div>
+						
+						<button type="submit" class="btn btn-success signin-button">Login</button>
+					
+					</form>
+
+					<div class="mt-2 forgot-password">
+						<a href="forgot_password.php">Forgot Your Password?</a>
+					</div>
+					
+				</div>
+			
 			</div>
+				
 		</div>
 	</div>
 </section>		
