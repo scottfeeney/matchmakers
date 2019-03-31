@@ -6,11 +6,11 @@
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/location.php';
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/employer.php';
 	} else {
-		require_once './wwwroot/utilities/common.php';
-		require_once './wwwroot/classes/header.php';
-		require_once './wwwroot/classes/footer.php';
-		require_once './wwwroot/classes/location.php';
-		require_once './wwwroot/classes/employer.php';
+		require_once './utilities/common.php';
+		require_once './classes/header.php';
+		require_once './classes/footer.php';
+		require_once './classes/location.php';
+		require_once './classes/employer.php';
 	}
 	
 	$user = \Utilities\Common::GetSessionUser();
@@ -91,12 +91,27 @@
 			$errorMessages[] = "Please enter your Area Code";
 		}
 		
+		if(ctype_digit($phoneAreaCode)){
+		}else{$errorMessages[] = "Your area code can only be numbers";
+			$phoneAreaCode = "";
+		}
+		
 		if ($phoneNumber == "") {
 			$errorMessages[] = "Please enter your Phone Number";
 		}
 		
+		if(ctype_digit($phoneNumber)){
+		}else{$errorMessages[] = "Your phone number can only be numbers";
+			$phoneNumber = "";
+		}
+		
 		if ($mobileNumber == "") {
 			$errorMessages[] = "Please enter your Mobile Number";
+		}
+		
+		if(ctype_digit($mobileNumber)){
+		}else{$errorMessages[] = "Your mobile number can only be numbers";
+			$mobileNumber = "";
 		}
 		
 				
@@ -134,6 +149,11 @@
 		
 		if ($postcode == "") {
 			$errorMessages[] = "Please enter a Postcode";
+		}
+		
+		if(ctype_digit($postcode)){
+		}else{$errorMessages[] = "Your post code can only be numbers";
+			$postcode = "";
 		}
 		
 		if (count($errorMessages) == 0) {
