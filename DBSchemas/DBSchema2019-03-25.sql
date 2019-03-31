@@ -24,21 +24,36 @@ DROP TABLE IF EXISTS `employer`;
  SET character_set_client = utf8mb4 ;
 CREATE TABLE `employer` (
   `EmployerId` int(11) NOT NULL AUTO_INCREMENT,
-  `CompanyName` varchar(100) NOT NULL,
-  `Surname` varchar(30) NOT NULL,
-  `givenname` varchar(30) NOT NULL,
-  `UserId` int(11) NOT NULL,
-  `phone` varchar(20) NOT NULL,
-  `otherSurname` varchar(30) DEFAULT NULL,
-  `otherGivenname` varchar(30) DEFAULT NULL,
-  `otherPhone` varchar(20) DEFAULT NULL,
-  `Created` datetime NOT NULL,
-  `Modified` datetime NOT NULL,
+  `UserId` int(11) DEFAULT NULL,
+  `CompanyName` varchar(100) DEFAULT NULL,
+  `LocationId` int(11) DEFAULT NULL,
+  `Title` varchar(10) DEFAULT NULL,
+  `FirstName` varchar(50) DEFAULT NULL,
+  `LastName` varchar(50) DEFAULT NULL,
+  `PhoneAreaCode` varchar(2) DEFAULT NULL,
+  `PhoneNumber` varchar(10) DEFAULT NULL,
+  `MobileNumber` varchar(10) DEFAULT NULL,
+  `OtherTitle` varchar(10) DEFAULT NULL,
+  `OtherFirstName` varchar(50) DEFAULT NULL,
+  `OtherLastName` varchar(50) DEFAULT NULL,
+  `OtherPhoneAreaCode` varchar(2) DEFAULT NULL,
+  `OtherPhoneNumber` varchar(10) DEFAULT NULL,
+  `Address1` varchar(100) DEFAULT NULL,
+  `Address2` varchar(100) DEFAULT NULL,
+  `City` varchar(100) DEFAULT NULL,
+  `State` varchar(10) DEFAULT NULL,
+  `Postcode` varchar(8) DEFAULT NULL,
+  `CompanyType` varchar(50) DEFAULT NULL,
+  `CompanySize` varchar(50) DEFAULT NULL,
+  `ExpectedGrowth` varchar(50) DEFAULT NULL,
+  `Created` datetime DEFAULT NULL,
+  `Modified` datetime DEFAULT NULL,
   PRIMARY KEY (`EmployerId`),
-  UNIQUE KEY `EmployerId_UNIQUE` (`EmployerId`),
-  KEY `UserId_idx` (`UserId`),
-  CONSTRAINT `UserId` FOREIGN KEY (`UserId`) REFERENCES `user` (`UserId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  UNIQUE KEY `idxUserId` (`UserId`),
+  KEY `conLocationId` (`LocationId`),
+  CONSTRAINT `conLocationId` FOREIGN KEY (`LocationId`) REFERENCES `location` (`LocationId`),
+  CONSTRAINT `conUserId` FOREIGN KEY (`UserId`) REFERENCES `user` (`UserId`)
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -51,14 +66,13 @@ DROP TABLE IF EXISTS `location`;
 CREATE TABLE `location` (
   `LocationId` int(11) NOT NULL AUTO_INCREMENT,
   `Name` varchar(45) NOT NULL,
-  `Shortname` varchar(20) NOT NULL,
-  `centreLat` decimal(6,3) NOT NULL,
+  `ShortName` varchar(20) DEFAULT NULL,
+  `centreLat` decimal(6,3) DEFAULT NULL,
   `centreLong` decimal(6,3) DEFAULT NULL,
   PRIMARY KEY (`LocationId`),
   UNIQUE KEY `LocationId_UNIQUE` (`LocationId`),
-  UNIQUE KEY `Name_UNIQUE` (`Name`),
-  UNIQUE KEY `Shortname_UNIQUE` (`Shortname`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  UNIQUE KEY `Name_UNIQUE` (`Name`)
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -73,15 +87,18 @@ CREATE TABLE `user` (
   `UserType` int(11) DEFAULT NULL,
   `Email` varchar(250) DEFAULT NULL,
   `Active` tinyint(1) DEFAULT NULL,
-  `Password` varchar(200) DEFAULT NULL,
+  `Password` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
   `VerifyCode` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
   `Verified` tinyint(1) DEFAULT NULL,
   `EnteredDetails` tinyint(1) DEFAULT NULL,
-  `ResetCode` varchar(36) DEFAULT NULL,
+  `ResetCode` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
   `Created` datetime DEFAULT NULL,
   `Modified` datetime DEFAULT NULL,
-  PRIMARY KEY (`UserId`)
-) ENGINE=InnoDB AUTO_INCREMENT=36 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  PRIMARY KEY (`UserId`),
+  UNIQUE KEY `idxEmail` (`Email`),
+  KEY `idxVerifyCode` (`VerifyCode`),
+  KEY `idxResetCode` (`ResetCode`)
+) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
