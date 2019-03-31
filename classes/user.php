@@ -7,8 +7,8 @@
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/config.php';
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/object_save.php';
 	} else {
-		require_once './wwwroot/config.php';
-		require_once './wwwroot/classes/object_save.php';
+		require_once './config.php';
+		require_once './classes/object_save.php';
 	}
 	
 	class User {
@@ -21,6 +21,7 @@
 		public $verified;
 		public $enteredDetails;
 		public $password;
+		public $resetCode;
 		
 		public function __construct($userId = 0) {
 		

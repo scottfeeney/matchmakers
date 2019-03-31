@@ -5,7 +5,7 @@
 	if ($_SERVER['DOCUMENT_ROOT'] != '') {
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/user.php';
 	} else {
-		require_once './wwwroot/classes/user.php';
+		require_once './classes/user.php';
 	}
 	
 	class Common {
