@@ -2,7 +2,39 @@
 
 use PHPUnit\Framework\TestCase;
 
-
+/**
+ * 
+ * List of gotchas for prospective unit test authors:
+ * 
+ * Any code after the first $this->assertXYZ statement in a test function,
+ * will not be executed (unless that code is other $this->assert statements).
+ * 
+ * 
+ * If you have setUp() or tearDown() functions that have a different method
+ * signature than those in this file (INCLUDING the return type hint ': void')
+ * or that don't call the corresponding parent::setUp() or parent::tearDown()
+ * before and after the rest of the code in that function, PHPUnit will silently
+ * fail. No error message or output of any kind.
+ * 
+ * 
+ * echo doesn't work inside of a PHPUnit unit test, as stdout has been redirected.
+ * It seems like the only way to write terminal output when inside a unit test is
+ * by using var_dump.
+ * 
+ * 
+ * Autoloader (which is not part of PHPUnit apparently but is provider by Composer,
+ * the PHP package management framework that PHPUnit was instaled through) needs to
+ * be updated each time a new class is introduced to the class hierarchy in order
+ * for PHPUnit to be aware of it and able to use it in unit tests.
+ * 
+ * 
+ * Found the composer binary (well, batch file) and added to prodUnitTests batch file
+ * in wwwroot directory. Problem of not being able to use PHPUnit for both our version
+ * of the site that exists in that directory AND the version that exists in dev (as
+ * the autloader can only track one of the two class hierarchies at any given time)
+ * remains at this stage.
+ * 
+ */
 
 final class UserTest extends TestCase {
 
@@ -111,6 +143,8 @@ final class UserTest extends TestCase {
     public function testGetUserByVerifyCodeFailure() {
         $oid = $this->saveNewUser();
         $user = new \Classes\User($oid);
+        $user->verified = true;
+        $user->save();
         $this->idsToDelete[] = $oid;
         $this->assertEquals(null, \Classes\User::GetUserByVerifyCode($user->verifyCode));
     }
@@ -138,6 +172,7 @@ final class UserTest extends TestCase {
         $this->idsToDelete[] = $oid;
         $user->verified = true;
         $user->active = true;
+        $user->resetCode = \Utilities\Common::GetGuid();
         $user->save();
         $this->assertEquals($user, \Classes\User::GetUserByResetCode($user->resetCode));
     }
@@ -160,7 +195,25 @@ final class UserTest extends TestCase {
     }
 
     public function testGetUserLogin() {
-        
+        $oid = $this->saveNewUser();
+        $user = new \Classes\User($oid);
+        $this->idsToDelete[] = $oid;
+        $user->verified = true;
+        $user->active = true;
+        $user->password = password_hash("notavery1good+password", PASSWORD_BCRYPT);
+        $user->save();
+        $this->assertEquals($user, \Classes\User::GetUserLogin($user->email, "notavery1good+password"));
+    }
+
+    public function testGetUserLoginFailInvalidPassword() {
+        $oid = $this->saveNewUser();
+        $user = new \Classes\User($oid);
+        $this->idsToDelete[] = $oid;
+        $user->verified = true;
+        $user->active = true;
+        $user->password = password_hash("notavery1good+password", PASSWORD_BCRYPT);
+        $user->save();
+        $this->assertSame(null, \Classes\User::GetUserLogin($user->email, "notthepassword"));
     }
 
     protected function setUp(): void {
@@ -182,6 +235,7 @@ final class UserTest extends TestCase {
                 $result = mysqli_stmt_get_result($stmt);
                 $stmt->close();
             } else {
+                //var_dump
                 var_dump($errorMessage = $conn->errno . ' ' . $conn->error);
             }
         }
