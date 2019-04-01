@@ -64,6 +64,15 @@
 				</div>
 			<?php } ?>	
 
+			
+			<p style="font-size: 2em; color: #ff0000;"><i class="fas fa-user"></i></p>
+			
+			<p style="font-size: 4em; color: #008800;"><i class="fas fa-user"></i></p>
+			
+			<p style="font-size: 2em; color: #0000ff;"><i class="fas fa-car"></i></p>
+			
+			<p style="font-size: 3.5em; color: #000000;"><i class="fas fa-car"></i></p>
+			
 		</section>
     
 <?php
