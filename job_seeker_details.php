@@ -4,9 +4,9 @@
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/header.php';
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/footer.php';
 	} else {
-		require_once './wwwroot/utilities/common.php';
-		require_once './wwwroot/classes/header.php';
-		require_once './wwwroot/classes/footer.php';
+		require_once './utilities/common.php';
+		require_once './classes/header.php';
+		require_once './classes/footer.php';
 	}
 	
 	

@@ -6,7 +6,7 @@
 	if ($_SERVER['DOCUMENT_ROOT'] != '') {
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/config.php';
 	} else {
-		require_once './wwwroot/config.php';
+		require_once './config.php';
 	}
 	
 	class Location {
