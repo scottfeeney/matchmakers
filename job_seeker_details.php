@@ -111,6 +111,11 @@
 			$mobileNumber = "";
 		}
 		
+		if(strlen($mobileNumber) <> 10){
+			$errorMessages[] = "Your mobile number must be 8 digits long";
+			$mobileNumber = "";
+		}
+		
 		// Address validation
 		if ($address1 == "") {
 			$errorMessages[] = "Please enter a Street Address 1";
@@ -131,6 +136,11 @@
 		if(ctype_digit($postcode)){
 		}else{$errorMessages[] = "Your post code can only be numbers";
 			$postcode = "";
+		}
+		
+		if(strlen($postcode) <> 4){
+		$errorMessages[] = "Post code must be 4 digits long";
+			$postcode = "";	
 		}
 		
 		if (count($errorMessages) == 0) {
