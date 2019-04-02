@@ -1,0 +1,104 @@
+<?php
+
+//require_once("UserTest.php"); //to use the static method saveNewUser
+
+use PHPUnit\Framework\TestCase;
+
+
+final class EmployerTest extends TestCase {
+
+    private $uidsToDelete;
+    //private $eidsToDelete;
+
+    public function testConstructor() {
+        $employer = new \Classes\Employer(0);
+        $this->assertSame(0, $employer->employerId);
+    }
+
+    public function testSaveUser() {
+        $oid = UserTest::saveNewUser();
+        $this->uidsToDelete[] = $oid;
+        $employer = new \Classes\Employer(0);
+        $employer->userId = $oid;
+        $oSave = $employer->save();
+        $eid = $oSave->objectId;
+        $employer->employerId = $eid;
+        //$this->eidsToDelete[] = $eid;
+        $this->assertEquals($employer, new \Classes\Employer($eid));
+    }
+
+    public function testEditUser() {
+        $oid = UserTest::saveNewUser();
+        $this->uidsToDelete[] = $oid;
+        $employer = new \Classes\Employer(0);
+        $employer->userId = $oid;
+        $oSave = $employer->save();
+        $eid = $oSave->objectId;
+        $employer = new \Classes\Employer($eid);
+        $employer->firstName = "Bob";
+        $oSave2 = $employer->save();
+        $eid = $oSave->objectId;
+        $this->assertSame($employer->firstName, (new \Classes\Employer($eid))->firstName);
+    }
+
+    public function testGetEmployerByUserIdFailure() {
+        $this->assertSame(null, \Classes\Employer::GetEmployerByUserId(0));
+    }
+
+    public function testGetEmployerByUserId() {
+        $oid = UserTest::saveNewUser();
+        $this->uidsToDelete[] = $oid;
+        $employer = new \Classes\Employer(0);
+        $employer->userId = $oid;
+        $oSave = $employer->save();
+        $eid = $oSave->objectId;
+        $employer->employerId = $eid;
+        $this->assertEquals(\Classes\Employer::GetEmployerByUserId($oid), $employer);
+    }
+
+    protected function setUp(): void {
+        parent::setUp();
+        $this->uidsToDelete = array();
+       // $this->eidsToDelete = array();
+    }
+
+    protected function tearDown(): void {
+        $conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);
+        //var_dump($conn);
+        //var_dump("In cleanup with oid ".$oid);
+        foreach ($this->uidsToDelete as $idd) {
+            $sql = 'delete from employer where userid = ?';
+            if ($stmt = $conn->prepare($sql)) {
+                //var_dump($stmt);
+                $stmt->bind_param("i", $idd);
+                //var_dump("Cleaning up - deleting user with id ".$oid);
+                $stmt->execute();
+                $result = mysqli_stmt_get_result($stmt);
+                $stmt->close();
+            } else {
+                //var_dump
+                var_dump($errorMessage = $conn->errno . ' ' . $conn->error);
+            }
+        }
+        foreach ($this->uidsToDelete as $idd) {
+            $sql = 'delete from user where UserId = ?';
+            if ($stmt = $conn->prepare($sql)) {
+                //var_dump($stmt);
+                $stmt->bind_param("i", $idd);
+                //var_dump("Cleaning up - deleting user with id ".$oid);
+                $stmt->execute();
+                $result = mysqli_stmt_get_result($stmt);
+                $stmt->close();
+            } else {
+                //var_dump
+                var_dump($errorMessage = $conn->errno . ' ' . $conn->error);
+            }
+        }
+        $conn->close();
+        parent::tearDown();
+    }
+
+
+}
+
+?>
