@@ -1,7 +1,5 @@
 <?php
 
-//require_once("UserTest.php"); //to use the static method saveNewUser
-
 use PHPUnit\Framework\TestCase;
 
 
@@ -16,6 +14,12 @@ final class EmployerTest extends TestCase {
     }
 
     public function testSaveUser() {
+        extract($this->createUserAndEmployer());
+        //$this->eidsToDelete[] = $eid;
+        $this->assertEquals($employer, new \Classes\Employer($eid));
+    }
+
+    private function createUserAndEmployer() {
         $oid = UserTest::saveNewUser();
         $this->uidsToDelete[] = $oid;
         $employer = new \Classes\Employer(0);
@@ -23,21 +27,14 @@ final class EmployerTest extends TestCase {
         $oSave = $employer->save();
         $eid = $oSave->objectId;
         $employer->employerId = $eid;
-        //$this->eidsToDelete[] = $eid;
-        $this->assertEquals($employer, new \Classes\Employer($eid));
+        return array('oid' => $oid, 'eid' => $eid, 'employer' => $employer);
     }
 
     public function testEditUser() {
-        $oid = UserTest::saveNewUser();
-        $this->uidsToDelete[] = $oid;
-        $employer = new \Classes\Employer(0);
-        $employer->userId = $oid;
-        $oSave = $employer->save();
-        $eid = $oSave->objectId;
-        $employer = new \Classes\Employer($eid);
+        extract($this->createUserAndEmployer());
         $employer->firstName = "Bob";
         $oSave2 = $employer->save();
-        $eid = $oSave->objectId;
+        $eid = $oSave2->objectId;
         $this->assertSame($employer->firstName, (new \Classes\Employer($eid))->firstName);
     }
 
@@ -46,13 +43,7 @@ final class EmployerTest extends TestCase {
     }
 
     public function testGetEmployerByUserId() {
-        $oid = UserTest::saveNewUser();
-        $this->uidsToDelete[] = $oid;
-        $employer = new \Classes\Employer(0);
-        $employer->userId = $oid;
-        $oSave = $employer->save();
-        $eid = $oSave->objectId;
-        $employer->employerId = $eid;
+        extract($this->createUserAndEmployer());
         $this->assertEquals(\Classes\Employer::GetEmployerByUserId($oid), $employer);
     }
 
