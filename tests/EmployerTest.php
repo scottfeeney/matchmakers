@@ -58,31 +58,19 @@ final class EmployerTest extends TestCase {
         //var_dump($conn);
         //var_dump("In cleanup with oid ".$oid);
         foreach ($this->uidsToDelete as $idd) {
-            $sql = 'delete from employer where userid = ?';
-            if ($stmt = $conn->prepare($sql)) {
-                //var_dump($stmt);
-                $stmt->bind_param("i", $idd);
-                //var_dump("Cleaning up - deleting user with id ".$oid);
-                $stmt->execute();
-                $result = mysqli_stmt_get_result($stmt);
-                $stmt->close();
-            } else {
-                //var_dump
-                var_dump($errorMessage = $conn->errno . ' ' . $conn->error);
-            }
-        }
-        foreach ($this->uidsToDelete as $idd) {
-            $sql = 'delete from user where UserId = ?';
-            if ($stmt = $conn->prepare($sql)) {
-                //var_dump($stmt);
-                $stmt->bind_param("i", $idd);
-                //var_dump("Cleaning up - deleting user with id ".$oid);
-                $stmt->execute();
-                $result = mysqli_stmt_get_result($stmt);
-                $stmt->close();
-            } else {
-                //var_dump
-                var_dump($errorMessage = $conn->errno . ' ' . $conn->error);
+            foreach (array('delete from employer where userid = ?', 'delete from user where UserId = ?') as $sql) {
+            //$sql = 'delete from employer where userid = ?';
+                if ($stmt = $conn->prepare($sql)) {
+                    //var_dump($stmt);
+                    $stmt->bind_param("i", $idd);
+                    //var_dump("Cleaning up - deleting user with id ".$oid);
+                    $stmt->execute();
+                    $result = mysqli_stmt_get_result($stmt);
+                    $stmt->close();
+                } else {
+                    //var_dump
+                    var_dump($errorMessage = $conn->errno . ' ' . $conn->error);
+                }
             }
         }
         $conn->close();
