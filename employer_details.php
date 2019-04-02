@@ -75,6 +75,7 @@
 		$expectedGrowth = \Utilities\Common::GetRequest("ExpectedGrowth");
 
 		
+		
 		if ($title == "") {
 			$errorMessages[] = "Please select your Title";
 		}
@@ -91,13 +92,24 @@
 			$errorMessages[] = "Please enter your Area Code";
 		}
 		
+		if(strlen($phoneAreaCode) <> 2){
+			$errorMessages[] = "Your area code has to be 2 characters (eg 02)";
+			$phoneAreaCode = "";
+		}
+		
 		if(ctype_digit($phoneAreaCode)){
 		}else{$errorMessages[] = "Your area code can only be numbers";
 			$phoneAreaCode = "";
 		}
 		
+		
 		if ($phoneNumber == "") {
 			$errorMessages[] = "Please enter your Phone Number";
+		}
+		
+		if(strlen($phoneNumber) <> 8){
+			$errorMessages[] = "Your phone number must be 8 digits long";
+			$phoneNumber = "";
 		}
 		
 		if(ctype_digit($phoneNumber)){
@@ -111,6 +123,11 @@
 		
 		if(ctype_digit($mobileNumber)){
 		}else{$errorMessages[] = "Your mobile number can only be numbers";
+			$mobileNumber = "";
+		}
+		
+		if(strlen($mobileNumber) <> 10){
+			$errorMessages[] = "Your mobile number must be 8 digits long";
 			$mobileNumber = "";
 		}
 		
@@ -155,6 +172,36 @@
 		}else{$errorMessages[] = "Your post code can only be numbers";
 			$postcode = "";
 		}
+		
+		if(strlen($postcode) <> 4){
+		$errorMessages[] = "Post code must be 4 digits long";
+			$postcode = "";	
+		}
+		
+		if($otherPhoneAreaCode != ''){
+			if(strlen($otherPhoneAreaCode) <> 2){
+				$errorMessages[] = "Your area code has to be 2 characters (eg 02)";
+				$otherPhoneAreaCode = "";
+			}
+			
+			if(ctype_digit($otherPhoneAreaCode)){
+			}else{$errorMessages[] = "Your area code can only be numbers";
+				$otherPhoneAreaCode = "";
+			}
+		}
+		
+		if($otherPhoneNumber != ''){
+			if(strlen($otherPhoneNumber) <> 8){
+				$errorMessages[] = "Your secondary phone number must be 8 digits long";
+				$otherPhoneNumber = "";
+			}
+			
+			if(ctype_digit($otherPhoneNumber)){
+			}else{$errorMessages[] = "Your secondary phone number can only be numbers";
+				$otherPhoneNumber = "";
+			}
+		}
+		
 		
 		if (count($errorMessages) == 0) {
 		
