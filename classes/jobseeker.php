@@ -35,7 +35,7 @@
 			if ($jobSeekerId != 0) {
 			    
 			    // TODO: Update query
-				$sql = "select * from employer where EmployerId = ?";
+				$sql = "select * from jobSeeker where jobSeekerId = ?";
 				
 				$conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);
 				
