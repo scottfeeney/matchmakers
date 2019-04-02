@@ -57,6 +57,11 @@
 
         }
 
+		/**
+		 * 
+		 * Commenting out rather than deleting in case there is ever cause to add
+		 * an admin panel allowing management of the adminStaff records
+
         public function Save() {
 		
 			$errorMessage = "";
@@ -120,7 +125,9 @@
 			//return object
 			return new \Classes\ObjectSave($errorMessage, $objectId);
 		
-		}        
+		}
+		
+		*/
 
     } 
     
