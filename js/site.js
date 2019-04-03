@@ -1,9 +1,9 @@
 $(document).ready(function () {
 	
-	resizeJumbotron();
+	resizePage();
 	
 	$( window ).resize(function() {
-		resizeJumbotron();
+		resizePage();
 	});
 	
 
@@ -26,12 +26,22 @@ $(document).ready(function () {
 		}, false);
 	});
 	
+	$('.jobseeker-currently-studying-field').change(function() {
+		if ($('.jobseeker-currently-studying-field:checked').val() == 'YES') {
+			$('.job-seeker-current-study-level-group').show();
+			//$('.job-seeker-current-study-level-group select').prop('required',true);
+		}
+		else {
+			$('.job-seeker-current-study-level-group').hide();
+			//$('.job-seeker-current-study-level-group select').prop('required',false);
+		}
+	});
 
 });	
 
-function resizeJumbotron() {
+function resizePage() {
+	
 	if ($(".home-page .jumbotron").length > 0) {
 		$(".home-page .jumbotron").css({'height' : $(".main-container").height() + 'px'});
 	}
 }
-

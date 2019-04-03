@@ -29,13 +29,21 @@
 		public $city;
 		public $state;
 		public $postcode;
+		
+		public $fieldOfExpertise;
+		public $ageGroup;
+		public $highestLevelCompleted;
+		public $currentlyStudying;
+		public $currentStudyLevel;
+		public $signUpReason;
+		public $jobChangeSpeed;
 				
 		public function __construct($jobSeekerId = 0) {
         
 			if ($jobSeekerId != 0) {
 			    
 			    // TODO: Update query
-				$sql = "select * from jobSeeker where jobSeekerId = ?";
+				$sql = "select * from job_seeker where JobSeekerId = ?";
 				
 				$conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);
 				
@@ -62,7 +70,6 @@
 		}
 		
 		private static function LoadObject($object, $row) {
-			//$object->employerId = $row['EmployerId'];
 			$object->jobSeekerId = $row['JobSeekerId'];
 			$object->userId = $row['UserId'];
 			
@@ -79,10 +86,20 @@
 			$object->city = $row['City'];
 			$object->state = $row['State'];
 			$object->postcode = $row['Postcode'];
+			
+			$object->fieldOfExpertise = $row['FieldOfExpertise'];
+			$object->ageGroup = $row['AgeGroup'];
+			$object->highestLevelCompleted = $row['HighestLevelCompleted'];
+			$object->currentlyStudying = $row['CurrentlyStudying'];
+			$object->currentStudyLevel = $row['CurrentStudyLevel'];
+			$object->signUpReason = $row['SignUpReason'];
+			$object->jobChangeSpeed = $row['JobChangeSpeed'];
 		}
 		
 	
 		public function Save() {
+			
+
 		
 			$errorMessage = "";
 			$objectId = $this->jobSeekerId;
@@ -93,31 +110,25 @@
 				// Insert jobseeker
 						
 				if ($errorMessage == "") {
-				    // TODO: Update query
-					// Remove CompanyName, LocationId, all OtherX, CompanyType, CompanySize, ExpectedGrowth
-					$sql = "insert into employer";
-					$sql .= " (UserId, CompanyName, LocationId,";
-					$sql .= " Title, FirstName, LastName, PhoneAreaCode, PhoneNumber, MobileNumber,";
-					$sql .= " OtherTitle, OtherFirstName, OtherLastName, OtherPhoneAreaCode, OtherPhoneNumber,";
+
+					$sql = "insert into job_seeker";
+					$sql .= " (UserId, Title, FirstName, LastName, PhoneAreaCode, PhoneNumber, MobileNumber,";
 					$sql .= " Address1, Address2, City, State, Postcode,";
-					$sql .= " CompanyType, CompanySize, ExpectedGrowth,";
+					$sql .= " FieldOfExpertise, AgeGroup, HighestLevelCompleted, CurrentlyStudying, CurrentStudyLevel, SignUpReason, JobChangeSpeed,";
 					$sql .= " Created)";
 					$sql .= " values";
-					$sql .= " (?, ?, ?,";
-					$sql .= " ?, ?, ?, ?, ?, ?,";
+					$sql .= " (?, ?, ?, ?, ?, ?, ?,";
 					$sql .= " ?, ?, ?, ?, ?,";
-					$sql .= " ?, ?, ?, ?, ?,";
-					$sql .= " ?, ?, ?,";
+					$sql .= " ?, ?, ?, ?, ?, ?, ?,";
 					$sql .= " UTC_TIMESTAMP())";
 	
 					$conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);	
 					
 					if($stmt = $conn->prepare($sql)) {
-						$stmt->bind_param("isisssssssssssssssssss", $this->userId, $this->companyName, $this->locationId, 
-								$this->title, $this->firstName, $this->lastName, $this->phoneAreaCode, $this->phoneNumber, $this->mobileNumber,
-								$this->otherTitle, $this->otherFirstName, $this->otherLastName, $this->otherPhoneAreaCode, $this->otherPhoneNumber,
+						$stmt->bind_param("issssssssssssssssss", $this->userId, $this->title, $this->firstName, $this->lastName, $this->phoneAreaCode, $this->phoneNumber, $this->mobileNumber,
 								$this->address1, $this->address2, $this->city, $this->state, $this->postcode,
-								$this->companyType, $this->companySize, $this->expectedGrowth);
+								$this->fieldOfExpertise, $this->ageGroup, $this->highestLevelCompleted, $this->currentlyStudying, $this->currentStudyLevel, $this->signUpReason, $this->jobChangeSpeed
+								);
 						$stmt->execute();
 						$objectId = $stmt->insert_id;
 					} 
@@ -135,45 +146,38 @@
 
 				// Edit job seeker
 				
-				// TODO: Update query
-				// Remove CompanyName, LocationId, all OtherX, CompanyType, CompanySize, ExpectedGrowth
 				
-				$sql = "update employer";
+				$sql = "update job_seeker";
 				$sql .= " set";
 				$sql .= " UserId = ?,";
-				$sql .= " CompanyName = ?,";
-				$sql .= " LocationId = ?,";
 				$sql .= " Title = ?,";
 				$sql .= " FirstName = ?,";
 				$sql .= " LastName = ?,";
 				$sql .= " PhoneAreaCode = ?,";
 				$sql .= " PhoneNumber = ?,";
 				$sql .= " MobileNumber = ?,";
-				$sql .= " OtherTitle = ?,";
-				$sql .= " OtherFirstName = ?,";
-				$sql .= " OtherLastName = ?,";
-				$sql .= " OtherPhoneAreaCode = ?,";
-				$sql .= " OtherPhoneNumber = ?,";
 				$sql .= " Address1 = ?,";
 				$sql .= " Address2 = ?,";
 				$sql .= " City = ?,";
 				$sql .= " State = ?,";
 				$sql .= " Postcode = ?,";
-				$sql .= " CompanyType = ?,";
-				$sql .= " CompanySize = ?,";
-				$sql .= " ExpectedGrowth = ?,";
+				$sql .= " FieldOfExpertise = ?,";
+				$sql .= " AgeGroup = ?,";
+				$sql .= " HighestLevelCompleted = ?,";
+				$sql .= " CurrentlyStudying = ?,";
+				$sql .= " CurrentStudyLevel = ?,";
+				$sql .= " SignUpReason = ?,";
+				$sql .= " JobChangeSpeed = ?,";
 				$sql .= " Modified = UTC_TIMESTAMP()";
-				$sql .= " where EmployerId = ?";
+				$sql .= " where JobSeekerId = ?";
 
 				$conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);	
 				
 				if($stmt = $conn->prepare($sql)) {
-					$stmt->bind_param("isisssssssssssssssssssi", $this->userId, $this->companyName, $this->locationId, 
-							$this->title, $this->firstName, $this->lastName, $this->phoneAreaCode, $this->phoneNumber, $this->mobileNumber,
-							$this->otherTitle, $this->otherFirstName, $this->otherLastName, $this->otherPhoneAreaCode, $this->otherPhoneNumber,
+					$stmt->bind_param("issssssssssssssssssi", $this->userId, $this->title, $this->firstName, $this->lastName, $this->phoneAreaCode, $this->phoneNumber, $this->mobileNumber,
 							$this->address1, $this->address2, $this->city, $this->state, $this->postcode,
-							$this->companyType, $this->companySize, $this->expectedGrowth,
-							$this->employerId);
+							$this->fieldOfExpertise, $this->ageGroup, $this->highestLevelCompleted, $this->currentlyStudying, $this->currentStudyLevel, $this->signUpReason, $this->jobChangeSpeed,
+							$this->jobSeekerId);
 					$stmt->execute();
 				} 
 				else {
@@ -195,7 +199,7 @@
 		public static function GetJobSeekerByUserId($userId) 
 		{
 			// TODO: Update query
-			$sql = "select EmployerId from employer where UserId = ?";
+			$sql = "select JobSeekerId from job_seeker where UserId = ?";
 				
 			$conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);
 			
@@ -227,7 +231,51 @@
 			return array("ACT", "NSW", "NT", "QLD", "SA", "TAS", "VIC", "WA");
 		}
 
+		public static function GetExpertiseFields() 
+		{
+			return array("Accountancy", "Health", "Information Technology", "Marketing", "Sales");
+		}
+		
+		public static function GetAgeGroups() 
+		{
+			return array("18-24", "25-34", "35-49", "50-65", "65+", "Rather Not Say");
+		}
+		
+		public static function GetEducationLevels() 
+		{
+			return array("High School", 
+				"T.A.F.E. or Trade Certificate", 
+				"Diploma", 
+				"Advanced Diploma",
+				"Undergraduate Degree", 
+				"Postgraduate Degree", 
+				"Master's Degree",
+				"Doctorate Degree");
+		}
+		
+		/*public static function GetYesNo() {
+			return array("Yes", "No"); 
+			
+		}*/
+		
+		public static function GetSignupReasons() 
+		{
+			return array("Currently without employment",
+				"Considering a change in the near future", 
+				"Seeing what may be out there");
 	
+		}
+		
+		public static function GetJobChangeSpeeds() 
+		{
+			return array("Immediate",
+				"Within 2 weeks", 
+				"2-4 weeks", 
+				"1-2 months", 
+				"2-6 months",
+				"Other");
+	
+		}
 	
 	}
 	

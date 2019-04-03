@@ -41,6 +41,14 @@
 	$state = "";
 	$postcode = "";
 	
+	$fieldOfExpertise = "";
+	$ageGroup = "";
+	$highestLevelCompleted = "";
+	$currentlyStudying = "NO";
+	$currentStudyLevel = "";
+	$signUpReason = "";
+	$jobChangeSpeed = "";
+	
 	
 	if (\Utilities\Common::IsSubmitForm())
 	{
@@ -58,6 +66,14 @@
 		$city = \Utilities\Common::GetRequest("City");
 		$state = \Utilities\Common::GetRequest("State");
 		$postcode = \Utilities\Common::GetRequest("Postcode");
+		
+		$fieldOfExpertise = \Utilities\Common::GetRequest("FieldOfExpertise");
+		$ageGroup = \Utilities\Common::GetRequest("AgeGroup");
+		$highestLevelCompleted = \Utilities\Common::GetRequest("HighestLevelCompleted");
+		$currentlyStudying = \Utilities\Common::GetRequest("CurrentlyStudying");
+		$currentStudyLevel = \Utilities\Common::GetRequest("CurrentStudyLevel");
+		$signUpReason = \Utilities\Common::GetRequest("SignUpReason");
+		$jobChangeSpeed = \Utilities\Common::GetRequest("JobChangeSpeed");
 
 		// Name/Title validation
 		if ($title == "") {
@@ -143,6 +159,37 @@
 			$postcode = "";	
 		}
 		
+		
+		if ($fieldOfExpertise == "") {
+			$errorMessages[] = "Please enter a Field of Expertise";
+		}
+		
+		if ($ageGroup == "") {
+			$errorMessages[] = "Please enter an Age Group";
+		}
+		
+		if ($highestLevelCompleted == "") {
+			$errorMessages[] = "Please enter a Highest level of education completed";
+		}
+		
+		if (strtoupper($currentlyStudying) == "YES") {
+			if ($currentStudyLevel == "") {
+				$errorMessages[] = "Please enter a Level of current study";
+			}
+		}
+		
+		if ($signUpReason == "") {
+			$errorMessages[] = "Please enter a Reason for Sign-up";
+		}
+		
+		if ($jobChangeSpeed == "") {
+			$errorMessages[] = "Please enter a Speed of job change";
+		}
+		
+
+		
+		
+		
 		if (count($errorMessages) == 0) {
 		
 			// save job seeker
@@ -164,6 +211,13 @@
 			$jobSeeker->city = $city;
 			$jobSeeker->state = $state;
 			$jobSeeker->postcode = $postcode;
+			$jobSeeker->fieldOfExpertise = $fieldOfExpertise;
+			$jobSeeker->ageGroup = $ageGroup;
+			$jobSeeker->highestLevelCompleted = $highestLevelCompleted;
+			$jobSeeker->currentlyStudying = (strtoupper($currentlyStudying) == "YES" ? "YES" : "NO");
+			$jobSeeker->currentStudyLevel = (strtoupper($currentlyStudying) == "YES" ? $currentStudyLevel : "");
+			$jobSeeker->signUpReason = $signUpReason;
+			$jobSeeker->jobChangeSpeed = $jobChangeSpeed;
 			$objectSave = $jobSeeker->Save();
 			
 			if ($objectSave->hasError) {
@@ -209,17 +263,26 @@
 			$city = $jobSeeker->city;
 			$state = $jobSeeker->state;
 			$postcode = $jobSeeker->postcode;
-			
+			$fieldOfExpertise = $jobSeeker->fieldOfExpertise;
+			$ageGroup = $jobSeeker->ageGroup;
+			$highestLevelCompleted = $jobSeeker->highestLevelCompleted;
+			$currentlyStudying = $jobSeeker->currentlyStudying;
+			$currentStudyLevel = $jobSeeker->currentStudyLevel;
+			$signUpReason = $jobSeeker->signUpReason;
+			$jobChangeSpeed = $jobSeeker->jobChangeSpeed;
 		}
 	}
 	
 	//get arrys list for dropdown
-	//$locations = \Classes\Location::GetLocations();
+
 	$titles = \Classes\JobSeeker::GetTitles() ;
 	$states = \Classes\JobSeeker::GetStates() ;
-	// $companyTypes = \Classes\Employer::GetCompanyTypes() ;
-	// $companySizes = \Classes\Employer::GetCompanySizes() ;
-	// $expectedGrowths = \Classes\Employer::GetExpectedGrowths() ;
+	$expertiseFields =	\Classes\JobSeeker::GetExpertiseFields();
+	$ageGroups = \Classes\JobSeeker::GetAgeGroups();
+	$educationLevels = \Classes\JobSeeker::GetEducationLevels();
+	$signupReasons = \Classes\JobSeeker::GetSignupReasons();
+	$jobChangeSpeeds = \Classes\JobSeeker::GetJobChangeSpeeds();
+	
 	
 	
 	$header = new \Template\Header();
@@ -335,6 +398,88 @@
 							<div class="invalid-feedback">Please enter a Postcode</div>
 						</div>
 					</div>
+				</div>
+				
+				<div class="form-section">Additional Info</div>
+				
+				<div class="form-group">
+					<label for="FieldOfExpertise">*Field of Expertise:</label>
+					<select name="FieldOfExpertise" id="FieldOfExpertise" class="form-control" required>
+						<option value=""></option>
+						<?php foreach ($expertiseFields as $expertiseFieldItem) { ?>
+							<option value="<?php echo $expertiseFieldItem; ?>" <?php if ($expertiseFieldItem == $fieldOfExpertise) {echo "selected";} ?>><?php echo $expertiseFieldItem; ?></option>
+						<?php } ?>
+					</select>
+					<div class="invalid-feedback">Please select a Field of Expertise</div>
+				</div>
+				
+				<div class="form-group">
+					<label for="AgeGroup">*Age Group:</label>
+					<select name="AgeGroup" id="AgeGroup" class="form-control" required>
+						<option value=""></option>
+						<?php foreach ($ageGroups as $ageGroupItem) { ?>
+							<option value="<?php echo $ageGroupItem; ?>" <?php if ($ageGroupItem == $ageGroup) {echo "selected";} ?>><?php echo $ageGroupItem; ?></option>
+						<?php } ?>
+					</select>
+					<div class="invalid-feedback">Please select an Age Group</div>
+				</div>
+				
+				<div class="form-group">
+					<label for="HighestLevelCompleted">*Highest level of education completed:</label>
+					<select name="HighestLevelCompleted" id="HighestLevelCompleted" class="form-control" required>
+						<option value=""></option>
+						<?php foreach ($educationLevels as $educationLevelItem) { ?>
+							<option value="<?php echo $educationLevelItem; ?>" <?php if ($educationLevelItem == $highestLevelCompleted) {echo "selected";} ?>><?php echo $educationLevelItem; ?></option>
+						<?php } ?>
+					</select>
+					<div class="invalid-feedback">Please select a Highest level of education completed</div>
+				</div>
+				
+				<div class="form-group">
+					<label>*Currently studying:</label>
+					<div class="form-check-inline">
+					  <label class="form-check-label">
+						<input type="radio" class="form-check-input jobseeker-currently-studying-field" name="CurrentlyStudying" value="YES" <?php if ($currentlyStudying == "YES") { echo "checked"; } ?>> Yes
+					  </label>
+					</div>
+					<div class="form-check-inline">
+					  <label class="form-check-label">
+						<input type="radio" class="form-check-input jobseeker-currently-studying-field" name="CurrentlyStudying" value="NO" <?php if ($currentlyStudying != "YES") { echo "checked"; } ?>> No
+					  </label>
+					</div>
+				</div>
+				
+				<div class="form-group job-seeker-current-study-level-group" <?php if ($currentlyStudying != "YES") { echo "style=\"display: none;\""; } ?>>
+					<label for="CurrentStudyLevel">*Level of current study:</label>
+					<select name="CurrentStudyLevel" id="CurrentStudyLevel" class="form-control">
+						<option value=""></option>
+						<?php foreach ($educationLevels as $educationLevelItem) { ?>
+							<option value="<?php echo $educationLevelItem; ?>" <?php if ($educationLevelItem == $currentStudyLevel) {echo "selected";} ?>><?php echo $educationLevelItem; ?></option>
+						<?php } ?>
+					</select>
+					<div class="invalid-feedback">Please select a Level of current study</div>
+				</div>
+				
+				<div class="form-group">
+					<label for="SignUpReason">*Reason for Sign-up:</label>
+					<select name="SignUpReason" id="SignUpReason" class="form-control" required>
+						<option value=""></option>
+						<?php foreach ($signupReasons as $signupReasonItem) { ?>
+							<option value="<?php echo $signupReasonItem; ?>" <?php if ($signupReasonItem == $signUpReason) {echo "selected";} ?>><?php echo $signupReasonItem; ?></option>
+						<?php } ?>
+					</select>
+					<div class="invalid-feedback">Please select a Reason for Sign-up</div>
+				</div>
+				
+				<div class="form-group">
+					<label for="JobChangeSpeed">*Speed of job change:</label>
+					<select name="JobChangeSpeed" id="JobChangeSpeed" class="form-control" required>
+						<option value=""></option>
+						<?php foreach ($jobChangeSpeeds as $jobChangeSpeedItem) { ?>
+							<option value="<?php echo $jobChangeSpeedItem; ?>" <?php if ($jobChangeSpeedItem == $jobChangeSpeed) {echo "selected";} ?>><?php echo $jobChangeSpeedItem; ?></option>
+						<?php } ?>
+					</select>
+					<div class="invalid-feedback">Please select a Speed of job change</div>
 				</div>
 				
 				<div class="form-section">Skills</div>
