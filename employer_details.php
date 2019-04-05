@@ -361,70 +361,84 @@
 							<div class="invalid-feedback">Please enter your Area Code</div>
 						</div>
 					</div>
-					<div class="col-sm-10">
+					<div class="col-sm-5">
 						<div class="form-group">
 							<label for="PhoneNumber">*Phone Number:</label>
 							<input type="tel" class="form-control" name="PhoneNumber" id="PhoneNumber" maxlength="8" value="<?php echo htmlspecialchars($phoneNumber) ?>" required>
 							<div class="invalid-feedback">Please enter your Phone Number</div>
 						</div>
 					</div>
-				</div>
-				<div class="form-group">
-					<label for="PhoneNumber">*Mobile Number:</label>
-					<input type="tel" class="form-control" name="MobileNumber" id="MobileNumber" maxlength="10" value="<?php echo htmlspecialchars($mobileNumber) ?>" required>
-					<div class="invalid-feedback">Please enter your Mobile Number</div>
+					<div class="col-sm-5">
+						<div class="form-group">
+							<label for="PhoneNumber">*Mobile Number:</label>
+							<input type="tel" class="form-control" name="MobileNumber" id="MobileNumber" maxlength="10" value="<?php echo htmlspecialchars($mobileNumber) ?>" required>
+							<div class="invalid-feedback">Please enter your Mobile Number</div>
+						</div>
+					</div>
 				</div>
 				
 				<div class="form-section">Company Details</div>
 				
-				<div class="form-group">
-					<label for="CompanyName">*Company Name:</label>
-					<input type="text" class="form-control" name="CompanyName" id="CompanyName" maxlength="100" value="<?php echo htmlspecialchars($companyName) ?>"  required>
-					<div class="invalid-feedback">Please enter a Company Name</div>
+				<div class="row">
+					<div class="col-sm-6">
+						<div class="form-group">
+							<label for="CompanyName">*Company Name:</label>
+							<input type="text" class="form-control" name="CompanyName" id="CompanyName" maxlength="100" value="<?php echo htmlspecialchars($companyName) ?>"  required>
+							<div class="invalid-feedback">Please enter a Company Name</div>
+						</div>
+					</div>
+					<div class="col-sm-6">
+						<div class="form-group">
+							<label for="CompanyType">*Company Type:</label>
+							<select name="CompanyType" id="CompanyType" class="form-control" required>
+								<option value=""></option>
+								<?php foreach ($companyTypes as $companyTypeItem) { ?>
+									<option value="<?php echo $companyTypeItem; ?>" <?php if ($companyTypeItem == $companyType) {echo "selected";} ?>><?php echo $companyTypeItem; ?></option>
+								<?php } ?>
+							</select>
+							<div class="invalid-feedback">Please select a Company Type</div>
+						</div>
+					</div>
 				</div>
-				
-				<div class="form-group">
-					<label for="CompanyType">*Company Type:</label>
-					<select name="CompanyType" id="CompanyType" class="form-control" required>
-						<option value=""></option>
-						<?php foreach ($companyTypes as $companyTypeItem) { ?>
-							<option value="<?php echo $companyTypeItem; ?>" <?php if ($companyTypeItem == $companyType) {echo "selected";} ?>><?php echo $companyTypeItem; ?></option>
-						<?php } ?>
-					</select>
-					<div class="invalid-feedback">Please select a Company Type</div>
+				<div class="row">
+					<div class="col-sm-6">
+						<div class="form-group">
+							<label for="CompanySize">*Company Size:</label>
+							<select name="CompanySize" id="CompanySize" class="form-control" required>
+								<option value=""></option>
+								<?php foreach ($companySizes as $companySizeItem) { ?>
+									<option value="<?php echo $companySizeItem; ?>" <?php if ($companySizeItem == $companySize) {echo "selected";} ?>><?php echo $companySizeItem; ?></option>
+								<?php } ?>
+							</select>
+							<div class="invalid-feedback">Please select a Company Size</div>
+						</div>
+					</div>
+					<div class="col-sm-6">
+						<div class="form-group">
+							<label for="ExpectedGrowth">*Expected Growth Next 12 Months:</label>
+							<select name="ExpectedGrowth" id="ExpectedGrowth" class="form-control" required>
+								<option value=""></option>
+								<?php foreach ($expectedGrowths as $expectedGrowthItem) { ?>
+									<option value="<?php echo $expectedGrowthItem; ?>" <?php if ($expectedGrowthItem == $expectedGrowth) {echo "selected";} ?>><?php echo $expectedGrowthItem; ?></option>
+								<?php } ?>
+							</select>
+							<div class="invalid-feedback">Please select an Expected Growth</div>
+						</div>
+					</div>
 				</div>
-				
-				<div class="form-group">
-					<label for="CompanySize">*Company Size:</label>
-					<select name="CompanySize" id="CompanySize" class="form-control" required>
-						<option value=""></option>
-						<?php foreach ($companySizes as $companySizeItem) { ?>
-							<option value="<?php echo $companySizeItem; ?>" <?php if ($companySizeItem == $companySize) {echo "selected";} ?>><?php echo $companySizeItem; ?></option>
-						<?php } ?>
-					</select>
-					<div class="invalid-feedback">Please select a Company Size</div>
-				</div>
-				
-				<div class="form-group">
-					<label for="ExpectedGrowth">*Expected Growth Next 12 Months:</label>
-					<select name="ExpectedGrowth" id="ExpectedGrowth" class="form-control" required>
-						<option value=""></option>
-						<?php foreach ($expectedGrowths as $expectedGrowthItem) { ?>
-							<option value="<?php echo $expectedGrowthItem; ?>" <?php if ($expectedGrowthItem == $expectedGrowth) {echo "selected";} ?>><?php echo $expectedGrowthItem; ?></option>
-						<?php } ?>
-					</select>
-					<div class="invalid-feedback">Please select an Expected Growth</div>
-				</div>
-				
-				<div class="form-group">
-					<label for="Location">*Location:</label>
-					<select name="LocationId" id="LocationId" class="form-control" required>
-						<option value=""></option>
-						<?php foreach ($locations as $location) { ?>
-							<option value="<?php echo $location->locationId; ?>" <?php if ($location->locationId == $locationId) {echo "selected";} ?>><?php echo $location->name; ?></option>
-						<?php } ?>
-					</select>
-					<div class="invalid-feedback">Please select a Location</div>
+				<div class="row">
+					<div class="col-sm-6">
+						<div class="form-group">
+							<label for="Location">*Location:</label>
+							<select name="LocationId" id="LocationId" class="form-control" required>
+								<option value=""></option>
+								<?php foreach ($locations as $location) { ?>
+									<option value="<?php echo $location->locationId; ?>" <?php if ($location->locationId == $locationId) {echo "selected";} ?>><?php echo $location->name; ?></option>
+								<?php } ?>
+							</select>
+							<div class="invalid-feedback">Please select a Location</div>
+						</div>
+					</div>
 				</div>
 				
 				<div class="form-section">Address</div>
@@ -504,7 +518,7 @@
 							<input type="tel" class="form-control" name="OtherPhoneAreaCode" id="OtherPhoneAreaCode" maxlength="2" value="<?php echo htmlspecialchars($otherPhoneAreaCode) ?>">
 						</div>
 					</div>
-					<div class="col-sm-10">						
+					<div class="col-sm-5">						
 						<div class="form-group">
 							<label for="OtherPhoneNumber">Phone Number:</label>
 							<input type="tel" class="form-control" name="OtherPhoneNumber" id="OtherPhoneNumber" maxlength="8" value="<?php echo htmlspecialchars($otherPhoneNumber) ?>">
