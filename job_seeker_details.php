@@ -49,7 +49,6 @@
 	$signUpReason = "";
 	$jobChangeSpeed = "";
 	
-	
 	if (\Utilities\Common::IsSubmitForm())
 	{
 		//form submitted
@@ -102,7 +101,6 @@
 		}else{$errorMessages[] = "Your area code can only be numbers";
 			$phoneAreaCode = "";
 		}
-		
 		
 		if ($phoneNumber == "") {
 			$errorMessages[] = "Please enter your Phone Number";
@@ -186,10 +184,6 @@
 			$errorMessages[] = "Please enter a Speed of job change";
 		}
 		
-
-		
-		
-		
 		if (count($errorMessages) == 0) {
 		
 			// save job seeker
@@ -237,18 +231,15 @@
 				
 				
 			}
-			
-			
+						
 			if (count($errorMessages) == 0) {
 				//no errors, send to home page;
 				header("Location: home.php");
 				die();	
 			}
-		}	
-		
+		}
 	}
 	else {
-	
 		//first load - load data if employer already saved
 	
 		if ($jobSeeker != null) {
@@ -282,17 +273,13 @@
 	$educationLevels = \Classes\JobSeeker::GetEducationLevels();
 	$signupReasons = \Classes\JobSeeker::GetSignupReasons();
 	$jobChangeSpeeds = \Classes\JobSeeker::GetJobChangeSpeeds();
-	
-	
-	
+
 	$header = new \Template\Header();
 	$header->isSignedIn = true;
 	echo $header->Bind();
-	
 ?>	
 
         <section>
-
 			<h2>Job Seeker Details</h2>
 			
 			<p>Please enter your details below.</p>
@@ -344,18 +331,20 @@
 							<div class="invalid-feedback">Please enter your Area Code</div>
 						</div>
 					</div>
-					<div class="col-sm-10">
+					<div class="col-sm-5">
 						<div class="form-group">
 							<label for="PhoneNumber">*Phone Number:</label>
 							<input type="tel" class="form-control" name="PhoneNumber" id="PhoneNumber" maxlength="8" value="<?php echo htmlspecialchars($phoneNumber) ?>" required>
 							<div class="invalid-feedback">Please enter your Phone Number</div>
 						</div>
 					</div>
-				</div>
-				<div class="form-group">
-					<label for="PhoneNumber">*Mobile Number:</label>
-					<input type="tel" class="form-control" name="MobileNumber" id="MobileNumber" maxlength="10" value="<?php echo htmlspecialchars($mobileNumber) ?>" required>
-					<div class="invalid-feedback">Please enter your Mobile Number</div>
+					<div class="col-sm-5">
+						<div class="form-group">
+							<label for="PhoneNumber">*Mobile Number:</label>
+							<input type="tel" class="form-control" name="MobileNumber" id="MobileNumber" maxlength="10" value="<?php echo htmlspecialchars($mobileNumber) ?>" required>
+							<div class="invalid-feedback">Please enter your Mobile Number</div>
+						</div>
+					</div>
 				</div>
 				
 				<div class="form-section">Address</div>
@@ -401,38 +390,45 @@
 				</div>
 				
 				<div class="form-section">Additional Info</div>
-				
-				<div class="form-group">
-					<label for="FieldOfExpertise">*Field of Expertise:</label>
-					<select name="FieldOfExpertise" id="FieldOfExpertise" class="form-control" required>
-						<option value=""></option>
-						<?php foreach ($expertiseFields as $expertiseFieldItem) { ?>
-							<option value="<?php echo $expertiseFieldItem; ?>" <?php if ($expertiseFieldItem == $fieldOfExpertise) {echo "selected";} ?>><?php echo $expertiseFieldItem; ?></option>
-						<?php } ?>
-					</select>
-					<div class="invalid-feedback">Please select a Field of Expertise</div>
+				<div class="row">
+					<div class="col-sm-6">
+						<div class="form-group">
+							<label for="FieldOfExpertise">*Field of Expertise:</label>
+							<select name="FieldOfExpertise" id="FieldOfExpertise" class="form-control" required>
+								<option value=""></option>
+								<?php foreach ($expertiseFields as $expertiseFieldItem) { ?>
+									<option value="<?php echo $expertiseFieldItem; ?>" <?php if ($expertiseFieldItem == $fieldOfExpertise) {echo "selected";} ?>><?php echo $expertiseFieldItem; ?></option>
+								<?php } ?>
+							</select>
+							<div class="invalid-feedback">Please select a Field of Expertise</div>
+						</div>
+					</div>
+					<div class="col-sm-6">
+						<div class="form-group">
+							<label for="AgeGroup">*Age Group:</label>
+							<select name="AgeGroup" id="AgeGroup" class="form-control" required>
+								<option value=""></option>
+								<?php foreach ($ageGroups as $ageGroupItem) { ?>
+									<option value="<?php echo $ageGroupItem; ?>" <?php if ($ageGroupItem == $ageGroup) {echo "selected";} ?>><?php echo $ageGroupItem; ?></option>
+								<?php } ?>
+							</select>
+							<div class="invalid-feedback">Please select an Age Group</div>
+						</div>
+					</div>
 				</div>
-				
-				<div class="form-group">
-					<label for="AgeGroup">*Age Group:</label>
-					<select name="AgeGroup" id="AgeGroup" class="form-control" required>
-						<option value=""></option>
-						<?php foreach ($ageGroups as $ageGroupItem) { ?>
-							<option value="<?php echo $ageGroupItem; ?>" <?php if ($ageGroupItem == $ageGroup) {echo "selected";} ?>><?php echo $ageGroupItem; ?></option>
-						<?php } ?>
-					</select>
-					<div class="invalid-feedback">Please select an Age Group</div>
-				</div>
-				
-				<div class="form-group">
-					<label for="HighestLevelCompleted">*Highest level of education completed:</label>
-					<select name="HighestLevelCompleted" id="HighestLevelCompleted" class="form-control" required>
-						<option value=""></option>
-						<?php foreach ($educationLevels as $educationLevelItem) { ?>
-							<option value="<?php echo $educationLevelItem; ?>" <?php if ($educationLevelItem == $highestLevelCompleted) {echo "selected";} ?>><?php echo $educationLevelItem; ?></option>
-						<?php } ?>
-					</select>
-					<div class="invalid-feedback">Please select a Highest level of education completed</div>
+				<div class="row">
+					<div class="col-sm-6">
+						<div class="form-group">
+							<label for="HighestLevelCompleted">*Highest level of education completed:</label>
+							<select name="HighestLevelCompleted" id="HighestLevelCompleted" class="form-control" required>
+								<option value=""></option>
+								<?php foreach ($educationLevels as $educationLevelItem) { ?>
+									<option value="<?php echo $educationLevelItem; ?>" <?php if ($educationLevelItem == $highestLevelCompleted) {echo "selected";} ?>><?php echo $educationLevelItem; ?></option>
+								<?php } ?>
+							</select>
+							<div class="invalid-feedback">Please select a Highest level of education completed</div>
+						</div>
+					</div>
 				</div>
 				
 				<div class="form-group">
@@ -448,40 +444,46 @@
 					  </label>
 					</div>
 				</div>
-				
-				<div class="form-group job-seeker-current-study-level-group" <?php if ($currentlyStudying != "YES") { echo "style=\"display: none;\""; } ?>>
-					<label for="CurrentStudyLevel">*Level of current study:</label>
-					<select name="CurrentStudyLevel" id="CurrentStudyLevel" class="form-control">
-						<option value=""></option>
-						<?php foreach ($educationLevels as $educationLevelItem) { ?>
-							<option value="<?php echo $educationLevelItem; ?>" <?php if ($educationLevelItem == $currentStudyLevel) {echo "selected";} ?>><?php echo $educationLevelItem; ?></option>
-						<?php } ?>
-					</select>
-					<div class="invalid-feedback">Please select a Level of current study</div>
+				<div class="row">
+					<div class="col-sm-6">
+						<div class="form-group job-seeker-current-study-level-group" <?php if ($currentlyStudying != "YES") { echo "style=\"display: none;\""; } ?>>
+							<label for="CurrentStudyLevel">*Level of current study:</label>
+							<select name="CurrentStudyLevel" id="CurrentStudyLevel" class="form-control">
+								<option value=""></option>
+								<?php foreach ($educationLevels as $educationLevelItem) { ?>
+									<option value="<?php echo $educationLevelItem; ?>" <?php if ($educationLevelItem == $currentStudyLevel) {echo "selected";} ?>><?php echo $educationLevelItem; ?></option>
+								<?php } ?>
+							</select>
+							<div class="invalid-feedback">Please select a Level of current study</div>
+						</div>
+					</div>
 				</div>
-				
-				<div class="form-group">
-					<label for="SignUpReason">*Reason for Sign-up:</label>
-					<select name="SignUpReason" id="SignUpReason" class="form-control" required>
-						<option value=""></option>
-						<?php foreach ($signupReasons as $signupReasonItem) { ?>
-							<option value="<?php echo $signupReasonItem; ?>" <?php if ($signupReasonItem == $signUpReason) {echo "selected";} ?>><?php echo $signupReasonItem; ?></option>
-						<?php } ?>
-					</select>
-					<div class="invalid-feedback">Please select a Reason for Sign-up</div>
+				<div class="row">
+					<div class="col-sm-6">
+						<div class="form-group">
+							<label for="SignUpReason">*Reason for Sign-up:</label>
+							<select name="SignUpReason" id="SignUpReason" class="form-control" required>
+								<option value=""></option>
+								<?php foreach ($signupReasons as $signupReasonItem) { ?>
+									<option value="<?php echo $signupReasonItem; ?>" <?php if ($signupReasonItem == $signUpReason) {echo "selected";} ?>><?php echo $signupReasonItem; ?></option>
+								<?php } ?>
+							</select>
+							<div class="invalid-feedback">Please select a Reason for Sign-up</div>
+						</div>
+					</div>
+					<div class="col-sm-6">
+						<div class="form-group">
+							<label for="JobChangeSpeed">*Speed of job change:</label>
+							<select name="JobChangeSpeed" id="JobChangeSpeed" class="form-control" required>
+								<option value=""></option>
+								<?php foreach ($jobChangeSpeeds as $jobChangeSpeedItem) { ?>
+									<option value="<?php echo $jobChangeSpeedItem; ?>" <?php if ($jobChangeSpeedItem == $jobChangeSpeed) {echo "selected";} ?>><?php echo $jobChangeSpeedItem; ?></option>
+								<?php } ?>
+							</select>
+							<div class="invalid-feedback">Please select a Speed of job change</div>
+						</div>
+					</div>
 				</div>
-				
-				<div class="form-group">
-					<label for="JobChangeSpeed">*Speed of job change:</label>
-					<select name="JobChangeSpeed" id="JobChangeSpeed" class="form-control" required>
-						<option value=""></option>
-						<?php foreach ($jobChangeSpeeds as $jobChangeSpeedItem) { ?>
-							<option value="<?php echo $jobChangeSpeedItem; ?>" <?php if ($jobChangeSpeedItem == $jobChangeSpeed) {echo "selected";} ?>><?php echo $jobChangeSpeedItem; ?></option>
-						<?php } ?>
-					</select>
-					<div class="invalid-feedback">Please select a Speed of job change</div>
-				</div>
-				
 				<div class="form-section">Skills</div>
 				<h4>Coming Sprint 6</h4>
 				
@@ -491,11 +493,8 @@
 				<div class="form-group mt-3">
 					<button type="submit" class="btn btn-primary">Save</button>  
 				<div>
-				
 			</form>
-			
 		</section>
-    
 <?php
 	$footer = new \Template\Footer();
 	echo $footer->Bind();
