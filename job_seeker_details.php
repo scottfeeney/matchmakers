@@ -473,14 +473,14 @@
 					</div>
 					<div class="col-sm-6">
 						<div class="form-group">
-							<label for="JobChangeSpeed">*Speed of job change:</label>
+							<label for="JobChangeSpeed">*Intended timeframe for switching jobs:</label>
 							<select name="JobChangeSpeed" id="JobChangeSpeed" class="form-control" required>
 								<option value=""></option>
 								<?php foreach ($jobChangeSpeeds as $jobChangeSpeedItem) { ?>
 									<option value="<?php echo $jobChangeSpeedItem; ?>" <?php if ($jobChangeSpeedItem == $jobChangeSpeed) {echo "selected";} ?>><?php echo $jobChangeSpeedItem; ?></option>
 								<?php } ?>
 							</select>
-							<div class="invalid-feedback">Please select a Speed of job change</div>
+							<div class="invalid-feedback">Please select an intended timeframe for switching jobs</div>
 						</div>
 					</div>
 				</div>
