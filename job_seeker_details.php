@@ -107,7 +107,7 @@
 		}
 		
 		if(strlen($phoneNumber) <> 8){
-			$errorMessages[] = "Your phone nuber must be 8 digits long";
+			$errorMessages[] = "Your phone number must be 8 digits long";
 			$phoneNumber = "";
 		}
 		
