@@ -98,7 +98,7 @@
 		}
 		
 		if(ctype_digit($phoneAreaCode)){
-		}else{$errorMessages[] = "Your area code can only be numbers";
+		}else{$errorMessages[] = "Your area code can only contain numbers";
 			$phoneAreaCode = "";
 		}
 		
@@ -148,7 +148,7 @@
 		}
 		
 		if(ctype_digit($postcode)){
-		}else{$errorMessages[] = "Your post code can only be numbers";
+		}else{$errorMessages[] = "Your post code can only contain numbers";
 			$postcode = "";
 		}
 		
@@ -159,29 +159,29 @@
 		
 		
 		if ($fieldOfExpertise == "") {
-			$errorMessages[] = "Please enter a Field of Expertise";
+			$errorMessages[] = "Please select a Field of Expertise";
 		}
 		
 		if ($ageGroup == "") {
-			$errorMessages[] = "Please enter an Age Group";
+			$errorMessages[] = "Please select an Age Group";
 		}
 		
 		if ($highestLevelCompleted == "") {
-			$errorMessages[] = "Please enter a Highest level of education completed";
+			$errorMessages[] = "Please select a Highest level of education completed";
 		}
 		
 		if (strtoupper($currentlyStudying) == "YES") {
 			if ($currentStudyLevel == "") {
-				$errorMessages[] = "Please enter a Level of current study";
+				$errorMessages[] = "Please select a Level of current study";
 			}
 		}
 		
 		if ($signUpReason == "") {
-			$errorMessages[] = "Please enter a Reason for Sign-up";
+			$errorMessages[] = "Please select a Reason for Sign-up";
 		}
 		
 		if ($jobChangeSpeed == "") {
-			$errorMessages[] = "Please enter a Speed of job change";
+			$errorMessages[] = "Please select a Speed of job change";
 		}
 		
 		if (count($errorMessages) == 0) {
