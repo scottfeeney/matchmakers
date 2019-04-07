@@ -15,23 +15,23 @@ final class JobTypeTest extends TestCase {
     }
 
     public function testConstructorValues() {
-        $this->assertSame("Casual", (new \Classes\JobType(1))->jobTypeName);
-        $this->assertSame("Full-time", (new \Classes\JobType(2))->jobTypeName);
-        $this->assertSame("Part-time", (new \Classes\JobType(3))->jobTypeName);
-        $this->assertSame("Contract", (new \Classes\JobType(4))->jobTypeName);
-        $this->assertSame("Temporary", (new \Classes\JobType(5))->jobTypeName);
+        foreach ($this->jobTypes as $index => $jobType) {
+            $this->assertSame($jobType, (new \Classes\JobType($index))->jobTypeName);
+        }
     }
 
     public function testGetJobTypes() {
         //Construct array to compare to, elements in order by jobTypeName as that is 
         //the order criteria in the method being tested's query
-        //Could use usort but we are presuming static jobTypeIds
+
         $compArr = array(   new \Classes\JobType(1),
                             new \Classes\JobType(4),
                             new \Classes\JobType(2),
                             new \Classes\JobType(3),
                             new \Classes\JobType(5));
-        $this->assertEquals($compArr, \Classes\JobType::GetJobTypes());
+        $fromGetJobTypes = \Classes\JobType::GetJobTypes();
+        $this->assertEquals($compArr, $fromGetJobTypes);
+        $this->assertSame(count($compArr), count());
     }
 
 }
