@@ -44,7 +44,7 @@
 			}
 			
 			if ($errorMessage == "" and strlen($password) < 6) {
-				$errorMessage = "Password length must be at least 6 charcaters";
+				$errorMessage = "Password length must be at least 6 characters";
 			}
 			
 			//save user
