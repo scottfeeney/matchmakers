@@ -46,6 +46,9 @@
 			?>
 			
 					<p>Welcome staff member: <?php echo htmlspecialchars($adminStaff->firstName . " " . $adminStaff->lastName) ?>
+					
+					
+					<p><a href="skills_manage.php">Click here</a> to manage skills.</p>
 			
 			
 				<?php } else { ?>

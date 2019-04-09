@@ -193,3 +193,50 @@ footer {
 #dashboard .card:hover{
 	border-color: #0a1933;
 }
+
+
+
+
+
+.manage-skills .main-form, .skill-add-button {
+	display: none;
+}
+
+.skill-add-button {
+	text-align: right;
+	padding-top: 30px;
+}
+
+
+.skill-manage-add-error {
+	text-align: center;
+	color: #ff0000;
+	margin-bottom: 10px;
+}
+
+.skill-manage-skills-loading {
+	display: none;
+	font-size: 3em;
+	text-align: center;
+	padding-top: 60px;
+	
+}
+
+.skill-manage-skills-list {
+	display: none;
+}
+
+.skill-manage-skills-list .card {
+	margin-top: 10px;
+}
+
+.skill-manage-edit-delete {
+	text-align: right;
+}
+
+
+.skill-manage-edit, .skill-manage-delete {
+	margin: 0 6px;
+	display: inline-block;
+	cursor: pointer;
+}
