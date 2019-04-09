@@ -30,7 +30,7 @@
 		// save skill
 		$skill = new \Classes\Skill($skillId);
 		$skill->skillCategoryId = $skillCategoryId;
-		$skill->skillName = $skillName;
+		$skill->skillName = trim($skillName);
 		$objectSave = $skill->Save($user);
 		
 		echo json_encode($objectSave);

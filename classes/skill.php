@@ -18,9 +18,9 @@
 		public $skillName;
 
 		
-		public function __construct($skillCategoryId = 0) {
+		public function __construct($skillId = 0) {
         
-			if ($skillCategoryId != 0) {
+			if ($skillId != 0) {
 			
 				$sql = "select * from skill where SkillId = ?";
 				
@@ -55,24 +55,30 @@
 			$objectId = $this->skillId;
 			
 			
-			if (Skill::GetSkillExists($this)) {
+			if ($this->skillName == "") {
+				$errorMessage = "Please enter a Skill Name";
+			}
+			
+			
+			if ($errorMessage == "" && Skill::GetSkillExists($this)) {
 				$errorMessage = "A skill with the same name already exists in this category";
 			}
 			
+			if ($errorMessage == "") {
 		
-			if ($this->skillId == 0) {
-				
-				// Insert skill
-				
-				if ($errorMessage == "") {
+				if ($this->skillId == 0) {
 					
+					// Insert skill
+					
+					
+						
 					$sql = "insert into skill";
 					$sql .= " (SkillCategoryId, SkillName,";
 					$sql .= " Created, CreatedBy)";
 					$sql .= " values";
 					$sql .= " (?, ?,";
 					$sql .= " UTC_TIMESTAMP(), ?)";
-	
+
 					$conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);	
 					
 					if($stmt = $conn->prepare($sql)) {
@@ -87,34 +93,36 @@
 					$stmt->close();
 					$conn->close();
 				
+					
+				
 				}
-			
-			}
-			else {
-
-				// Edit skill
-				
-				$sql = "update skill";
-				$sql .= " set";
-				$sql .= " SkillCategoryId = ?,";
-				$sql .= " SkillName = ?,";
-				$sql .= " Modified = UTC_TIMESTAMP(),";
-				$sql .= " ModifiedBy = ?";
-				$sql .= " where SkillId = ?";
-
-				$conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);	
-				
-				if($stmt = $conn->prepare($sql)) {
-					$stmt->bind_param("isii", $this->skillCategoryId, $this->skillName, $user->userId, $this->skillId);
-					$stmt->execute();
-				} 
 				else {
-					$errorMessage = $conn->errno . ' ' . $conn->error;
+
+					// Edit skill
+					
+					$sql = "update skill";
+					$sql .= " set";
+					$sql .= " SkillCategoryId = ?,";
+					$sql .= " SkillName = ?,";
+					$sql .= " Modified = UTC_TIMESTAMP(),";
+					$sql .= " ModifiedBy = ?";
+					$sql .= " where SkillId = ?";
+
+					$conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);	
+					
+					if($stmt = $conn->prepare($sql)) {
+						$stmt->bind_param("isii", $this->skillCategoryId, $this->skillName, $user->userId, $this->skillId);
+						$stmt->execute();
+					} 
+					else {
+						$errorMessage = $conn->errno . ' ' . $conn->error;
+					}
+					
+					$stmt->close();
+					$conn->close();
+
 				}
 				
-				$stmt->close();
-				$conn->close();
-
 			}
 			
 			//return object

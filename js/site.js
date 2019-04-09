@@ -80,7 +80,7 @@ $(document).ready(function () {
 			data['SkillName'] = $("#SkillName").val();
 
 
-			console.log(data);
+			//console.log(data);
 			
 			$.ajax({
 				type: 'POST',
@@ -165,6 +165,7 @@ $(document).ready(function () {
 function skillManage(skillId, skillName) {
 	$('#hidSkillId').val(skillId);
 	$('#hidSkillName').val(skillName);
+	//console.log($('#hidSkillId').val(), $('#hidSkillName').val());
 }
 
 function skillDelete(skillId, skillName) {
@@ -182,7 +183,7 @@ function getSkillsByCategory($skillCategoryId) {
 	data['SkillCategoryId'] = $skillCategoryId;
 
 
-	console.log(data);
+	//console.log(data);
 	
 	$.ajax({
 		type: 'POST',
