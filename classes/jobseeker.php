@@ -30,7 +30,8 @@
 		public $state;
 		public $postcode;
 		
-		public $fieldOfExpertise;
+		/*public $fieldOfExpertise;*/
+		public $skillCategoryId;
 		public $ageGroup;
 		public $highestLevelCompleted;
 		public $currentlyStudying;
@@ -38,14 +39,15 @@
 		public $signUpReason;
 		public $jobChangeSpeed;
 		public $jobTypeId;
-		public $jobType;
+		//public $jobType;
+
 				
 		public function __construct($jobSeekerId = 0) {
         
 			if ($jobSeekerId != 0) {
 			    
 			    // TODO: Update query
-				$sql = "select * from job_seeker join jobType on job_seeker.jobTypeId = jobType.jobType where JobSeekerId = ?";
+				$sql = "select * from job_seeker where JobSeekerId = ?";
 				
 				$conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);
 				
@@ -89,7 +91,7 @@
 			$object->state = $row['State'];
 			$object->postcode = $row['Postcode'];
 			
-			$object->fieldOfExpertise = $row['FieldOfExpertise'];
+			$object->skillCategoryId = $row['SkillCategoryId'];
 			$object->ageGroup = $row['AgeGroup'];
 			$object->highestLevelCompleted = $row['HighestLevelCompleted'];
 			$object->currentlyStudying = $row['CurrentlyStudying'];
@@ -97,7 +99,7 @@
 			$object->signUpReason = $row['SignUpReason'];
 			$object->jobChangeSpeed = $row['JobChangeSpeed'];
 			$object->jobTypeId = $row['JobTypeId'];
-			$object->jobType = $row['JobTypeName'];
+			//$object->jobType = $row['JobTypeName'];
 		}
 		
 	
@@ -118,7 +120,7 @@
 					$sql = "insert into job_seeker";
 					$sql .= " (UserId, Title, FirstName, LastName, PhoneAreaCode, PhoneNumber, MobileNumber,";
 					$sql .= " Address1, Address2, City, State, Postcode,";
-					$sql .= " FieldOfExpertise, AgeGroup, HighestLevelCompleted, CurrentlyStudying, CurrentStudyLevel, SignUpReason, JobChangeSpeed, JobTypeId,";
+					$sql .= " SkillCategoryId, AgeGroup, HighestLevelCompleted, CurrentlyStudying, CurrentStudyLevel, SignUpReason, JobChangeSpeed, JobTypeId,";
 					$sql .= " Created)";
 					$sql .= " values";
 					$sql .= " (?, ?, ?, ?, ?, ?, ?,";
@@ -129,9 +131,9 @@
 					$conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);	
 					
 					if($stmt = $conn->prepare($sql)) {
-						$stmt->bind_param("issssssssssssssssssi", $this->userId, $this->title, $this->firstName, $this->lastName, $this->phoneAreaCode, $this->phoneNumber, $this->mobileNumber,
+						$stmt->bind_param("isssssssssssissssssi", $this->userId, $this->title, $this->firstName, $this->lastName, $this->phoneAreaCode, $this->phoneNumber, $this->mobileNumber,
 								$this->address1, $this->address2, $this->city, $this->state, $this->postcode,
-								$this->fieldOfExpertise, $this->ageGroup, $this->highestLevelCompleted, $this->currentlyStudying, $this->currentStudyLevel, $this->signUpReason, $this->jobChangeSpeed, $this->jobTypeId
+								$this->skillCategoryId, $this->ageGroup, $this->highestLevelCompleted, $this->currentlyStudying, $this->currentStudyLevel, $this->signUpReason, $this->jobChangeSpeed, $this->jobTypeId
 								);
 						$stmt->execute();
 						$objectId = $stmt->insert_id;
@@ -165,7 +167,7 @@
 				$sql .= " City = ?,";
 				$sql .= " State = ?,";
 				$sql .= " Postcode = ?,";
-				$sql .= " FieldOfExpertise = ?,";
+				$sql .= " SkillCategoryId = ?,";
 				$sql .= " AgeGroup = ?,";
 				$sql .= " HighestLevelCompleted = ?,";
 				$sql .= " CurrentlyStudying = ?,";
@@ -179,9 +181,9 @@
 				$conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);	
 				
 				if($stmt = $conn->prepare($sql)) {
-					$stmt->bind_param("issssssssssssssssssii", $this->userId, $this->title, $this->firstName, $this->lastName, $this->phoneAreaCode, $this->phoneNumber, $this->mobileNumber,
+					$stmt->bind_param("isssssssssssissssssii", $this->userId, $this->title, $this->firstName, $this->lastName, $this->phoneAreaCode, $this->phoneNumber, $this->mobileNumber,
 							$this->address1, $this->address2, $this->city, $this->state, $this->postcode,
-							$this->fieldOfExpertise, $this->ageGroup, $this->highestLevelCompleted, $this->currentlyStudying, $this->currentStudyLevel, $this->signUpReason, $this->jobChangeSpeed, $this->jobTypeId,
+							$this->skillCategoryId, $this->ageGroup, $this->highestLevelCompleted, $this->currentlyStudying, $this->currentStudyLevel, $this->signUpReason, $this->jobChangeSpeed, $this->jobTypeId,
 							$this->jobSeekerId);
 					$stmt->execute();
 				} 
@@ -236,10 +238,10 @@
 			return array("ACT", "NSW", "NT", "QLD", "SA", "TAS", "VIC", "WA");
 		}
 
-		public static function GetExpertiseFields() 
+		/*public static function GetExpertiseFields() 
 		{
 			return array("Accountancy", "Health", "Information Technology", "Marketing", "Sales");
-		}
+		}*/
 		
 		public static function GetAgeGroups() 
 		{

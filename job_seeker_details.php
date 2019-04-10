@@ -4,12 +4,14 @@
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/header.php';
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/footer.php';
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/location.php';
+		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/skill_category.php';
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/jobseeker.php';
 	} else {
 		require_once './utilities/common.php';
 		require_once './classes/header.php';
 		require_once './classes/footer.php';
 		require_once './classes/location.php';
+		require_once './classes/skill_category.php';
 		require_once './classes/jobseeker.php';
 	}
 	
@@ -41,7 +43,8 @@
 	$state = "";
 	$postcode = "";
 	
-	$fieldOfExpertise = "";
+	//$fieldOfExpertise = "";
+	$skillCategoryId = 0;
 	$ageGroup = "";
 	$highestLevelCompleted = "";
 	$currentlyStudying = "NO";
@@ -66,7 +69,8 @@
 		$state = \Utilities\Common::GetRequest("State");
 		$postcode = \Utilities\Common::GetRequest("Postcode");
 		
-		$fieldOfExpertise = \Utilities\Common::GetRequest("FieldOfExpertise");
+		//$fieldOfExpertise = \Utilities\Common::GetRequest("FieldOfExpertise");
+		$skillCategoryId = \Utilities\Common::GetRequest("SkillCategoryId");
 		$ageGroup = \Utilities\Common::GetRequest("AgeGroup");
 		$highestLevelCompleted = \Utilities\Common::GetRequest("HighestLevelCompleted");
 		$currentlyStudying = \Utilities\Common::GetRequest("CurrentlyStudying");
@@ -158,7 +162,7 @@
 		}
 		
 		
-		if ($fieldOfExpertise == "") {
+		if ($skillCategoryId == 0) {
 			$errorMessages[] = "Please select a Field of Expertise";
 		}
 		
@@ -205,7 +209,8 @@
 			$jobSeeker->city = $city;
 			$jobSeeker->state = $state;
 			$jobSeeker->postcode = $postcode;
-			$jobSeeker->fieldOfExpertise = $fieldOfExpertise;
+			//$jobSeeker->fieldOfExpertise = $fieldOfExpertise;
+			$jobSeeker->skillCategoryId = $skillCategoryId;
 			$jobSeeker->ageGroup = $ageGroup;
 			$jobSeeker->highestLevelCompleted = $highestLevelCompleted;
 			$jobSeeker->currentlyStudying = (strtoupper($currentlyStudying) == "YES" ? "YES" : "NO");
@@ -254,7 +259,8 @@
 			$city = $jobSeeker->city;
 			$state = $jobSeeker->state;
 			$postcode = $jobSeeker->postcode;
-			$fieldOfExpertise = $jobSeeker->fieldOfExpertise;
+			//$fieldOfExpertise = $jobSeeker->fieldOfExpertise;
+			$skillCategoryId = $jobSeeker->skillCategoryId;
 			$ageGroup = $jobSeeker->ageGroup;
 			$highestLevelCompleted = $jobSeeker->highestLevelCompleted;
 			$currentlyStudying = $jobSeeker->currentlyStudying;
@@ -268,7 +274,8 @@
 
 	$titles = \Classes\JobSeeker::GetTitles() ;
 	$states = \Classes\JobSeeker::GetStates() ;
-	$expertiseFields =	\Classes\JobSeeker::GetExpertiseFields();
+	//$expertiseFields =	\Classes\JobSeeker::GetExpertiseFields();
+	$skillCategories = \Classes\SkillCategory::GetSkillCategories();
 	$ageGroups = \Classes\JobSeeker::GetAgeGroups();
 	$educationLevels = \Classes\JobSeeker::GetEducationLevels();
 	$signupReasons = \Classes\JobSeeker::GetSignupReasons();
@@ -393,11 +400,11 @@
 				<div class="row">
 					<div class="col-sm-6">
 						<div class="form-group">
-							<label for="FieldOfExpertise">*Field of Expertise:</label>
-							<select name="FieldOfExpertise" id="FieldOfExpertise" class="form-control" required>
+							<label for="SkillCategoryId">*Field of Expertise:</label>
+							<select name="SkillCategoryId" id="SkillCategoryId" class="form-control" required>
 								<option value=""></option>
-								<?php foreach ($expertiseFields as $expertiseFieldItem) { ?>
-									<option value="<?php echo $expertiseFieldItem; ?>" <?php if ($expertiseFieldItem == $fieldOfExpertise) {echo "selected";} ?>><?php echo $expertiseFieldItem; ?></option>
+								<?php foreach ($skillCategories as $skillCategory) { ?>
+									<option value="<?php echo $skillCategory->skillCategoryId; ?>" <?php if ($skillCategory->skillCategoryId == $skillCategoryId) {echo "selected";} ?>><?php echo $skillCategory->skillCategoryName; ?></option>
 								<?php } ?>
 							</select>
 							<div class="invalid-feedback">Please select a Field of Expertise</div>
