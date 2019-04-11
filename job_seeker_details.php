@@ -6,6 +6,7 @@
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/location.php';
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/skill_category.php';
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/jobseeker.php';
+		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/job_type.php';
 	} else {
 		require_once './utilities/common.php';
 		require_once './classes/header.php';
@@ -13,6 +14,7 @@
 		require_once './classes/location.php';
 		require_once './classes/skill_category.php';
 		require_once './classes/jobseeker.php';
+		require_once './classes/job_type.php';
 	}
 	
 	$user = \Utilities\Common::GetSessionUser();
@@ -51,6 +53,7 @@
 	$currentStudyLevel = "";
 	$signUpReason = "";
 	$jobChangeSpeed = "";
+	$jobType = "";
 	
 	if (\Utilities\Common::IsSubmitForm())
 	{
@@ -77,6 +80,7 @@
 		$currentStudyLevel = \Utilities\Common::GetRequest("CurrentStudyLevel");
 		$signUpReason = \Utilities\Common::GetRequest("SignUpReason");
 		$jobChangeSpeed = \Utilities\Common::GetRequest("JobChangeSpeed");
+		$jobType = \Utilities\Common::GetRequest("JobType");
 
 		// Name/Title validation
 		if ($title == "") {
@@ -187,6 +191,10 @@
 		if ($jobChangeSpeed == "") {
 			$errorMessages[] = "Please select a Speed of job change";
 		}
+
+		if ($jobType == "") {
+			$errorMessages[] = "Please select a type of work";
+		}
 		
 		if (count($errorMessages) == 0) {
 		
@@ -217,6 +225,7 @@
 			$jobSeeker->currentStudyLevel = (strtoupper($currentlyStudying) == "YES" ? $currentStudyLevel : "");
 			$jobSeeker->signUpReason = $signUpReason;
 			$jobSeeker->jobChangeSpeed = $jobChangeSpeed;
+			$jobSeeker->jobTypeId = $jobType;
 			$objectSave = $jobSeeker->Save();
 			
 			if ($objectSave->hasError) {
@@ -267,6 +276,7 @@
 			$currentStudyLevel = $jobSeeker->currentStudyLevel;
 			$signUpReason = $jobSeeker->signUpReason;
 			$jobChangeSpeed = $jobSeeker->jobChangeSpeed;
+			$jobType = $jobSeeker->jobTypeId;
 		}
 	}
 	
@@ -280,6 +290,7 @@
 	$educationLevels = \Classes\JobSeeker::GetEducationLevels();
 	$signupReasons = \Classes\JobSeeker::GetSignupReasons();
 	$jobChangeSpeeds = \Classes\JobSeeker::GetJobChangeSpeeds();
+	$jobTypes = \Classes\JobType::GetJobTypes();
 
 	$header = new \Template\Header();
 	$header->isSignedIn = true;
@@ -434,6 +445,19 @@
 								<?php } ?>
 							</select>
 							<div class="invalid-feedback">Please select a Highest level of education completed</div>
+						</div>
+					</div>
+					<div class="row">
+					<div class="col-sm-6">
+						<div class="form-group">
+							<label for="jobType">*Type of work sought:</label>
+							<select name="jobType" id="jobType" class="form-control" required>
+								<option value=""></option>
+								<?php foreach ($jobTypes as $currJobType) { ?>
+									<option value="<?php echo $currJobType->jobTypeId; ?>" <?php if ($currJobType->jobTypeId == $jobType) {echo "selected";} ?>><?php echo $currJobType->jobTypeName; ?></option>
+								<?php } ?>
+							</select>
+							<div class="invalid-feedback">Please select a type of work</div>
 						</div>
 					</div>
 				</div>
