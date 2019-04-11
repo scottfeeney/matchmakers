@@ -53,7 +53,7 @@
 	$currentStudyLevel = "";
 	$signUpReason = "";
 	$jobChangeSpeed = "";
-	$jobType = "";
+	$jobTypeId = 0;
 	
 	if (\Utilities\Common::IsSubmitForm())
 	{
@@ -80,7 +80,7 @@
 		$currentStudyLevel = \Utilities\Common::GetRequest("CurrentStudyLevel");
 		$signUpReason = \Utilities\Common::GetRequest("SignUpReason");
 		$jobChangeSpeed = \Utilities\Common::GetRequest("JobChangeSpeed");
-		$jobType = \Utilities\Common::GetRequest("JobType");
+		$jobTypeId = \Utilities\Common::GetRequest("JobTypeId");
 
 		// Name/Title validation
 		if ($title == "") {
@@ -192,7 +192,7 @@
 			$errorMessages[] = "Please select a Speed of job change";
 		}
 
-		if ($jobType == "") {
+		if ($jobTypeId == 0) {
 			$errorMessages[] = "Please select a type of work";
 		}
 		
@@ -225,7 +225,7 @@
 			$jobSeeker->currentStudyLevel = (strtoupper($currentlyStudying) == "YES" ? $currentStudyLevel : "");
 			$jobSeeker->signUpReason = $signUpReason;
 			$jobSeeker->jobChangeSpeed = $jobChangeSpeed;
-			$jobSeeker->jobTypeId = $jobType;
+			$jobSeeker->jobTypeId = $jobTypeId;
 			$objectSave = $jobSeeker->Save();
 			
 			if ($objectSave->hasError) {
@@ -276,7 +276,7 @@
 			$currentStudyLevel = $jobSeeker->currentStudyLevel;
 			$signUpReason = $jobSeeker->signUpReason;
 			$jobChangeSpeed = $jobSeeker->jobChangeSpeed;
-			$jobType = $jobSeeker->jobTypeId;
+			$jobTypeId = $jobSeeker->jobTypeId;
 		}
 	}
 	
@@ -446,14 +446,14 @@
 							</select>
 							<div class="invalid-feedback">Please select a Highest level of education completed</div>
 						</div>
-					</div>
+					</div>currJ
 					<div class="col-sm-6">
 						<div class="form-group">
-							<label for="jobType">*Type of work sought:</label>
-							<select name="jobType" id="jobType" class="form-control" required>
+							<label for="JobTypeId">*Type of work sought:</label>
+							<select name="JobTypeId" id="JobTypeId" class="form-control" required>
 								<option value=""></option>
-								<?php foreach ($jobTypes as $currJobType) { ?>
-									<option value="<?php echo $currJobType->jobTypeId; ?>" <?php if ($currJobType->jobTypeId == $jobType) {echo "selected";} ?>><?php echo $currJobType->jobTypeName; ?></option>
+								<?php foreach ($jobTypes as $jobType) { ?>
+									<option value="<?php echo $jobType->jobTypeId; ?>" <?php if ($jobType->jobTypeId == $jobTypeId) {echo "selected";} ?>><?php echo $jobType->jobTypeName; ?></option>
 								<?php } ?>
 							</select>
 							<div class="invalid-feedback">Please select a type of work</div>
