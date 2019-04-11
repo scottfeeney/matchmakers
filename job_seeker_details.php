@@ -447,7 +447,6 @@
 							<div class="invalid-feedback">Please select a Highest level of education completed</div>
 						</div>
 					</div>
-					<div class="row">
 					<div class="col-sm-6">
 						<div class="form-group">
 							<label for="jobType">*Type of work sought:</label>
