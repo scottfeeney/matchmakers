@@ -62,7 +62,7 @@ final class UserTest extends TestCase {
         $this->assertEquals(true, $objSave->hasError);
     }
 
-    private function saveNewUser() {
+    public static function saveNewUser() {
         $user = new \Classes\User(0);
         $user->userType = 1;
         $user->email = "unit@tester.com";
