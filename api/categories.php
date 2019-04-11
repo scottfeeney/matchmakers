@@ -1,6 +1,6 @@
 <?php
 
-    //namespace api;
+    namespace api;
 
     if ($_SERVER['DOCUMENT_ROOT'] != '') {
         require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/skill_category.php';

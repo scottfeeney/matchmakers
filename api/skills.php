@@ -5,11 +5,11 @@
     if ($_SERVER['DOCUMENT_ROOT'] != '') {
         require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/skill.php';
         require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/skill_category.php';
-        require_once $_SERVER['DOCUMENT_ROOT'] . '/api/error.php';
+        require_once $_SERVER['DOCUMENT_ROOT'] . '/api/api_error.php';
     } else {
         require_once './classes/skill.php';
         require_once './classes/skill_category.php';
-        require_once './api/error.php';
+        require_once './api/api_error.php';
     }
 
 	$rest_json = file_get_contents("php://input");
