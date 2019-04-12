@@ -38,7 +38,7 @@
 	
 		<h2>Manage Skills</h2>
 		
-		<div class="card">
+		<div id="manageSkillSelector" class="card">
 			<div class="card-body">
 				<div class="row">
 					<div class="col-10">
