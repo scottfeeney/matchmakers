@@ -60,10 +60,16 @@
 					<div class="home-text-content">
 				
 							<h2>About Job Matcher</h2>
-							<p>Tired of spending hours reading job ads or resumes? Why not let us do it for you? Join today either as an employer or a job seeker, tell us 
-							a bit about you (or your company) and your requirements, and we will do our best to provide you with a list of possible candidates (if you're 
-							an employer) or positions (if you're a job seeker).</p>
-						
+							<p>Job Matcher matches Employers seeking staff with Job Seekers looking for work. To enable the site to work at its optimum, we have limited our industries to: </p>
+							<ul>
+         						<li>Finance</li>
+         						<li>Health</li>
+         						<li>Information Technology</li>
+         						<li>Marketing</li>
+         						<li>Sales</li>
+      						</ul>
+							<p>Not on the list?  Please check back, we will be adding more very soon. So whether you're an Employer looking for your next star employee, or a Job Seeker after a new challenge, this is the website for you.</p> 
+							<p>Why not <a href="signup.php">Sign Up</a> today?</p>
 					</div>
 					
 					<div class="home-text-spacer"></div>
