@@ -87,7 +87,7 @@ footer {
 	padding: 20px;
 	flex: 0 0 42.5%;
 	max-width: 42.5%;
-	text-align: center;
+	text-align: left;
 }
 
 @media (max-width: 990px)
@@ -196,7 +196,9 @@ footer {
 
 
 
-
+#manageSkillSelector{
+	border-color: #0a1933;
+}
 
 .manage-skills .main-form, .skill-add-button {
 	display: none;

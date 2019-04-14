@@ -240,7 +240,7 @@
 
 		/*public static function GetExpertiseFields() 
 		{
-			return array("Accountancy", "Health", "Information Technology", "Marketing", "Sales");
+			return array("Finance", "Health", "Information Technology", "Marketing", "Sales");
 		}*/
 		
 		public static function GetAgeGroups() 
