@@ -6,6 +6,7 @@ use PHPUnit\Framework\TestCase;
 final class JobSeekerTest extends TestCase {
 
     private $uidsToDelete;
+    private $testEmail = "someJobSeekerEmail@somewhere.com";
 
     public function testConstructor() {
         $jobSeeker = new \Classes\JobSeeker(0);
@@ -13,6 +14,9 @@ final class JobSeekerTest extends TestCase {
     }
 
     public function testSaveUser() {
+        if ($this->createUserAndJobSeeker() == null) {
+            $this->assertTrue(false);
+        }
         extract($this->createUserAndJobSeeker());
         $this->assertEquals($jobSeeker, new \Classes\JobSeeker($jid));
     }
@@ -22,7 +26,7 @@ final class JobSeekerTest extends TestCase {
      */
 
     private function createUserAndJobSeeker() {
-        $oid = UserTest::saveNewUser();
+        $oid = UserTest::saveNewUser($this->testEmail);
         $this->uidsToDelete[] = $oid;
         $jobSeeker = new \Classes\JobSeeker(0);
         $jobSeeker->userId = $oid;
@@ -33,6 +37,9 @@ final class JobSeekerTest extends TestCase {
     }
 
     public function testEditUser() {
+        if ($this->createUserAndJobSeeker() == null) {
+            $this->assertTrue(false);
+        }
         extract($this->createUserAndJobSeeker());
         $jobSeeker->firstName = "Bob";
         $oSave2 = $jobSeeker->save();
@@ -45,7 +52,11 @@ final class JobSeekerTest extends TestCase {
     }
 
     public function testGetJobSeekerByUserId() {
-        extract($this->createUserAndJobSeeker());
+        $result = $this->createUserAndJobSeeker();
+        if ($result == null) {
+            $this->assertTrue(false);
+        }
+        extract($result);
         $this->assertEquals(\Classes\jobSeeker::GetJobSeekerByUserId($oid), $jobSeeker);
     }
 
@@ -66,6 +77,23 @@ final class JobSeekerTest extends TestCase {
                 } else {
                     var_dump($errorMessage = $conn->errno . ' ' . $conn->error);
                 }
+            }
+            $sql = 'delete from job_seeker where userid in (Select userid from user where email = ?)';
+            if ($stmt = $conn->prepare($sql)) {
+                $stmt->bind_param("s", $this->testEmail);
+                $stmt->execute();
+                $result = mysqli_stmt_get_result($stmt);
+                $stmt->close();
+            } else {
+                var_dump($errorMessage = $conn->errno . ' ' . $conn->error);
+            }
+            $sql = 'delete from job_seeker where userid is null';
+            if ($stmt = $conn->prepare($sql)) {
+                $stmt->execute();
+                $result = mysqli_stmt_get_result($stmt);
+                $stmt->close();
+            } else {
+                var_dump($errorMessage = $conn->errno . ' ' . $conn->error);
             }
         }
         $conn->close();

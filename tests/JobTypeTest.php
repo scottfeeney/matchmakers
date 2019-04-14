@@ -31,7 +31,7 @@ final class JobTypeTest extends TestCase {
                             new \Classes\JobType(5));
         $fromGetJobTypes = \Classes\JobType::GetJobTypes();
         $this->assertEquals($compArr, $fromGetJobTypes);
-        $this->assertSame(count($compArr), count());
+        $this->assertSame(count($compArr), count($fromGetJobTypes));
     }
 
 }

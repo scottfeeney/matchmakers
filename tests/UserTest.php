@@ -39,6 +39,8 @@ use PHPUnit\Framework\TestCase;
 final class UserTest extends TestCase {
 
     private $idsToDelete = array();
+    private $testEmails = array(1 => "unit@tester.com", 2 => "reallyunittesting@test.com");
+    private $testPassword = "notavery1good+password";
 
     public function testConstructorUserIdZeroGivenZero() {
         $this->assertEquals(0, (new \Classes\User(0))->userId);
@@ -62,10 +64,10 @@ final class UserTest extends TestCase {
         $this->assertEquals(true, $objSave->hasError);
     }
 
-    public static function saveNewUser() {
+    public static function saveNewUser($email) {
         $user = new \Classes\User(0);
         $user->userType = 1;
-        $user->email = "unit@tester.com";
+        $user->email = $email;
         $user->active = 1;
         $user->password = NULL;
         $user->verified = 0;
@@ -81,9 +83,9 @@ final class UserTest extends TestCase {
     }
 
     public function testUpdateUser() {
-        $oid = $this->saveNewUser();
+        $oid = $this->saveNewUser($this->testEmails[1]);
         $user = new \Classes\User($oid);
-        $user->email = "reallyunittesting@test.com";
+        $user->email = $this->testEmails[2];
         $objSave = $user->Save();
         $oid2 = $objSave->objectId;
         $user2 = new \Classes\User($oid2);
@@ -95,11 +97,11 @@ final class UserTest extends TestCase {
         $this->idsToDelete[] = $oid2;
 
         $this->assertEquals($oid, $oid2);
-        $this->assertEquals("reallyunittesting@test.com", $user2->email);
+        $this->assertEquals($this->testEmails[2], $user2->email);
     }
 
     public function testSaveGetUser() {
-        $oid = $this->saveNewUser();
+        $oid = $this->saveNewUser($this->testEmails[1]);
         $user = new \Classes\User($oid);
         //var_dump("Testing with oid ".$oid);
         //Cleanup DB BEFORE assertions as it seems code after them doesn't get executed (according to hacky var_dump testing)
@@ -107,7 +109,7 @@ final class UserTest extends TestCase {
 
         $this->idsToDelete[] = $oid;
 
-        $this->assertEquals('unit@tester.com', $user->email);
+        $this->assertEquals($this->testEmails[1], $user->email);
         $this->assertEquals(NULL, $user->password);
         $this->assertEquals(1, $user->userType);
         $this->assertEquals(1, $user->active);
@@ -117,21 +119,21 @@ final class UserTest extends TestCase {
     }
 
     public function testGetEmailExists() {
-        $oid = $this->saveNewUser();
+        $oid = $this->saveNewUser($this->testEmails[1]);
         $user = new \Classes\User($oid);
         $this->idsToDelete[] = $oid;
         $this->assertSame(true, $user->GetEmailExists($user->email, 0));
     }
 
     public function testGetEmailExistsFailure() {
-        $oid = $this->saveNewUser();
+        $oid = $this->saveNewUser($this->testEmails[1]);
         $user = new \Classes\User($oid);
         $this->idsToDelete[] = $oid;
         $this->assertSame(false, $user->GetEmailExists(NULL, 0));
     }
 
     public function testGetUserByVerifyCode() {
-        $oid = $this->saveNewUser();
+        $oid = $this->saveNewUser($this->testEmails[1]);
         $user = new \Classes\User($oid);
         $this->idsToDelete[] = $oid;
         $user->verified = false;
@@ -141,7 +143,7 @@ final class UserTest extends TestCase {
     }
 
     public function testGetUserByVerifyCodeFailure() {
-        $oid = $this->saveNewUser();
+        $oid = $this->saveNewUser($this->testEmails[1]);
         $user = new \Classes\User($oid);
         $user->verified = true;
         $user->save();
@@ -150,7 +152,7 @@ final class UserTest extends TestCase {
     }
 
     public function testGetUserByEmailAddress() {
-        $oid = $this->saveNewUser();
+        $oid = $this->saveNewUser($this->testEmails[1]);
         $user = new \Classes\User($oid);
         $this->idsToDelete[] = $oid;
         $user->verified = true;
@@ -160,14 +162,14 @@ final class UserTest extends TestCase {
     }
 
     public function testGetUserByEmailAddressFailure() {
-        $oid = $this->saveNewUser();
+        $oid = $this->saveNewUser($this->testEmails[1]);
         $user = new \Classes\User($oid);
         $this->idsToDelete[] = $oid;
         $this->assertEquals(null, \Classes\User::GetUserByEmailAddress($user->email));
     }
 
     public function testGetUserByResetCode() {
-        $oid = $this->saveNewUser();
+        $oid = $this->saveNewUser($this->testEmails[1]);
         $user = new \Classes\User($oid);
         $this->idsToDelete[] = $oid;
         $user->verified = true;
@@ -178,14 +180,14 @@ final class UserTest extends TestCase {
     }
 
     public function testGetUserByResetCodeFailureNoMatch() {
-        $oid = $this->saveNewUser();
+        $oid = $this->saveNewUser($this->testEmails[1]);
         $user = new \Classes\User($oid);
         $this->idsToDelete[] = $oid;
         $this->assertEquals(null, \Classes\User::GetUserByResetCode($user->resetCode));
     }
 
     public function testGetUserByResetCodeFailurecodeLength() {
-        $oid = $this->saveNewUser();
+        $oid = $this->saveNewUser($this->testEmails[1]);
         $user = new \Classes\User($oid);
         $this->idsToDelete[] = $oid;
         $user->verified = true;
@@ -195,25 +197,25 @@ final class UserTest extends TestCase {
     }
 
     public function testGetUserLogin() {
-        $oid = $this->saveNewUser();
+        $oid = $this->saveNewUser($this->testEmails[1]);
         $user = new \Classes\User($oid);
         $this->idsToDelete[] = $oid;
         $user->verified = true;
         $user->active = true;
-        $user->password = password_hash("notavery1good+password", PASSWORD_BCRYPT);
+        $user->password = password_hash($this->testPassword, PASSWORD_BCRYPT);
         $user->save();
-        $this->assertEquals($user, \Classes\User::GetUserLogin($user->email, "notavery1good+password"));
+        $this->assertEquals($user, \Classes\User::GetUserLogin($user->email, $this->testPassword));
     }
 
     public function testGetUserLoginFailInvalidPassword() {
-        $oid = $this->saveNewUser();
+        $oid = $this->saveNewUser($this->testEmails[1]);
         $user = new \Classes\User($oid);
         $this->idsToDelete[] = $oid;
         $user->verified = true;
         $user->active = true;
-        $user->password = password_hash("notavery1good+password", PASSWORD_BCRYPT);
+        $user->password = password_hash($this->testPassword, PASSWORD_BCRYPT);
         $user->save();
-        $this->assertSame(null, \Classes\User::GetUserLogin($user->email, "notthepassword"));
+        $this->assertSame(null, \Classes\User::GetUserLogin($user->email, "Wrong password"));
     }
 
     protected function setUp(): void {
@@ -238,6 +240,29 @@ final class UserTest extends TestCase {
                 //var_dump
                 var_dump($errorMessage = $conn->errno . ' ' . $conn->error);
             }
+        }
+        foreach ($this->testEmails as $testEmail) {
+            $sql = 'delete from user where email = ?';
+            if ($stmt = $conn->prepare($sql)) {
+                //var_dump($stmt);
+                $stmt->bind_param("s", $testEmail);
+                //var_dump("Cleaning up - deleting user with id ".$oid);
+                $stmt->execute();
+                $result = mysqli_stmt_get_result($stmt);
+                $stmt->close();
+            } else {
+                //var_dump
+                var_dump($errorMessage = $conn->errno . ' ' . $conn->error);
+            }
+        }
+        $sql = 'delete from user where email is null';
+        if ($stmt = $conn->prepare($sql)) {
+            $stmt->execute();
+            $result = mysqli_stmt_get_result($stmt);
+            $stmt->close();
+        } else {
+            //var_dump
+            var_dump($errorMessage = $conn->errno . ' ' . $conn->error);
         }
         $conn->close();
         parent::tearDown();

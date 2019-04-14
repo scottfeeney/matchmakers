@@ -6,6 +6,7 @@ use PHPUnit\Framework\TestCase;
 final class EmployerTest extends TestCase {
 
     private $uidsToDelete;
+    private $testEmail = "someEmployerEmail@somewhere.com";
     //private $eidsToDelete;
 
     public function testConstructor() {
@@ -14,13 +15,23 @@ final class EmployerTest extends TestCase {
     }
 
     public function testSaveUser() {
-        extract($this->createUserAndEmployer());
+        $result = $this->createUserAndEmployer();
+        if ($result == null) {
+            $this->assertTrue(false);
+        }
+        //var_dump($result);
+        extract($result);
         //$this->eidsToDelete[] = $eid;
         $this->assertEquals($employer, new \Classes\Employer($eid));
     }
 
     private function createUserAndEmployer() {
-        $oid = UserTest::saveNewUser();
+        $oid = UserTest::saveNewUser($this->testEmail);
+        if ($oid == null) {
+            return null; //better for stuff to fail here than make a mess
+                        //creating records in employer with null userId values
+                        //that won't be deleted by cleanup
+        }
         $this->uidsToDelete[] = $oid;
         $employer = new \Classes\Employer(0);
         $employer->userId = $oid;
@@ -30,8 +41,12 @@ final class EmployerTest extends TestCase {
         return array('oid' => $oid, 'eid' => $eid, 'employer' => $employer);
     }
 
-    public function testEditUser() {
-        extract($this->createUserAndEmployer());
+    public function testEditEmployer() {
+        $result = $this->createUserAndEmployer();
+        if ($result == null) {
+            $this->assertTrue(false);
+        }
+        extract($result);
         $employer->firstName = "Bob";
         $oSave2 = $employer->save();
         $eid = $oSave2->objectId;
@@ -43,7 +58,11 @@ final class EmployerTest extends TestCase {
     }
 
     public function testGetEmployerByUserId() {
-        extract($this->createUserAndEmployer());
+        $result = $this->createUserAndEmployer();
+        if ($result == null) {
+            $this->assertTrue(false);
+        }
+        extract($result);
         $this->assertEquals(\Classes\Employer::GetEmployerByUserId($oid), $employer);
     }
 
@@ -68,9 +87,26 @@ final class EmployerTest extends TestCase {
                     $result = mysqli_stmt_get_result($stmt);
                     $stmt->close();
                 } else {
-                    //var_dump
                     var_dump($errorMessage = $conn->errno . ' ' . $conn->error);
                 }
+            }
+            $sql = 'delete from employer where userid in (Select userid from user where email = ?)';
+            if ($stmt = $conn->prepare($sql)) {
+                $stmt->bind_param("s", $this->testEmail);
+                $stmt->execute();
+                $result = mysqli_stmt_get_result($stmt);
+                $stmt->close();
+            } else {
+                var_dump($errorMessage = $conn->errno . ' ' . $conn->error);
+            }
+            $sql = 'delete from employer where userid is null';
+            if ($stmt = $conn->prepare($sql)) {
+                $stmt->execute();
+                $result = mysqli_stmt_get_result($stmt);
+                $stmt->close();
+            } else {
+                //var_dump
+                var_dump($errorMessage = $conn->errno . ' ' . $conn->error);
             }
         }
         $conn->close();
