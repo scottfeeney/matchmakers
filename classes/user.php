@@ -282,6 +282,61 @@
 			return null;
 			
 		}
+		
+		// get user api token
+		public function CreateApiToken() {
+			
+			$token = password_hash(\Utilities\Common::GetGuid(), PASSWORD_BCRYPT);
+			
+			$conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);
+			
+			$sql = " update api_token set Active = 0 where UserId = ? and Active = 1;";
+			$stmt = $conn->prepare($sql);
+			$stmt->bind_param("i", $this->userId);
+			$stmt->execute();
+			
+			$sql = " insert into api_token (UserId, Token, Created, ExpiryDate, Active)";
+			$sql .= " values";
+			$sql .= " (?, ?, UTC_TIMESTAMP(), DATE_ADD(UTC_TIMESTAMP(), INTERVAL 1 HOUR), 1)";
+			$stmt = $conn->prepare($sql);
+			$stmt->bind_param("is", $this->userId, $token);
+			$stmt->execute();
+			
+			$stmt->close();
+			$conn->close();
+			
+			
+			return $token;
+			
+		}
+		
+		// get user by API token
+		public static function GetUserByApiToken($token) {
+			
+			if (strlen($token) == 60)
+			{
+			
+				$sql = "select UserId from api_token where Token = ? and Active = 1 and UTC_TIMESTAMP() < ExpiryDate;";
+					
+				$conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);
+				
+				$stmt = $conn->prepare($sql);
+				$stmt->bind_param("s", $token);
+				$stmt->execute();
+				$result = mysqli_stmt_get_result($stmt);
+				$stmt->close();
+				$conn->close();
+				
+				if ($result->num_rows == 1) {
+					$row = mysqli_fetch_array($result);
+					return new User($row['UserId']);
+				}
+				
+			}
+			
+			return null;
+			
+		}
 	
 	
 	}
