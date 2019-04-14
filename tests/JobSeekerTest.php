@@ -57,7 +57,7 @@ final class JobSeekerTest extends TestCase {
     protected function tearDown(): void {
         $conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);
         foreach ($this->uidsToDelete as $idd) {
-            foreach (array('delete from jobSeeker where userid = ?', 'delete from user where UserId = ?') as $sql) {
+            foreach (array('delete from job_seeker where userid = ?', 'delete from user where UserId = ?') as $sql) {
                 if ($stmt = $conn->prepare($sql)) {
                     $stmt->bind_param("i", $idd);
                     $stmt->execute();

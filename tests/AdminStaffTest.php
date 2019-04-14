@@ -12,14 +12,20 @@ final class AdminStaffTest extends TestCase {
         $this->assertSame(0, $adminStaff->adminStaffId);
     }
 
+    /** save method is commented out in adminstaff class, as we currently have no facility for 
+     * adding new adminstaff records except via direct database query
+     * So nothing to test
+     
     public function testSaveUser() {
         extract($this->createUserAndadminStaff());
         $this->assertEquals($adminStaff, new \Classes\AdminStaff($asid));
     }
-
+*/
     /**
      * Helper function as multiple tests will want to work on a record already in the database
-     */
+     *  UPDATE: commenting out as we have commented out the save method in adminstaff
+     * While the functionality to manage adminstaff records via the site may be added later,
+     * currently adminstaff records can be added/edited/removed by database query only
 
     private function createUserAndAdminStaff() {
         $oid = UserTest::saveNewUser();
@@ -32,6 +38,7 @@ final class AdminStaffTest extends TestCase {
         return array('oid' => $oid, 'asid' => $asid, 'adminStaff' => $adminStaff);
     }
 
+
     public function testEditUser() {
         extract($this->createUserAndAdminStaff());
         $adminStaff->firstName = "Bob";
@@ -40,13 +47,18 @@ final class AdminStaffTest extends TestCase {
         $this->assertSame($adminStaff->firstName, (new \Classes\AdminStaff($asid))->firstName);
     }
 
+    */
+
     public function testGetAdminStaffByUserIdFailure() {
         $this->assertSame(null, \Classes\AdminStaff::GetAdminStaffByUserId(0));
     }
 
-    public function testGetAdminStaffByUserId() {
-        extract($this->createUserAndAdminStaff());
-        $this->assertEquals(\Classes\AdminStaff::GetAdminStaffByUserId($oid), $adminStaff);
+    public function testGetAdminStaff() { //ByUserId() {
+        //Cannot use the below line as the adminstaff->save method it relies on is currently
+        //commented out - instead assume that there is a staff record created with adminstaffid 1
+        //extract($this->createUserAndAdminStaff());
+        //$this->assertEquals(\Classes\AdminStaff::GetAdminStaffByUserId($oid), $adminStaff);
+        $this->assertTrue((new \Classes\AdminStaff(1))->userId > 0);
     }
 
     protected function setUp(): void {
@@ -57,7 +69,7 @@ final class AdminStaffTest extends TestCase {
     protected function tearDown(): void {
         $conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);
         foreach ($this->uidsToDelete as $idd) {
-            foreach (array('delete from adminStaff where userid = ?', 'delete from user where UserId = ?') as $sql) {
+            foreach (array('delete from admin_staff where userid = ?', 'delete from user where UserId = ?') as $sql) {
                 if ($stmt = $conn->prepare($sql)) {
                     $stmt->bind_param("i", $idd);
                     $stmt->execute();
