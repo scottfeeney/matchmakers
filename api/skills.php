@@ -4,11 +4,11 @@
 
     if ($_SERVER['DOCUMENT_ROOT'] != '') {
         require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/skill.php';
-        require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/skill_category.php';
+        require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/skillcategory.php';
         require_once $_SERVER['DOCUMENT_ROOT'] . '/api/api_error.php';
     } else {
         require_once './classes/skill.php';
-        require_once './classes/skill_category.php';
+        require_once './classes/skillcategory.php';
         require_once './api/api_error.php';
     }
 

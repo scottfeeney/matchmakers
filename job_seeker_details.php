@@ -4,7 +4,7 @@
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/header.php';
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/footer.php';
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/location.php';
-		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/skill_category.php';
+		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/skillcategory.php';
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/jobseeker.php';
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/jobtype.php';
 	} else {
@@ -12,7 +12,7 @@
 		require_once './classes/header.php';
 		require_once './classes/footer.php';
 		require_once './classes/location.php';
-		require_once './classes/skill_category.php';
+		require_once './classes/skillcategory.php';
 		require_once './classes/jobseeker.php';
 		require_once './classes/jobtype.php';
 	}
