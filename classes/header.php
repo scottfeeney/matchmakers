@@ -48,14 +48,14 @@
 							<div class="row">
 							
 								<div class="col-6">
-									<div class="logo"><a href="/"><img src="/images/logo.png" alt="Job Matcher" width="" height="" alt="" /></a></div>
+									<div class="logo"><a href="home.php"><img src="/images/logo.png" alt="Job Matcher Logo" /></a></div>
 								</div>
 
 								<div class="col-6">';
 								
 									if ($this->isSignedIn)
 									{
-										$html .= '<div class="float-right"><a href="signout.php" class="btn btn-signup">Signout</a></div>';
+										$html .= '<div class="float-right"><a href="signout.php" class="btn btn-signup">Sign Out</a></div>';
 									}
 									else
 									{
