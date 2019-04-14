@@ -6,7 +6,7 @@
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/location.php';
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/skill_category.php';
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/jobseeker.php';
-		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/job_type.php';
+		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/jobtype.php';
 	} else {
 		require_once './utilities/common.php';
 		require_once './classes/header.php';
@@ -14,7 +14,7 @@
 		require_once './classes/location.php';
 		require_once './classes/skill_category.php';
 		require_once './classes/jobseeker.php';
-		require_once './classes/job_type.php';
+		require_once './classes/jobtype.php';
 	}
 	
 	$user = \Utilities\Common::GetSessionUser();
