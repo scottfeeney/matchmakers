@@ -83,55 +83,64 @@
 
 <section>
 	<div class="jumbotron jumbotron-fluid">
-	<div class="container">
-	<h2>Verify Account</h2>
-
-	<?php if ($user == null) { ?>
-
-		<?php if ($verifyCode != "") { ?>
-			<div class="alert alert-danger" role="alert">Invalid code supplied.</div>
-		<?php } ?>	
+		<div class="container">
 		
-		<form action="verify_account.php" method="get">
-			<div class="form-group">
-				<label for="v">Verification Code:</label>
-				<input type="text" class="form-control" name="v" maxlength="36" value="<?php echo htmlspecialchars($verifyCode) ?>">
+			<div class="row">
+					
+				<div class="col-lg-6 ml-lg-auto mr-lg-auto">
+						
+					<h2>Verify Account</h2>
+
+					<?php if ($user == null) { ?>
+
+						<?php if ($verifyCode != "") { ?>
+							<div class="alert alert-danger" role="alert">Invalid code supplied.</div>
+						<?php } ?>	
+						
+						<form action="verify_account.php" method="get">
+							<div class="form-group">
+								<label for="v">Verification Code:</label>
+								<input type="text" class="form-control" name="v" maxlength="36" value="<?php echo htmlspecialchars($verifyCode) ?>">
+							</div>
+							<button type="submit" class="btn btn-success">Submit</button>
+						</form>
+
+					<?php } else { ?>
+
+						<p>Your account has been verified, please create your password below.</p>
+						
+						
+						<form action="verify_account.php" method="post">
+							
+							<input type="hidden" name="SubmitForm" value="1">
+							<input type="hidden" name="v" value="<?php echo htmlspecialchars($verifyCode) ?>">
+							
+							<?php if ($errorMessage != "") { ?>
+								<div class="alert alert-danger" role="alert"><?php echo $errorMessage ?></div>
+							<?php } ?>	
+							
+						
+							<div class="form-group">
+								<label for="Password">Password:</label>
+								<input type="Password" class="form-control" name="Password" id="Password" maxlength="50" value="<?php echo htmlspecialchars($password) ?>">
+							</div>
+							
+							<div class="form-group">
+								<label for="ConfirmPassword">Confirm Password:</label>
+								<input type="password" class="form-control" name="ConfirmPassword" id="ConfirmPassword" maxlength="50" value="<?php echo htmlspecialchars($confirmPassword) ?>">
+							</div>
+							
+							<button type="submit" class="btn btn-success">Submit</button>
+							
+						</form>
+				
+					<?php } ?>
+	
+				</div>				
 			</div>
-			<button type="submit" class="btn btn-primary">Submit</button>
-		</form>
-
-	<?php } else { ?>
-
-		<p>Your account has been verified, please create your password below.</p>
-		
-		
-		<form action="verify_account.php" method="post">
-			
-			<input type="hidden" name="SubmitForm" value="1">
-			<input type="hidden" name="v" value="<?php echo htmlspecialchars($verifyCode) ?>">
-			
-			<?php if ($errorMessage != "") { ?>
-				<div class="alert alert-danger" role="alert"><?php echo $errorMessage ?></div>
-			<?php } ?>	
-			
-		
-			<div class="form-group">
-				<label for="Password">Password:</label>
-				<input type="Password" class="form-control" name="Password" id="Password" maxlength="50" value="<?php echo htmlspecialchars($password) ?>">
-			</div>
-			
-			<div class="form-group">
-				<label for="ConfirmPassword">Confirm Password:</label>
-				<input type="password" class="form-control" name="ConfirmPassword" id="ConfirmPassword" maxlength="50" value="<?php echo htmlspecialchars($confirmPassword) ?>">
-			</div>
-			
-			<button type="submit" class="btn btn-primary">Submit</button>
-			
-		</form>
-	</div>
+		</div>
 	</div>
 </section>
-	<?php } ?>
 	
 <?php
 	$footer = new \Template\Footer();

@@ -68,36 +68,45 @@
 
         <section>
             <div class="jumbotron jumbotron-fluid">
-			<div class="container">
-			<h2>Sign Up</h2>
-			
-			<p>Select your account type and enter your email address below.</p>
+				<div class="container">
+				
+					<div class="row">
+				
+						<div class="col-lg-6 ml-lg-auto mr-lg-auto">
+				
+							<h2>Sign Up</h2>
+							
+							<p>Select your account type and enter your email address below.</p>
 
-			<form action="signup.php" method="post">
-				
-				<input type="hidden" name="SubmitForm" value="1">
-				
-				<?php if ($errorMessage != "") { ?>
-					<div class="alert alert-danger" role="alert"><?php echo $errorMessage ?></div>
-				<?php } ?>
+							<form action="signup.php" method="post">
+								
+								<input type="hidden" name="SubmitForm" value="1">
+								
+								<?php if ($errorMessage != "") { ?>
+									<div class="alert alert-danger" role="alert"><?php echo $errorMessage ?></div>
+								<?php } ?>
 
-				<div class="form-group">
-					<label for="email">User Type:</label>
-					<select class="form-control" name="UserType" id="usertype">
-						<option value="1">Employer</option>
-						<option value="2">Job Seeker</option>
-					</select>
+								<div class="form-group">
+									<label for="email">Account Type:</label>
+									<select class="form-control" name="UserType" id="usertype">
+										<option value="1">Employer</option>
+										<option value="2">Job Seeker</option>
+									</select>
+								</div>
+								
+								<div class="form-group">
+									<label for="email">Email address:</label>
+									<input type="email" class="form-control" name="Email" id="email" value="<?php echo htmlspecialchars($email) ?>">
+								</div>
+								
+								<button type="submit" class="btn btn-success">Submit</button>
+								
+							</form>
+							
+						</div>
+					</div>
+					
 				</div>
-				
-				<div class="form-group">
-					<label for="email">Email address:</label>
-					<input type="email" class="form-control" name="Email" id="email" value="<?php echo htmlspecialchars($email) ?>">
-				</div>
-				
-				<button type="submit" class="btn btn-primary">Submit</button>
-				
-			</form>
-			</div>
 			</div>
 		</section>
 

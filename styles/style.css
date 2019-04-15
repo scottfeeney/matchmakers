@@ -19,6 +19,10 @@ header {
 footer {
 	background-color: #0a1933;
 	height: 100px;
+	color: #ffffff;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }
 
 .logo {
@@ -40,6 +44,17 @@ footer {
 	max-width: none;
 	margin: 0;
 	padding: 0;
+}
+
+.home-page .alert-success {
+	color: #ffffff;
+	border-color: #ffffff;
+	background-color: rgba(75,75,75,0.3);
+}
+
+.home-page .alert-success a {
+	color: #ffffff;
+	text-decoration: underline;
 }
 
 @media (max-width: 767px)
@@ -242,3 +257,4 @@ footer {
 	display: inline-block;
 	cursor: pointer;
 }
+

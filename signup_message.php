@@ -19,11 +19,19 @@
         <section>
             <div class="jumbotron jumbotron-fluid">
 				<div class="container">
-				<h2>Sign Up</h2>
+					
+					<div class="row">
 				
-				<div class="alert alert-success" role="alert">
-					You have been sent an email.
-				</div>
+						<div class="col-lg-6 ml-lg-auto mr-lg-auto">
+						
+							<h2>Sign Up</h2>
+							<br />
+							<div class="alert alert-success" role="alert">
+								Thank you for signing up.
+								<br />You have been sent an email with a link to verify your account and create your password.
+							</div>
+						</div>
+					</div>
 				</div>
 			</div>
 		</section>

@@ -10,7 +10,7 @@
 			
 					</div>
 					<footer>
-					
+						<div>Job Matcher © 2019</div>
 					</footer>
 		
 					<script

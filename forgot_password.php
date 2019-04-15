@@ -66,26 +66,34 @@
 	<section>
 		<div class="jumbotron jumbotron-fluid">
 			<div class="container">
-				<h1>Forgot Password</h1>
-
-				<p>Enter your email address below.</p>
-							
-				<form action="forgot_password.php" method="post">
-						
-					<input type="hidden" name="SubmitForm" value="1">
-					
-					<?php if ($errorMessage != "") { ?>
-						<div class="alert alert-danger" role="alert"><?php echo $errorMessage ?></div>
-					<?php } ?>
+			
+				<div class="row">
 				
+					<div class="col-lg-6 ml-lg-auto mr-lg-auto">
 					
-					<div class="form-group">
-						<label for="Password">Email:</label>
-						<input type="email" class="form-control" name="Email" id="Email" maxlength="250" value="<?php echo htmlspecialchars($email) ?>">
-					</div>
+						<h1>Forgot Password</h1>
+
+						<p>Enter your email address below and you will be sent an email with a link to reset your password.</p>
+									
+						<form action="forgot_password.php" method="post">
 								
-					<button type="submit" class="btn btn-primary">Send Link</button>  
-				</form>
+							<input type="hidden" name="SubmitForm" value="1">
+							
+							<?php if ($errorMessage != "") { ?>
+								<div class="alert alert-danger" role="alert"><?php echo $errorMessage ?></div>
+							<?php } ?>
+						
+							
+							<div class="form-group">
+								<label for="Password">Email:</label>
+								<input type="email" class="form-control" name="Email" id="Email" maxlength="250" value="<?php echo htmlspecialchars($email) ?>">
+							</div>
+										
+							<button type="submit" class="btn btn-success">Send Link</button>  
+						</form>
+						
+					</div>
+				</div>
 			</div>
 		</div>
 	</section>

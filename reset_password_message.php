@@ -8,17 +8,31 @@
 	}
 	
 	$header = new \Template\Header();
+	$header->isHomePage = true;
+	$header->showMainBanner = false;
 	echo $header->Bind();
 	
 ?>	
 
         <section>
+		
+			<div class="jumbotron jumbotron-fluid">
+				<div class="container">
+				
+					<div class="row">
+					
+						<div class="col-lg-6 ml-lg-auto mr-lg-auto">		
 
-			<h2>Password Reset</h2>
+							<h2>Password Reset</h2>
+							<br />
+							<div class="alert alert-success" role="alert">
+								Your password has been reset.<br /><a href="/default.php">Click here</a> to sign in.
+							</div>
 			
-			<p>Your password has been reset.</p>
-			
-			<p><a href="/default.php">Click here</a> to sign in.</p>
+						</div>
+					</div>
+				</div>
+			</div>			
 
 		</section>
     
