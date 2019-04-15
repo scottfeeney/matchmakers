@@ -30,6 +30,20 @@ footer {
 	margin-left: 15px;
 }
 
+.jumbotron{
+	margin-bottom: 0px;
+	background-image: linear-gradient(rgba(50, 50, 50, 0.65), rgba(50, 50, 50, 0.65)),
+        /* Image from: https://www.pexels.com/photo/adult-beard-beverage-blur-590516/*/
+        url('../images/adult-asking-beard-590516.jpg');
+	background-repeat:no-repeat;
+	background-size:cover;
+	background-position: top;
+	color: white;
+	padding: 40px;
+	
+}
+
+
 .main-container {
 	min-height: calc( 100% - 160px );
 }
@@ -97,16 +111,65 @@ footer {
 }
 
 .home-text-content {
-	background:rgba(0,0,0,0.5);
+	/*background:rgba(0,0,0,0.5);*/
 	border-radius: 5px;
 	padding: 20px;
 	flex: 0 0 42.5%;
 	max-width: 42.5%;
 	text-align: left;
+	border-left: 5px solid #28a745;
+}
+
+
+.home-top {
+	background: rgba(48,56,83,.5); 
+	padding: 40px;
+	margin: -40px -40px 0 -40px;
+}
+
+.home-text-content-panel {
+	margin: 100px 0 0 0; 
+	background: rgba(255,255,255,0.85); 
+	color: #000000; 
+	padding-top: 40px; 
+	padding-bottom: 40px; 
+	border-radius: 4px;
+}
+
+.home-page ul {
+    margin-top: 7px;
+    margin-bottom: 7px;
+}
+
+.home-page  li {
+        list-style-type: none;
+        list-style-position: inside;
+        padding: 3px 0 3px 10px;
+        text-indent: -1.4em;
+}
+
+.home-page li:before {
+	color: #F85A3E;
+	content: "\f058";
+	font-family: "Font Awesome 5 Free";
+	width: 10px;
+	height: 10px;
+	margin-right: 8px;
+	font-weight: 900;
+}
+
+.login-heading {
+	text-align: center;
 }
 
 @media (max-width: 990px)
 {
+	
+	.home-top{
+		padding: 20px;
+	}
+	
+	
 	.home-text-spacer {
 		display: none;
 	}
@@ -116,9 +179,27 @@ footer {
 		max-width: 100%;
 		border-radius: 0;
 	}
+
 	
-	.home-text-content-two {
-		margin-top: 20px;
+	.home-text-content-panel-container{
+		margin: -100px -55px 0 -55px;
+		width: auto;
+	}
+	
+	.home-text-content-panel {
+		border-radius: 0;
+		padding-top: 20px;
+		padding-bottom: 20px;
+		padding-left: 20px;
+		padding-right: 20px;
+	}
+	
+	.home-text-content {
+		border-left: 0;
+	}
+		
+	.jumbotron-main-home {
+		padding: 40px 40px 0 40px;
 	}
 	
 }
@@ -179,17 +260,6 @@ footer {
     text-align: center;
 }
 
-.jumbotron{
-	margin-bottom: 0px;
-	background-image: linear-gradient(rgba(50, 50, 50, 0.65), rgba(50, 50, 50, 0.65)),
-        /* Image from: https://www.pexels.com/photo/adult-beard-beverage-blur-590516/*/
-        url('../images/adult-asking-beard-590516.jpg');
-	background-repeat:no-repeat;
-	background-size:cover;
-	background-position: top;
-	color: white;
-	
-}
 
 .forgot-password a {
 	color: #ffffff;
