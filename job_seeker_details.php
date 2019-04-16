@@ -4,17 +4,17 @@
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/header.php';
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/footer.php';
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/location.php';
-		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/skillcategory.php';
+		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/skill_category.php';
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/jobseeker.php';
-		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/jobtype.php';
+		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/job_type.php';
 	} else {
 		require_once './utilities/common.php';
 		require_once './classes/header.php';
 		require_once './classes/footer.php';
 		require_once './classes/location.php';
-		require_once './classes/skillcategory.php';
+		require_once './classes/skill_category.php';
 		require_once './classes/jobseeker.php';
-		require_once './classes/jobtype.php';
+		require_once './classes/job_type.php';
 	}
 	
 	$user = \Utilities\Common::GetSessionUser();
@@ -53,7 +53,7 @@
 	$currentStudyLevel = "";
 	$signUpReason = "";
 	$jobChangeSpeed = "";
-	$jobTypeId = 0;
+	$jobType = "";
 	
 	if (\Utilities\Common::IsSubmitForm())
 	{
@@ -80,7 +80,7 @@
 		$currentStudyLevel = \Utilities\Common::GetRequest("CurrentStudyLevel");
 		$signUpReason = \Utilities\Common::GetRequest("SignUpReason");
 		$jobChangeSpeed = \Utilities\Common::GetRequest("JobChangeSpeed");
-		$jobTypeId = \Utilities\Common::GetRequest("JobTypeId");
+		$jobType = \Utilities\Common::GetRequest("JobType");
 
 		// Name/Title validation
 		if ($title == "") {
@@ -192,7 +192,7 @@
 			$errorMessages[] = "Please select a Speed of job change";
 		}
 
-		if ($jobTypeId == 0) {
+		if ($jobType == "") {
 			$errorMessages[] = "Please select a type of work";
 		}
 		
@@ -225,7 +225,7 @@
 			$jobSeeker->currentStudyLevel = (strtoupper($currentlyStudying) == "YES" ? $currentStudyLevel : "");
 			$jobSeeker->signUpReason = $signUpReason;
 			$jobSeeker->jobChangeSpeed = $jobChangeSpeed;
-			$jobSeeker->jobTypeId = $jobTypeId;
+			$jobSeeker->jobTypeId = $jobType;
 			$objectSave = $jobSeeker->Save();
 			
 			if ($objectSave->hasError) {
@@ -276,7 +276,7 @@
 			$currentStudyLevel = $jobSeeker->currentStudyLevel;
 			$signUpReason = $jobSeeker->signUpReason;
 			$jobChangeSpeed = $jobSeeker->jobChangeSpeed;
-			$jobTypeId = $jobSeeker->jobTypeId;
+			$jobType = $jobSeeker->jobTypeId;
 		}
 	}
 	
@@ -449,11 +449,11 @@
 					</div>
 					<div class="col-sm-6">
 						<div class="form-group">
-							<label for="JobTypeId">*Type of work sought:</label>
-							<select name="JobTypeId" id="JobTypeId" class="form-control" required>
+							<label for="JobType">*Type of work sought:</label>
+							<select name="JobType" id="JobType" class="form-control" required>
 								<option value=""></option>
-								<?php foreach ($jobTypes as $jobType) { ?>
-									<option value="<?php echo $jobType->jobTypeId; ?>" <?php if ($jobType->jobTypeId == $jobTypeId) {echo "selected";} ?>><?php echo $jobType->jobTypeName; ?></option>
+								<?php foreach ($jobTypes as $currJobType) { ?>
+									<option value="<?php echo $currJobType->jobTypeId; ?>" <?php if ($currJobType->jobTypeId == $jobType) {echo "selected";} ?>><?php echo $currJobType->jobTypeName; ?></option>
 								<?php } ?>
 							</select>
 							<div class="invalid-feedback">Please select a type of work</div>
@@ -522,7 +522,7 @@
 				
 				<div class="form-group mt-3">
 					<button type="submit" class="btn btn-primary">Save</button>  
-				<div>
+				</div>
 			</form>
 		</section>
 <?php
