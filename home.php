@@ -30,6 +30,7 @@
 			<?php
 				if ($user->userType == 1) {
 					$details = "href='employer_details.php'";
+					$newJob = "href='create_job.php'";
 					$match = "View Your Jobs";
 				}
 				else if ($user->userType == 2) {
@@ -69,14 +70,16 @@
 					
 					<?php if ($user->userType == 1) { ?>
 						<div class="col-sm-3">
-							<div class="card p-1 mb-2" data-toggle="tooltip" data-placement="top" title="Create new job listings">
-								<!-- Job Search by Thomas' designs from the Noun Project
-									 https://thenounproject.com/term/job-search/1018640/ -->
-								<img class="card-img-top mx-auto img-responsive" src="images/noun_Job Search_1018640.png" alt="Card image cap">
-								<div class="card-body">
-									<h5 class="card-title text-center">Create New Job</h5>
+							<a <?php echo $newJob; ?> data-toggle="tooltip" data-placement="top" title="Create a new job listing">
+								<div class="card p-1 mb-2" data-toggle="tooltip" data-placement="top" title="Create new job listings">
+									<!-- Job Search by Thomas' designs from the Noun Project
+										 https://thenounproject.com/term/job-search/1018640/ -->
+									<img class="card-img-top mx-auto img-responsive" src="images/noun_Job_Search_1018640.png" alt="Card image cap">
+									<div class="card-body">
+										<h5 class="card-title text-center">Create New Job</h5>
+									</div>
 								</div>
-							</div>
+							</a>
 						</div>
 					<?php } ?>
 					
