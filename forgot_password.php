@@ -85,7 +85,7 @@
 						
 							
 							<div class="form-group">
-								<label for="Password">Email:</label>
+								<label for="Email">Email:</label>
 								<input type="email" class="form-control" name="Email" id="Email" maxlength="250" value="<?php echo htmlspecialchars($email) ?>">
 							</div>
 										
