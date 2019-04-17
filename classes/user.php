@@ -225,6 +225,35 @@
 			return null;
 			
 		}
+
+		// As per above, but doesn't require verified or active to be set
+		// necessary where a user has lost or deleted the verification email
+		// and then tries the forgot password function to reset their account.
+
+		public static function GetUnverifiedUserByEmailAddress($email) 
+		{
+			if ($email != "")
+			{
+				$sql = "select UserId from user where Email = ?";
+					
+				$conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);
+				
+				$stmt = $conn->prepare($sql);
+				$stmt->bind_param("s", $email);
+				$stmt->execute();
+				$result = mysqli_stmt_get_result($stmt);
+				$stmt->close();
+				$conn->close();
+				
+				if ($result->num_rows == 1) {
+					$row = mysqli_fetch_array($result);
+					return new User($row['UserId']);
+				}
+			}
+			
+			return null;
+			
+		}
 		
 		// get user by reset Code
 		public static function GetUserByResetCode($resetCode) 

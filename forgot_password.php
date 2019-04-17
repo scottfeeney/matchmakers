@@ -44,6 +44,18 @@
 				$message .= "\n\nJob Matcher Team\n";
 				
 				\Utilities\Common::SendEmail($user->email, "Reset Password", $message);
+			} else {
+				$user = \Classes\User::GetUnverifiedUserByEmailAddress($email);
+				if ($user != null) {
+					$message = "Thank you for signing up with Job Matcher.\n\n";
+					$message .= "It appears the link in your original verification email was not activated.";
+					$message .= "Before you can continue, please verify your email address by clicking on the following link: ".SITE_URL."/verify_account.php?v=v".$user->verifyCode."\n\n";
+					$message .= "\n\nIf for some reason the link does not work for you, please visit on the following link ".SITE_URL."/verify_account.php and enter the following verification code: ".$user->verifyCode;
+					$message .= "\n\nJob Matcher Team\n";
+					
+					\Utilities\Common::SendEmail($email, "Job Matcher - verification email resend", $message);
+					
+				}
 			}
 			
 			header("Location: forgot_password_message.php");
