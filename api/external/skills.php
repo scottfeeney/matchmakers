@@ -5,31 +5,29 @@
     if ($_SERVER['DOCUMENT_ROOT'] != '') {
         require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/skill.php';
         require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/skillcategory.php';
-        require_once $_SERVER['DOCUMENT_ROOT'] . '/api/api_error.php';
+        require_once $_SERVER['DOCUMENT_ROOT'] . '/api/external/apiResult.php';
+        require_once $_SERVER['DOCUMENT_ROOT'] . '/utilities/common.php';
     } else {
-        require_once './classes/skill.php';
-        require_once './classes/skillcategory.php';
-        require_once './api/api_error.php';
+        require_once '../../classes/skill.php';
+        require_once '../../classes/skillcategory.php';
+        require_once './apiResult.php';
+        require_once '../../utilities/common.php';
     }
 
-	$rest_json = file_get_contents("php://input");
-    $_POST = json_decode($rest_json, true);
-
-    $skillCategoryId = isset($_POST['SkillCategoryId']) ? $_POST['SkillCategoryId'] : null;
-
-    if ($skillCategoryId != null) {
-        $categories = \Classes\SkillCategory::GetSkillCategories();
-        foreach ($categories as $category) {
-            if ($skillCategoryId == $category->skillCategoryId) {
-                echo json_encode(\Classes\Skill::GetSkillsBySkillCategory($skillCategoryId));
-                die;
-            }
-        }
-        //ID given does not match skill category currently in use
-        echo (new APIError("failure","invalid skill category ID"))->getJSON();
-    } else {
-        echo (new APIError("failure","must specify skill category ID"))->getJSON();
+    $categoryId = \Utilities\Common::GetRequest("categoryId");
+    if ($categoryId == "") {
+        echo (new APIResult("failure","categoryId not provided"))->getJSON();
+        exit();
     }
+
+    $category = new \Classes\SkillCategory($categoryId);
+    if ($category->skillCategoryName != null) {
+        echo (new APIResult("success",json_encode(\Classes\Skill::GetSkillsBySkillCategory($categoryId)), true))->getJSON();
+    } else {
+        echo (new APIResult("failure","invalid categoryId"))->getJSON();
+    }
+
+
 
 
 ?>
