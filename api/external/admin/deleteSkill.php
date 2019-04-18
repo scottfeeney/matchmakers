@@ -33,22 +33,29 @@ if ($user != null) {
         
         //Code to add skill
         $categoryId = \Utilities\Common::GetRequest("categoryId");
-        $skillName = \Utilities\Common::GetRequest("skillName");
-        if ($categoryId == "" or $skillName == "") {
-            echo (new \api\APIResult("failure","Must provide both categoryId and skillName via POST or GET"))->getJSON();
+        $skillId = \Utilities\Common::GetRequest("categoryId");
+        if ($categoryId == "" or $skillId == "") {
+            echo (new \api\APIResult("failure","Must provide categoryId and skillId via POST or GET"))->getJSON();
             exit();
         }
 
         $category = \Classes\SkillCategory($categoryId);
         if ($category != null) {
-            $skill = new \Classes\Skill();
-            $skill->skillCategoryId = $categoryId;
-            $skill->skillName = $skillName;
-            $objSave = $skill->save();
-            if ($objSave->hasError) {
-                echo (new \api\APIResult("failure","Error attempting to save skill: " . $objSave->errorMessage))->getJSON();
+            $skill = new \Classes\Skill($skillId);
+            if ($skill != null) {
+                if ($skill->skillCategoryId == $category->skillCategoryId) {
+                    $objSave = \Classes\Skill::DeleteSkill($skillId);
+                    if ($objSave->hasError) {
+                        echo (new \api\APIResult("failure","Error attempting to delete skill: " . $objSave->errorMessage))->getJSON();
+                    } else {
+                        echo (new \api\APIResult("success", "Skill successfully deleted"))->getJSON();
+                    }                
+                } else {
+                    echo (new \api\APIResult("failure","skillId does not represent a skill in the category represented by categoryId"))->getJSON();
+                }
+
             } else {
-                echo (new \api\APIResult("success", "Skill successfully added"))->getJSON();
+                echo (new \api\APIResult("failure","skillId does not match a skill in our system"))->getJSON();
             }
         } else {
             echo (new \api\APIResult("failure","categoryId does not match a category in our system"))->getJSON();
