@@ -169,7 +169,7 @@
 
 					<div class="skills-control-selected-skills"></div>
 			
-				<input type="hidden" id="SkillsControlSelectedSkills" value="' . $selectedSkills . '" />
+				<input type="hidden" id="SkillsControlSelectedSkills" name="SkillsControlSelectedSkills" value="' . $selectedSkills . '" />
 				<script>
 					var skills = [';
 					

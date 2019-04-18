@@ -9,6 +9,7 @@
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/jobseeker.php';
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/jobtype.php';
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/skill.php';
+		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/job.php';
 	} else {
 		require_once './utilities/common.php';
 		require_once './classes/header.php';
@@ -19,6 +20,7 @@
 		require_once './classes/jobseeker.php';
 		require_once './classes/jobtype.php';
 		require_once './classes/skill.php';
+		require_once './classes/job.php';
 	}
 	
 	$user = \Utilities\Common::GetSessionUser();
@@ -31,39 +33,44 @@
 	
 	$employer = \Classes\Employer::GetEmployerByUserId($user->userId);
 	
+	
+	$jobId = 0;
+	
+	//for now
+	$job = new \Classes\Job($jobId);
+	
 
 	// empty fields
 	$errorMessages = [];
 	
-	$positionName = "";
-	$positionDescription = "";
+	$jobName = "";
 	
+	$positionDescription = "";
 	$locationId = "";
 	$jobChangeSpeed = "";
 	$jobType = "";
 	
-	$skillCategoryId = 0;
-	$skillsSelection = [];
+	$skillCategoryId = "";
+	$selectedSkills = "";
 	
 	
 	if (\Utilities\Common::IsSubmitForm())
 	{
 		//form submitted
-		$positionName = \Utilities\Common::GetRequest("positionName");
-		$positionDescription = \Utilities\Common::GetRequest("positionDescription");
+		$jobName = \Utilities\Common::GetRequest("JobName");
+		/*$positionDescription = \Utilities\Common::GetRequest("positionDescription");
 		$jobChangeSpeed = \Utilities\Common::GetRequest("jobChangeSpeed");
 		$jobType = \Utilities\Common::GetRequest("jobType");
-		$locationId = \Utilities\Common::GetRequest("LocationId");
+		$locationId = \Utilities\Common::GetRequest("LocationId");*/
 		$skillCategoryId = \Utilities\Common::GetRequest("SkillCategoryId");
 		
-		//$selectedSkills = "30,255,32,14,28,27,24,12,25";
 		$selectedSkills = \Utilities\Common::GetRequest("SkillsControlSelectedSkills");
 		
-		if ($positionName == "") {
+		if ($jobName == "") {
 			$errorMessages[] = "Please enter a position name";
 		}
 		
-		if ($positionDescription == "") {
+		/*if ($positionDescription == "") {
 			$errorMessages[] = "Please enter your postition description";
 		}
 		
@@ -77,23 +84,40 @@
 		
 		if ($locationId == "") {
 			$errorMessages[] = "Please select a Location";
-		}
+		}*/
 		
 		if ($skillCategoryId == 0) {
 			$errorMessages[] = "Please select a Field of Expertise";
 		}
 		
-		if (count($skillsSelection) == 0) {
+		/*if (count($skillsSelection) == 0) {
 			$errorMessages[] = "Please select up to 10 skills";
 		}
 		elseif (count($skillsSelection) > 10) {
 			$errorMessages[] = "Please select no more than 10 skills";
-		}
+		}*/
 		
+		
+		$errorMessages[] = "Test Error";
 		
 		if (count($errorMessages) == 0) {
 		
 			// save job
+			
+			$job->jobName = $jobName;
+			$job->skillCategoryId = $skillCategoryId;
+			$objectSave = $job->Save();
+			
+			if ($objectSave->hasError) {
+				$errorMessages[] = $objectSave->errorMessage;
+			}
+			else {
+			
+				$jobId = $objectSave->objectId;
+				
+				print_r($jobId);
+			
+			}
 			
 			// if (count($errorMessages) == 0) {
 			// //	no errors, send to view job page;
@@ -128,7 +152,7 @@
 			
 			<p>Please enter your position details below.</p>
 			
-			<form action="employer_details.php" method="post" class="needs-validation" novalidate>
+			<form action="create_job.php" method="post" class="needs-validation" novalidate>
 			
 				<input type="hidden" name="SubmitForm" value="1">
 				
@@ -141,8 +165,8 @@
 				<div class="row">
 					<div class="col-sm-12">
 						<div class="form-group">
-							<label for="positionName">*Position Title:</label>
-							<input type="text" class="form-control" name="positionName" id="positionName" maxlength="70" value="<?php echo htmlspecialchars($positionName) ?>" required>
+							<label for="JobName">*Position Title:</label>
+							<input type="text" class="form-control" name="JobName" id="JobName" maxlength="70" value="<?php echo htmlspecialchars($jobName) ?>" required>
 							<div class="invalid-feedback">Please enter the position name.</div>
 						</div>
 					</div>
@@ -152,7 +176,7 @@
 					<div class="col-sm-12">
 						<div class="form-group">
 							<label for="positionDescription">*Postion description:</label>
-							<textarea type="text" class="form-control" rows="5" name="positionDescription" id="positionDescription" value="<?php echo htmlspecialchars($positionDescription) ?>" maxlength="300" required></textarea>
+							<textarea type="text" class="form-control" rows="5" name="positionDescription" id="positionDescription" value="<?php echo htmlspecialchars($positionDescription) ?>" maxlength="300" ></textarea>
 							<div id="count">Characters Left: 300</div>
 							<div class="invalid-feedback">Please enter your postition description</div>
 						</div>
@@ -163,7 +187,7 @@
 					<div class="col-sm-4">
 						<div class="form-group">
 							<label for="JobType">*Job Type:</label>
-							<select name="JobType" id="JobType" class="form-control" required>
+							<select name="JobType" id="JobType" class="form-control" >
 								<option value=""></option>
 								<?php foreach ($jobTypes as $currJobType) { ?>
 									<option value="<?php echo $currJobType->jobTypeId; ?>" <?php if ($currJobType->jobTypeId == $jobType) {echo "selected";} ?>><?php echo $currJobType->jobTypeName; ?></option>
@@ -176,7 +200,7 @@
 					<div class="col-sm-4">
 						<div class="form-group">
 							<label for="Location">*Location:</label>
-							<select name="LocationId" id="LocationId" class="form-control" required>
+							<select name="LocationId" id="LocationId" class="form-control" >
 								<option value=""></option>
 								<?php foreach ($locations as $location) { ?>
 									<option value="<?php echo $location->locationId; ?>" <?php if ($location->locationId == $locationId) {echo "selected";} ?>><?php echo $location->name; ?></option>
@@ -189,7 +213,7 @@
 					<div class="col-sm-4">
 						<div class="form-group">
 							<label for="JobChangeSpeed">*Position available in:</label>
-							<select name="JobChangeSpeed" id="JobChangeSpeed" class="form-control" required>
+							<select name="JobChangeSpeed" id="JobChangeSpeed" class="form-control" >
 								<option value=""></option>
 								<?php foreach ($jobChangeSpeeds as $jobChangeSpeedItem) { ?>
 									<option value="<?php echo $jobChangeSpeedItem; ?>" <?php if ($jobChangeSpeedItem == $jobChangeSpeed) {echo "selected";} ?>><?php echo $jobChangeSpeedItem; ?></option>
@@ -225,7 +249,7 @@
 									<div class="skills-control">
 									<?php 
 										if ($skillCategoryId != "") {
-											$skills = \Classes\Skill::GetSkillsBySkillCategory(1);
+											$skills = \Classes\Skill::GetSkillsBySkillCategory($skillCategoryId);
 											echo \Utilities\Common::GetSkillsControl($skills, $selectedSkills); 
 										}
 									?>
