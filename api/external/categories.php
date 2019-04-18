@@ -4,11 +4,13 @@
 
     if ($_SERVER['DOCUMENT_ROOT'] != '') {
         require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/skillcategory.php';
+        require_once $_SERVER['DOCUMENT_ROOT'] . '/api/external/apiResult.php';
     } else {
+        require_once './apiResult.php';
         require_once './classes/skillcategory.php';
     }
 
-    echo json_encode(\Classes\SkillCategory::GetSkillCategories());
+    echo (new \api\APIResult("success", json_encode(\Classes\SkillCategory::GetSkillCategories()), true))->getJSON();
 
 
 ?>

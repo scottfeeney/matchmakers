@@ -38,6 +38,7 @@
 	$positionName = "";
 	$positionDescription = "";
 	
+	$locationId = "";
 	$jobChangeSpeed = "";
 	$jobType = "";
 	
@@ -52,6 +53,7 @@
 		$positionDescription = \Utilities\Common::GetRequest("positionDescription");
 		$jobChangeSpeed = \Utilities\Common::GetRequest("jobChangeSpeed");
 		$jobType = \Utilities\Common::GetRequest("jobType");
+		$locationId = \Utilities\Common::GetRequest("LocationId");
 		$skillCategoryId = \Utilities\Common::GetRequest("SkillCategoryId");
 		
 		//$selectedSkills = "30,255,32,14,28,27,24,12,25";
@@ -71,6 +73,10 @@
 
 		if ($jobType == "") {
 			$errorMessages[] = "Please select a type of work";
+		}
+		
+		if ($locationId == "") {
+			$errorMessages[] = "Please select a Location";
 		}
 		
 		if ($skillCategoryId == 0) {
@@ -140,17 +146,21 @@
 							<div class="invalid-feedback">Please enter the position name.</div>
 						</div>
 					</div>
-					
+				</div>
+				
+				<div class="row">	
 					<div class="col-sm-12">
 						<div class="form-group">
 							<label for="positionDescription">*Postion description:</label>
 							<textarea type="text" class="form-control" rows="5" name="positionDescription" id="positionDescription" value="<?php echo htmlspecialchars($positionDescription) ?>" maxlength="300" required></textarea>
-							<div id="count"></div>
+							<div id="count">Characters Left: 300</div>
 							<div class="invalid-feedback">Please enter your postition description</div>
 						</div>
 					</div>
-					
-					<div class="col-sm-6">
+				</div>
+				
+				<div class="row">					
+					<div class="col-sm-4">
 						<div class="form-group">
 							<label for="JobType">*Job Type:</label>
 							<select name="JobType" id="JobType" class="form-control" required>
@@ -163,9 +173,22 @@
 						</div>
 					</div>
 					
-					<div class="col-sm-6">
+					<div class="col-sm-4">
 						<div class="form-group">
-							<label for="JobChangeSpeed">*Position availability in:</label>
+							<label for="Location">*Location:</label>
+							<select name="LocationId" id="LocationId" class="form-control" required>
+								<option value=""></option>
+								<?php foreach ($locations as $location) { ?>
+									<option value="<?php echo $location->locationId; ?>" <?php if ($location->locationId == $locationId) {echo "selected";} ?>><?php echo $location->name; ?></option>
+								<?php } ?>
+							</select>
+							<div class="invalid-feedback">Please select a Location</div>
+						</div>
+					</div>
+					
+					<div class="col-sm-4">
+						<div class="form-group">
+							<label for="JobChangeSpeed">*Position available in:</label>
 							<select name="JobChangeSpeed" id="JobChangeSpeed" class="form-control" required>
 								<option value=""></option>
 								<?php foreach ($jobChangeSpeeds as $jobChangeSpeedItem) { ?>
@@ -174,8 +197,10 @@
 							</select>
 							<div class="invalid-feedback">Please select an intended timeframe for position availability</div>
 						</div>
-					</div>
-					
+					</div>					
+				</div>
+				
+				<div class="row">	
 					<div class="col-sm-12">
 						<div class="form-group">
 							<label for="SkillCategoryId">*Field of Expertise:</label>
@@ -188,7 +213,9 @@
 							<div class="invalid-feedback">Please select a Field of Expertise</div>
 						</div>
 					</div>
-					
+				</div>
+				
+				<div class="row">		
 					<div class="col-sm-12">
 						<div class="form-group">
 							<label>*Skills:</label>

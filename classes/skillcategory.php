@@ -56,18 +56,22 @@
 				
 			$conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);
 			
-			$stmt = $conn->prepare($sql);
-			$stmt->execute();
-			$result = mysqli_stmt_get_result($stmt);
+			if($stmt = $conn->prepare($sql)) {
+				$stmt->execute();
+				$result = mysqli_stmt_get_result($stmt);
+				
+				while($row = mysqli_fetch_array($result))
+				{
+					$skillCategory = new SkillCategory();
+					SkillCategory::LoadObject($skillCategory, $row);
+					$skillCategories[] = $skillCategory;
+				}
+			} else {
+				$errorMessage = $conn->errno . ' ' . $conn->error;
+				echo $errorMessage;
+			}
 			$stmt->close();
 			$conn->close();
-			
-			while($row = mysqli_fetch_array($result))
-			{
-				$skillCategory = new SkillCategory();
-				SkillCategory::LoadObject($skillCategory, $row);
-				$skillCategories[] = $skillCategory;
-			}
 			
 			return $skillCategories;
 			
