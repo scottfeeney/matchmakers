@@ -60,12 +60,12 @@
 					<div class="row">
 					
 						<div class="col-lg-6">
-						
-							<div class="page-banner-text">
+							<div class="page-banner-text-wrapper">
+								<div class="page-banner-text">
 									<h1>Finding the job that's right for you</h1>
 								</div>
-						
 							</div>
+						</div>
 					
 						<div class="col-lg-6">
 						

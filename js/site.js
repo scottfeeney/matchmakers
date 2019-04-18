@@ -41,6 +41,19 @@ $(document).ready(function () {
 
 function resizePage() {
 	
+	$('.main-container').css({'height' : 'auto'})
+	if ($(".home-page .jumbotron").length > 0) {
+		$('.home-page .jumbotron').css({'height' : 'auto'})
+	}
+	
+	console.log($(window).height(), $('.main-container').height());
+	var screenHeight = $(window).height();
+	var mainContainerHeight = $('.main-container').height();
+	
+	if (mainContainerHeight + 160 < screenHeight) {
+		$('.main-container').css({'height' : (screenHeight - 160) + 'px'})
+	}
+	
 	if ($(".home-page .jumbotron").length > 0) {
 		$(".home-page .jumbotron").css({'height' : $(".main-container").height() + 'px'});
 	}

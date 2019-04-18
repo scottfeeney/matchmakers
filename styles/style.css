@@ -44,9 +44,6 @@ footer {
 }
 
 
-.main-container {
-	min-height: calc( 100% - 160px );
-}
 
 .page-container {
 	max-width: 1000px;
@@ -162,6 +159,10 @@ footer {
 	text-align: center;
 }
 
+.home-text-content-panel-container{
+	padding-bottom: 60px;
+}
+
 @media (max-width: 990px)
 {
 	
@@ -180,10 +181,14 @@ footer {
 		border-radius: 0;
 	}
 
+	.home-top .page-banner-text-container {
+		text-align: center;
+	}
 	
 	.home-text-content-panel-container{
-		margin: -100px -55px 0 -55px;
+		/*margin: -100px -55px 0 -55px;*/
 		width: auto;
+		padding-bottom: 100px;
 	}
 	
 	.home-text-content-panel {
@@ -204,6 +209,27 @@ footer {
 	
 }
 
+@media (max-width: 767px)
+{
+	.home-text-content-panel-container {
+		margin: 0 -55px 0 -55px;
+	}
+	
+	.home-text-content-panel {
+		margin: 0 0 0 0;
+	}
+	
+	.home-text-content-panel-container {
+		padding-bottom: 0;
+	}
+}
+
+@media (min-width: 576px)
+{
+	.container {
+		max-width: 1540px;
+	}
+}
 
 /*
 	Image source: https://www.pexels.com/photo/photo-of-group-of-people-in-a-meeting-1661004/
@@ -219,6 +245,11 @@ footer {
 	width: 100%;
 }	
 
+
+.page-banner-text-wrapper {
+	display: table;
+	width: 100%;
+}
 
 .page-banner-text {
 	height: 230px;
