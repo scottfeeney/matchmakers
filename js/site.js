@@ -51,7 +51,7 @@ function resizePage() {
 	var mainContainerHeight = $('.main-container').height();
 	
 	if (mainContainerHeight + 160 < screenHeight) {
-		$('.main-container').css({'height' : (screenHeight - 160) + 'px'})
+		$('.main-container').css({'min-height' : (screenHeight - 160) + 'px'})
 	}
 	
 	if ($(".home-page .jumbotron").length > 0) {
