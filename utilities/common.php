@@ -160,7 +160,37 @@
 		}
 		
 		
+		public static function GetSkillsControl($skills, $selectedSkills) {
 		
+			$html = '<div class="dropdown skills-control-dropdown">
+						  <button class="btn btn-secondary dropdown-toggle skills-control-dropdown-button" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+						  <div class="dropdown-menu skills-control-dropdown-menu"></div>
+					</div>
+
+					<div class="skills-control-selected-skills"></div>
+			
+				<input type="hidden" id="SkillsControlSelectedSkills" value="' . $selectedSkills . '" />
+				<script>
+					var skills = [';
+					
+						// create a javascript array containing skills
+					
+						$javaScriptSkills = Array();
+							
+						foreach ($skills as $skill) {
+							
+							$javaScriptSkills[] = '{"skillId": "' . $skill->skillId . '", "skillName": "' . htmlspecialchars(str_replace("\"","\\\"", $skill->skillName)) . '"}';
+							
+						}
+						$html .= join(",", $javaScriptSkills);
+				
+					$html .= '];
+				
+				</script>';
+			
+			return $html;
+			
+		}
 		
 	}
 	

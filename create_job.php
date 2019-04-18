@@ -5,18 +5,20 @@
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/footer.php';
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/location.php';
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/employer.php';
-		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/skill_category.php';
+		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/skillcategory.php';
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/jobseeker.php';
-		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/job_type.php';
+		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/jobtype.php';
+		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/skill.php';
 	} else {
 		require_once './utilities/common.php';
 		require_once './classes/header.php';
 		require_once './classes/footer.php';
 		require_once './classes/location.php';
 		require_once './classes/employer.php';
-		require_once './classes/skill_category.php';
+		require_once './classes/skillcategory.php';
 		require_once './classes/jobseeker.php';
-		require_once './classes/job_type.php';
+		require_once './classes/jobtype.php';
+		require_once './classes/skill.php';
 	}
 	
 	$user = \Utilities\Common::GetSessionUser();
@@ -51,7 +53,9 @@
 		$jobChangeSpeed = \Utilities\Common::GetRequest("jobChangeSpeed");
 		$jobType = \Utilities\Common::GetRequest("jobType");
 		$skillCategoryId = \Utilities\Common::GetRequest("SkillCategoryId");
-		$skillsSelection = \Utilities\Common::GetRequest("SkillsSelection");
+		
+		//$selectedSkills = "30,255,32,14,28,27,24,12,25";
+		$selectedSkills = \Utilities\Common::GetRequest("SkillsControlSelectedSkills");
 		
 		if ($positionName == "") {
 			$errorMessages[] = "Please enter a position name";
@@ -175,7 +179,7 @@
 					<div class="col-sm-12">
 						<div class="form-group">
 							<label for="SkillCategoryId">*Field of Expertise:</label>
-							<select name="SkillCategoryId" id="SkillCategoryId" class="form-control" required>
+							<select name="SkillCategoryId" id="SkillCategoryId" class="form-control skills-control-skills-category" required>
 								<option value=""></option>
 								<?php foreach ($skillCategories as $skillCategory) { ?>
 									<option value="<?php echo $skillCategory->skillCategoryId; ?>" <?php if ($skillCategory->skillCategoryId == $skillCategoryId) {echo "selected";} ?>><?php echo $skillCategory->skillCategoryName; ?></option>
@@ -187,30 +191,26 @@
 					
 					<div class="col-sm-12">
 						<div class="form-group">
-							<label for="SkillsSelection">*Skills:</label>
-							<br />
-							<?php
-							
-								// foreach($skillsList as $skill){
-								// 	$skillID = $skill["ID"];
-								// 	$skillName = $skill["Name"];
-								// 	echo "<input type='checkbox' name='SkillsSelection[]' value='$skillID'><label>$skillName</label>";
-								// }
-								
-							?>
-							<div class="main-form">
-								<div class="skill-checkbox-skills-list"></div>
-								<div class="skill-checkbox-skills-loading">
-									<i class="fas fa-spinner fa-spin"></i>
+							<label>*Skills:</label>
+							<div class="card">
+								<div class="card-body">
+									<div class="skills-control-spinner"><i class="fas fa-spinner fa-spin"></i></div>
+									<div class="skills-control">
+									<?php 
+										if ($skillCategoryId != "") {
+											$skills = \Classes\Skill::GetSkillsBySkillCategory(1);
+											echo \Utilities\Common::GetSkillsControl($skills, $selectedSkills); 
+										}
+									?>
+									</div>
 								</div>
-								<input type="hidden" id="hidSkillId" value="" />
-								<input type="hidden" id="hidSkillName" value="" />
-								
 							</div>
-							<div class="invalid-feedback">Please select up to 10 skills</div>
 						</div>
 					</div>
-				</div>
+					
+
+					
+					
 				
 				<div class="form-group mt-3">
 					<button class="btn btn-primary">Post Job</button>  

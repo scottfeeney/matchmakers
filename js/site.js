@@ -213,3 +213,129 @@ function getSkillsByCategory($skillCategoryId) {
 	});
 	
 }
+
+
+//----skills control----
+
+
+$(document).ready(function () {
+	if ($(".skills-control").length > 0) {
+		
+		skillsControlUpdate();
+		
+		$('.skills-control-skills-category').on('change', function() {
+			skillsControlLoadCategory($(this).val());
+		});
+		
+	}
+});
+
+
+function skillsControlSelectSkill(item) {
+	var selectedItemId = $(item).attr('data-id');
+	selected = skillsControlGetSelectedSkills();
+	selected.push(selectedItemId);
+	$('#SkillsControlSelectedSkills').val(selected.join(","));
+	skillsControlUpdate();
+    setTimeout("$('.dropdown').find('[data-toggle=dropdown]').dropdown('toggle');", 1);
+}
+
+function skillsControlRemoveSkill(item) {
+	var selected = removeFromArrayByValue(skillsControlGetSelectedSkills(), $(item).attr('data-id'));
+	$('#SkillsControlSelectedSkills').val(selected.join(","));
+	skillsControlUpdate();
+}
+
+function skillsControlGetSelectedSkills() {
+	
+	if ($('#SkillsControlSelectedSkills').val() == '') {
+		return Array();
+	}
+	else {
+		return $('#SkillsControlSelectedSkills').val().split(',');
+	}
+}
+
+
+
+function skillsControlUpdate() {
+	
+	if (typeof skills != "undefined") {
+	
+		var selectedSkills = "," + $('#SkillsControlSelectedSkills').val() + ",";
+		var dropdownHtml = '';
+		var badgeHtml = '';
+		var selectedCount = 0;
+		var dropdownMessage = '';
+
+		for (var i = 0; i < skills.length; i++){
+			
+			if (selectedSkills.indexOf("," + skills[i].skillId + ",") == -1) {
+				dropdownHtml += '<a class="dropdown-item" href="#" data-id="' + skills[i].skillId + '" onclick="skillsControlSelectSkill(this);">' + skills[i].skillName + '</a>';
+			}
+			else {
+				selectedCount++;
+				badgeHtml += '<span class="badge badge-pill badge-success">' + skills[i].skillName + '&nbsp;&nbsp;<span class="skill-remove" data-id="' + skills[i].skillId + '" onclick="skillsControlRemoveSkill(this);"><i class="fas fa-times"></i></span></span>';
+			}
+			
+		}
+		
+		$(".skills-control-dropdown-menu").html(dropdownHtml);
+		$(".skills-control-selected-skills").html(badgeHtml);
+		
+		if (selectedCount == 1) {
+			dropdownMessage = '1 skill selected';
+		}
+		else {
+			dropdownMessage = selectedCount + ' skills selected';
+		}
+		
+		$(".skills-control-dropdown-button").text(dropdownMessage);
+	
+	}
+}
+
+
+function skillsControlLoadCategory(id) {
+	
+	$('.skills-control').hide();
+	$('.skills-control-spinner').show();
+	
+	var data = {}
+	data['Mode'] = "control";
+	data['SkillCategoryId'] = id;
+
+
+	//console.log(data);
+	
+	$.ajax({
+		type: 'POST',
+		url: '/api/skills_control.php',
+		data: JSON.stringify(data),
+		contentType: 'application/json; charset=utf-8',
+		dataType: 'json',
+		success: function (response) {
+			$('.skills-control').html(response).show();
+			$('.skills-control-spinner').hide();
+			skillsControlUpdate();
+		},
+		error: function (xhr, status, error) {
+			$('.skills-control-spinner').hide();
+			console.log(error);
+		}
+	});
+	
+	
+}
+
+
+
+function removeFromArrayByValue(array, value) {
+	var out = Array();
+	for (var i = 0; i < array.length; i++){
+		if (array[i] != value) {
+			out.push(array[i]);
+		}
+	}
+	return out;
+}
