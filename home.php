@@ -4,11 +4,15 @@
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/header.php';
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/footer.php';
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/adminStaff.php';
+		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/employer.php';
+		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/job.php';		
 	} else {
 		require_once './utilities/common.php';
 		require_once './classes/header.php';
 		require_once './classes/footer.php';
 		require_once './classes/adminStaff.php';
+		require_once './classes/employer.php';
+		require_once './classes/job.php';
 	}
 	
 	
@@ -52,7 +56,15 @@
 					<p><a href="skills_manage.php">Click here</a> to manage skills.</p>
 			
 			
-				<?php } else { ?>
+				<?php } else { 
+				
+						$employer = \Classes\Employer::GetEmployerByUserId($user->userId);
+						$jobs = \Classes\Job::GetJobsByEmployer($employer->employerId);
+				
+				?>
+				
+				
+				
 				
 				<div id="dashboard" class="row">
 					<div class="col-sm-3">
@@ -94,8 +106,23 @@
 						</div>
 					</div>
 				</div>
+				
+				<p>Jobs List - Testing</p>
+				
+				
 			
-			<?php } ?>
+			<?php 
+			
+					foreach ($jobs as $job) {
+						echo '<p><a href="create_job.php?j=' . $job->jobId . '">' . $job->jobName . '</a></p>';
+					} 
+					
+					
+					
+					//end employer
+				}
+				
+			?>
 			
 		</section>
     

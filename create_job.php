@@ -33,11 +33,19 @@
 	
 	$employer = \Classes\Employer::GetEmployerByUserId($user->userId);
 	
+	$jobId = \Utilities\Common::GetRequest("j");
 	
-	$jobId = 0;
+	echo "JobId: " . $jobId;
 	
-	//for now
 	$job = new \Classes\Job($jobId);
+	
+	if ($job->jobId != 0) {
+		//check employer
+		if ($job->employerId != $employer->employerId) {
+			header("Location: home.php");
+			die();		
+		}
+	}
 	
 
 	// empty fields
@@ -90,6 +98,10 @@
 			$errorMessages[] = "Please select a Field of Expertise";
 		}
 		
+		if ($selectedSkills == "") {
+			$errorMessages[] = "Please select at least one skill";
+		}
+		
 		/*if (count($skillsSelection) == 0) {
 			$errorMessages[] = "Please select up to 10 skills";
 		}
@@ -98,12 +110,13 @@
 		}*/
 		
 		
-		$errorMessages[] = "Test Error";
+		//$errorMessages[] = "Test Error";
 		
 		if (count($errorMessages) == 0) {
 		
 			// save job
 			
+			$job->employerId = $employer->employerId;
 			$job->jobName = $jobName;
 			$job->skillCategoryId = $skillCategoryId;
 			$objectSave = $job->Save();
@@ -115,23 +128,24 @@
 			
 				$jobId = $objectSave->objectId;
 				
-				print_r($jobId);
-			
+				\Classes\Job::SaveJobSkills($jobId, $selectedSkills);
 			}
 			
-			// if (count($errorMessages) == 0) {
-			// //	no errors, send to view job page;
-			// //  $jobID = "";
-			// 	header("Location: view_job.php?jobID=$jobID");
-			// 	die();	
-			// }
+			if (count($errorMessages) == 0) {
+				//	no errors, send to view job page;
+				header("Location: home.php");
+				die();	
+			}
 		}	
 		
 	}
 	else {
 	
 		//first load - load job information
-	
+		
+		$jobName = $job->jobName;
+		$skillCategoryId = $job->skillCategoryId;
+		$selectedSkills = \Classes\Job::GetSkillsByJobString($job->jobId);
 	}
 	
 	//get arrys list for dropdown
@@ -155,6 +169,7 @@
 			<form action="create_job.php" method="post" class="needs-validation" novalidate>
 			
 				<input type="hidden" name="SubmitForm" value="1">
+				<input type="hidden" name="j" value="<?php echo htmlspecialchars($jobId) ?>">
 				
 				<?php if (count($errorMessages) > 0) { ?>
 					<div class="alert alert-danger" role="alert"><?php echo join("<br />", $errorMessages); ?></div>

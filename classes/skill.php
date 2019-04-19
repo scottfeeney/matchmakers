@@ -182,6 +182,38 @@
 			
 		}
 		
+		// Get skills by Job
+		public static function GetSkillsByJob($jobId) {
+			
+			$skills = Array();
+			
+			$sql = "select s.* from skill s";
+			$sql .= " inner join job_skill js on s.SkillId = js.SkillId";
+			$sql .= " where js.JobId = ?";
+			$sql .= " order by s.SkillName";
+
+				
+			$conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);
+			
+			$stmt = $conn->prepare($sql);
+			$stmt->bind_param("i", $jobId);
+			$stmt->execute();
+			$result = mysqli_stmt_get_result($stmt);
+			$stmt->close();
+			$conn->close();
+			
+			while($row = mysqli_fetch_array($result))
+			{
+				$skill = new Skill();
+				Skill::LoadObject($skill, $row);
+				$skills[] = $skill;
+			}
+			
+			return $skills;
+			
+		}
+		
+		
 		private static function GetSkillExists($object) {
 			
 			$sql = "select * from skill where SkillCategoryId = ? and SkillName = ? and SkillId <> ?";
