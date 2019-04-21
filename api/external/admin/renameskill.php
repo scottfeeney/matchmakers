@@ -3,16 +3,16 @@
 
 if ($_SERVER['DOCUMENT_ROOT'] != '') {
     require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/user.php';
-    require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/adminStaff.php';
+    require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/adminstaff.php';
     require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/skill.php';
     require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/skillcategory.php';
-    require_once $_SERVER['DOCUMENT_ROOT'] . '/api/external/apiResult.php';
+    require_once $_SERVER['DOCUMENT_ROOT'] . '/api/external/apiresult.php';
     require_once $_SERVER['DOCUMENT_ROOT'] . '/utilities/common.php';
     require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/object_save.php';
 } else {
     require_once '../../../classes/user.php';
-    require_once '../../../classes/adminStaff.php';
-    require_once '../apiResult.php';
+    require_once '../../../classes/adminstaff.php';
+    require_once '../apiresult.php';
     require_once '../../../utilities/common.php';
     require_once '../../../classes/skill.php';
     require_once '../../../classes/skillcategory.php';
@@ -34,8 +34,9 @@ if ($user != null) {
         //Code to add skill
         $categoryId = \Utilities\Common::GetRequest("categoryId");
         $skillId = \Utilities\Common::GetRequest("categoryId");
-        if ($categoryId == "" or $skillId == "") {
-            echo (new \api\APIResult("failure","Must provide categoryId and skillId via POST or GET"))->getJSON();
+        $skillName = \Utilities\Common::GetRequest("newName");
+        if ($categoryId == "" or $skillName == "" or $skillId == "") {
+            echo (new \api\APIResult("failure","Must provide categoryId, skillId and new skillName via POST or GET"))->getJSON();
             exit();
         }
 
@@ -44,11 +45,12 @@ if ($user != null) {
             $skill = new \Classes\Skill($skillId);
             if ($skill != null) {
                 if ($skill->skillCategoryId == $category->skillCategoryId) {
-                    $objSave = \Classes\Skill::DeleteSkill($skillId);
+                    $skill->skillName = $skillName;
+                    $objSave = $skill->save();
                     if ($objSave->hasError) {
-                        echo (new \api\APIResult("failure","Error attempting to delete skill: " . $objSave->errorMessage))->getJSON();
+                        echo (new \api\APIResult("failure","Error attempting to rename skill: " . $objSave->errorMessage))->getJSON();
                     } else {
-                        echo (new \api\APIResult("success", "Skill successfully deleted"))->getJSON();
+                        echo (new \api\APIResult("success", "Skill successfully renamed"))->getJSON();
                     }                
                 } else {
                     echo (new \api\APIResult("failure","skillId does not represent a skill in the category represented by categoryId"))->getJSON();

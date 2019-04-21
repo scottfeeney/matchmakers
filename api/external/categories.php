@@ -4,9 +4,9 @@
 
     if ($_SERVER['DOCUMENT_ROOT'] != '') {
         require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/skillcategory.php';
-        require_once $_SERVER['DOCUMENT_ROOT'] . '/api/external/apiResult.php';
+        require_once $_SERVER['DOCUMENT_ROOT'] . '/api/external/apiresult.php';
     } else {
-        require_once './apiResult.php';
+        require_once './apiresult.php';
         require_once './classes/skillcategory.php';
     }
 

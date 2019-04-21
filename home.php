@@ -3,14 +3,14 @@
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/utilities/common.php';
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/header.php';
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/footer.php';
-		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/adminStaff.php';
+		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/adminstaff.php';
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/employer.php';
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/job.php';		
 	} else {
 		require_once './utilities/common.php';
 		require_once './classes/header.php';
 		require_once './classes/footer.php';
-		require_once './classes/adminStaff.php';
+		require_once './classes/adminstaff.php';
 		require_once './classes/employer.php';
 		require_once './classes/job.php';
 	}

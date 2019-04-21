@@ -3,16 +3,16 @@
 
 if ($_SERVER['DOCUMENT_ROOT'] != '') {
     require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/user.php';
-    require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/adminStaff.php';
+    require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/adminstaff.php';
     require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/skill.php';
     require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/skillcategory.php';
-    require_once $_SERVER['DOCUMENT_ROOT'] . '/api/external/apiResult.php';
+    require_once $_SERVER['DOCUMENT_ROOT'] . '/api/external/apiresult.php';
     require_once $_SERVER['DOCUMENT_ROOT'] . '/utilities/common.php';
     require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/object_save.php';
 } else {
     require_once '../../../classes/user.php';
-    require_once '../../../classes/adminStaff.php';
-    require_once '../apiResult.php';
+    require_once '../../../classes/adminstaff.php';
+    require_once '../apiresult.php';
     require_once '../../../utilities/common.php';
     require_once '../../../classes/skill.php';
     require_once '../../../classes/skillcategory.php';

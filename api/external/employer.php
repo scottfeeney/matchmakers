@@ -4,12 +4,12 @@
         require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/user.php';
         require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/employer.php';
         require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/location.php';
-        require_once $_SERVER['DOCUMENT_ROOT'] . '/api/external/apiResult.php';
+        require_once $_SERVER['DOCUMENT_ROOT'] . '/api/external/apiresult.php';
     } else {
         require_once '../../classes/user.php';
         require_once '../../classes/employer.php';
         require_once '../../classes/location.php';
-        require_once './apiResult.php';
+        require_once './apiresult.php';
     }
 
     if (!isset($_SERVER['HTTP_TOKEN'])) {

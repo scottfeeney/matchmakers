@@ -14,20 +14,13 @@
         require_once '../../utilities/common.php';
     }
 
-    $categoryId = \Utilities\Common::GetRequest("categoryId");
-    if ($categoryId == "") {
-        echo (new APIResult("failure","categoryId not provided"))->getJSON();
-        exit();
+    $categories = \Classes\SkillCategory::GetSkillCategories();
+
+    $allSkills = array();
+
+    foreach ($categories as $skill) {
+        $allSkills[$skill->skillCategoryName] = \Classes\Skill::GetSkillsBySkillCategory($skill->skillCategoryId);
     }
 
-    $category = new \Classes\SkillCategory($categoryId);
-    if ($category->skillCategoryName != null) {
-        echo (new APIResult("success",json_encode(\Classes\Skill::GetSkillsBySkillCategory($categoryId)), true))->getJSON();
-    } else {
-        echo (new APIResult("failure","invalid categoryId"))->getJSON();
-    }
-
-
-
-
+    echo (new APIResult("success",json_encode($allSkills), true))->getJSON();
 ?>

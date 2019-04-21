@@ -2,14 +2,14 @@
 
     if ($_SERVER['DOCUMENT_ROOT'] != '') {
         require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/user.php';
-        require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/jobSeeker.php';
+        require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/jobseeker.php';
         require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/location.php';
-        require_once $_SERVER['DOCUMENT_ROOT'] . '/api/external/apiResult.php';
+        require_once $_SERVER['DOCUMENT_ROOT'] . '/api/external/apiresult.php';
     } else {
         require_once '../../classes/user.php';
-        require_once '../../classes/jobSeeker.php';
+        require_once '../../classes/jobseeker.php';
         require_once '../../classes/location.php';
-        require_once './apiResult.php';
+        require_once './apiresult.php';
     }
 
     if (!isset($_SERVER['HTTP_TOKEN'])) {
@@ -30,6 +30,9 @@
             //Convert locationId to name (if able)
             $location = new \Classes\Location($jobSeeker->locationId);
             if (!isset($location->locationId)) {
+                //In retrospect, this should never execute as the foreign key constraint will
+                //prevent the locationId from ever being set to something not present in
+                //the location table
                 $jobSeeker->location = "Error: Not able to retrieve location";
             } else {
                 $jobSeeker->location = $location->name;
