@@ -83,7 +83,7 @@
 		}
 		
 		if ($jobChangeSpeed == "") {
-			$errorMessages[] = "Please select a Speed of job change";
+			$errorMessages[] = "Please select a speed of job change";
 		}
 
 		if ($jobType == "") {
@@ -162,7 +162,7 @@
 
         <section>
 
-			<h2>New Job listing</h2>
+			<h2>New Job Listing</h2>
 			
 			<p>Please enter your position details below.</p>
 			
@@ -182,7 +182,7 @@
 						<div class="form-group">
 							<label for="JobName">*Position Title:</label>
 							<input type="text" class="form-control" name="JobName" id="JobName" maxlength="70" value="<?php echo htmlspecialchars($jobName) ?>" required>
-							<div class="invalid-feedback">Please enter the position name.</div>
+							<div class="invalid-feedback">Please enter the position name</div>
 						</div>
 					</div>
 				</div>
@@ -190,10 +190,10 @@
 				<div class="row">	
 					<div class="col-sm-12">
 						<div class="form-group">
-							<label for="positionDescription">*Postion description:</label>
+							<label for="positionDescription">*Position Description:</label>
 							<textarea type="text" class="form-control" rows="5" name="positionDescription" id="positionDescription" value="<?php echo htmlspecialchars($positionDescription) ?>" maxlength="300" ></textarea>
 							<div id="count">Characters Left: 300</div>
-							<div class="invalid-feedback">Please enter your postition description</div>
+							<div class="invalid-feedback">Please enter your position description</div>
 						</div>
 					</div>
 				</div>
