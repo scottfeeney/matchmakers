@@ -56,10 +56,12 @@ final class UserTest extends TestCase {
     }
 
     public function testSaveEmailExists() {
-        //obviously needs at least two records in the database for this to work
-        $user = new \Classes\User(2);
-        $user->userId = 1;
-        $objSave = $user->Save();
+        $oid = $this->saveNewUser($this->testEmails[1]);
+        $this->idsToDelete[] = $oid;
+        $user = new \Classes\User($oid);
+        $newUser = new \Classes\User();
+        $newUser->email = $user->email;
+        $objSave = $newUser->Save();
         $this->assertEquals('Email address exists in system', $objSave->errorMessage);
         $this->assertEquals(true, $objSave->hasError);
     }

@@ -15,24 +15,25 @@ final class EmployerTest extends TestCase {
     }
 
     public function testSaveUser() {
-        $result = $this->createUserAndEmployer();
+        $result = $this->createUserAndEmployer($this->testEmail);
         if ($result == null) {
-            $this->assertTrue(false);
+            $this->assertTrue(false,"Result of trying to save user was null");
         }
         //var_dump($result);
         extract($result);
+        $this->uidsToDelete[] = $oid;
         //$this->eidsToDelete[] = $eid;
         $this->assertEquals($employer, new \Classes\Employer($eid));
     }
 
-    private function createUserAndEmployer() {
-        $oid = UserTest::saveNewUser($this->testEmail);
+    public static function createUserAndEmployer($email) {
+        $oid = UserTest::saveNewUser($email);
         if ($oid == null) {
+            var_dump("ERROR: failure to create new user record");
             return null; //better for stuff to fail here than make a mess
                         //creating records in employer with null userId values
                         //that won't be deleted by cleanup
         }
-        $this->uidsToDelete[] = $oid;
         $employer = new \Classes\Employer(0);
         $employer->userId = $oid;
         $oSave = $employer->save();
@@ -42,11 +43,12 @@ final class EmployerTest extends TestCase {
     }
 
     public function testEditEmployer() {
-        $result = $this->createUserAndEmployer();
+        $result = $this->createUserAndEmployer($this->testEmail);
         if ($result == null) {
             $this->assertTrue(false);
         }
         extract($result);
+        $this->uidsToDelete[] = $oid;
         $employer->firstName = "Bob";
         $oSave2 = $employer->save();
         $eid = $oSave2->objectId;
@@ -58,11 +60,12 @@ final class EmployerTest extends TestCase {
     }
 
     public function testGetEmployerByUserId() {
-        $result = $this->createUserAndEmployer();
+        $result = $this->createUserAndEmployer($this->testEmail);
         if ($result == null) {
             $this->assertTrue(false);
         }
         extract($result);
+        $this->uidsToDelete[] = $oid;
         $this->assertEquals(\Classes\Employer::GetEmployerByUserId($oid), $employer);
     }
 
