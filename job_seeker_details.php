@@ -4,17 +4,19 @@
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/header.php';
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/footer.php';
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/location.php';
-		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/skill_category.php';
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/jobseeker.php';
-		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/job_type.php';
+		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/jobtype.php';
+		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/skillcategory.php';
+		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/skill.php';
 	} else {
 		require_once './utilities/common.php';
 		require_once './classes/header.php';
 		require_once './classes/footer.php';
 		require_once './classes/location.php';
-		require_once './classes/skill_category.php';
+		require_once './classes/skillcategory.php';
 		require_once './classes/jobseeker.php';
-		require_once './classes/job_type.php';
+		require_once './classes/jobtype.php';
+		require_once './classes/skill.php';
 	}
 	
 	$user = \Utilities\Common::GetSessionUser();
@@ -54,6 +56,7 @@
 	$signUpReason = "";
 	$jobChangeSpeed = "";
 	$jobType = "";
+	$selectedSkills = "";
 	
 	if (\Utilities\Common::IsSubmitForm())
 	{
@@ -81,6 +84,7 @@
 		$signUpReason = \Utilities\Common::GetRequest("SignUpReason");
 		$jobChangeSpeed = \Utilities\Common::GetRequest("JobChangeSpeed");
 		$jobType = \Utilities\Common::GetRequest("JobType");
+		$selectedSkills = \Utilities\Common::GetRequest("SkillsControlSelectedSkills");
 
 		// Name/Title validation
 		if ($title == "") {
@@ -134,7 +138,7 @@
 		}
 		
 		if(strlen($mobileNumber) <> 10){
-			$errorMessages[] = "Your mobile number must be 8 digits long";
+			$errorMessages[] = "Your mobile number must be 10 digits long";
 			$mobileNumber = "";
 		}
 		
@@ -196,6 +200,10 @@
 			$errorMessages[] = "Please select a type of work";
 		}
 		
+		if ($selectedSkills == "") {
+			$errorMessages[] = "Please select at least one skill";
+		}
+		
 		if (count($errorMessages) == 0) {
 		
 			// save job seeker
@@ -217,7 +225,6 @@
 			$jobSeeker->city = $city;
 			$jobSeeker->state = $state;
 			$jobSeeker->postcode = $postcode;
-			//$jobSeeker->fieldOfExpertise = $fieldOfExpertise;
 			$jobSeeker->skillCategoryId = $skillCategoryId;
 			$jobSeeker->ageGroup = $ageGroup;
 			$jobSeeker->highestLevelCompleted = $highestLevelCompleted;
@@ -242,9 +249,17 @@
 						$errorMessages[] = $objectSave->errorMessage;
 					}
 				}
-				
+				else {
+			
+			
+					//save job seeker skills
+					$jobSeekerId = $objectSave->objectId;
+					
+					\Classes\JobSeeker::SaveJobSeekerSkills($jobSeekerId, $selectedSkills);
+				}
 				
 			}
+			
 						
 			if (count($errorMessages) == 0) {
 				//no errors, send to home page;
@@ -268,7 +283,6 @@
 			$city = $jobSeeker->city;
 			$state = $jobSeeker->state;
 			$postcode = $jobSeeker->postcode;
-			//$fieldOfExpertise = $jobSeeker->fieldOfExpertise;
 			$skillCategoryId = $jobSeeker->skillCategoryId;
 			$ageGroup = $jobSeeker->ageGroup;
 			$highestLevelCompleted = $jobSeeker->highestLevelCompleted;
@@ -277,6 +291,7 @@
 			$signUpReason = $jobSeeker->signUpReason;
 			$jobChangeSpeed = $jobSeeker->jobChangeSpeed;
 			$jobType = $jobSeeker->jobTypeId;
+			$selectedSkills = \Classes\JobSeeker::GetSkillsByJobSeekerString($jobSeeker->jobSeekerId);
 		}
 	}
 	
@@ -284,7 +299,6 @@
 
 	$titles = \Classes\JobSeeker::GetTitles() ;
 	$states = \Classes\JobSeeker::GetStates() ;
-	//$expertiseFields =	\Classes\JobSeeker::GetExpertiseFields();
 	$skillCategories = \Classes\SkillCategory::GetSkillCategories();
 	$ageGroups = \Classes\JobSeeker::GetAgeGroups();
 	$educationLevels = \Classes\JobSeeker::GetEducationLevels();
@@ -412,7 +426,7 @@
 					<div class="col-sm-6">
 						<div class="form-group">
 							<label for="SkillCategoryId">*Field of Expertise:</label>
-							<select name="SkillCategoryId" id="SkillCategoryId" class="form-control" required>
+							<select name="SkillCategoryId" id="SkillCategoryId" class="form-control skills-control-skills-category" required>
 								<option value=""></option>
 								<?php foreach ($skillCategories as $skillCategory) { ?>
 									<option value="<?php echo $skillCategory->skillCategoryId; ?>" <?php if ($skillCategory->skillCategoryId == $skillCategoryId) {echo "selected";} ?>><?php echo $skillCategory->skillCategoryName; ?></option>
@@ -514,11 +528,30 @@
 						</div>
 					</div>
 				</div>
-				<div class="form-section">Skills</div>
-				<h4>Coming Sprint 6</h4>
 				
-				<div class="form-section">Experience</div>
-				<h4>Coming Sprint 6</h4>
+				<div class="row">		
+					<div class="col-sm-12">
+						<div class="form-group">
+							<label>*Skills: (select your skills based on your Field of Expertise)</label>
+							<div class="skills-control-wrapper none-selected">
+								<div class="card">
+									<div class="card-body">
+										<div class="skills-control-spinner"><i class="fas fa-spinner fa-spin"></i></div>
+										<div class="skills-control">
+											<?php 
+												if ($skillCategoryId != "") {
+													$skills = \Classes\Skill::GetSkillsBySkillCategory($skillCategoryId);
+													echo \Utilities\Common::GetSkillsControl($skills, $selectedSkills); 
+												}
+											?>
+										</div>
+									</div>
+								</div>
+								<div class="invalid-skills-control-feedback">Please select at least one skill</div>
+							</div>
+						</div>
+					</div>
+				</div>
 				
 				<div class="form-group mt-3">
 					<button type="submit" class="btn btn-primary">Save</button>  

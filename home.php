@@ -56,73 +56,77 @@
 					<p><a href="skills_manage.php">Click here</a> to manage skills.</p>
 			
 			
-				<?php } else { 
-				
-						$employer = \Classes\Employer::GetEmployerByUserId($user->userId);
-						$jobs = \Classes\Job::GetJobsByEmployer($employer->employerId);
-				
-				?>
+			<?php } else { ?>
 				
 				
 				
 				
-				<div id="dashboard" class="row">
-					<div class="col-sm-3">
-						<a <?php echo $details; ?> data-toggle="tooltip" data-placement="top" title="View or update your details">
-							<div class="card p-1 mb-2">
-								<!-- detail by priyanka from the Noun Project
-									 https://thenounproject.com/search/?q=details&i=2336354 -->
-								<img class="card-img-top mx-auto img-responsive" src="images/noun_detail_2336354_resized.png" alt="Card image cap">
-								<div class="card-body">
-									<h5 class="card-title text-center">Your Details</h5>
-								</div>
-							</div>
-						</a>
-					</div>
-					
-					<?php if ($user->userType == 1) { ?>
+				
+				
+					<div id="dashboard" class="row">
 						<div class="col-sm-3">
-							<a <?php echo $newJob; ?> data-toggle="tooltip" data-placement="top" title="Create a new job listing">
-								<div class="card p-1 mb-2" data-toggle="tooltip" data-placement="top" title="Create new job listings">
-									<!-- Job Search by Thomas' designs from the Noun Project
-										 https://thenounproject.com/term/job-search/1018640/ -->
-									<img class="card-img-top mx-auto img-responsive" src="images/noun_Job_Search_1018640.png" alt="Card image cap">
+							<a <?php echo $details; ?> data-toggle="tooltip" data-placement="top" title="View or update your details">
+								<div class="card p-1 mb-2">
+									<!-- detail by priyanka from the Noun Project
+										 https://thenounproject.com/search/?q=details&i=2336354 -->
+									<img class="card-img-top mx-auto img-responsive" src="images/noun_detail_2336354_resized.png" alt="Card image cap">
 									<div class="card-body">
-										<h5 class="card-title text-center">Create New Job</h5>
+										<h5 class="card-title text-center">Your Details</h5>
 									</div>
 								</div>
 							</a>
 						</div>
-					<?php } ?>
-					
-					<div class="col-sm-3">
-						<div class="card p-1 mb-2" data-toggle="tooltip" data-placement="top" title="View and edit your job listings">
-							<!-- job by Adrien Coquet from the Noun Project
-								 https://thenounproject.com/search/?q=job&i=2043873 -->
-							<img class="card-img-top mx-auto img-responsive" src="images/noun_job_2043873.png" alt="Card image cap">
-							<div class="card-body">
-								<h5 class="card-title text-center"><?php echo $match; ?></h5>
+						
+						<?php if ($user->userType == 1) { ?>
+							<div class="col-sm-3">
+								<a <?php echo $newJob; ?> data-toggle="tooltip" data-placement="top" title="Create a new job listing">
+									<div class="card p-1 mb-2" data-toggle="tooltip" data-placement="top" title="Create new job listings">
+										<!-- Job Search by Thomas' designs from the Noun Project
+											 https://thenounproject.com/term/job-search/1018640/ -->
+										<img class="card-img-top mx-auto img-responsive" src="images/noun_Job_Search_1018640.png" alt="Card image cap">
+										<div class="card-body">
+											<h5 class="card-title text-center">Create New Job</h5>
+										</div>
+									</div>
+								</a>
+							</div>
+						<?php } ?>
+						
+						<div class="col-sm-3">
+							<div class="card p-1 mb-2" data-toggle="tooltip" data-placement="top" title="View and edit your job listings">
+								<!-- job by Adrien Coquet from the Noun Project
+									 https://thenounproject.com/search/?q=job&i=2043873 -->
+								<img class="card-img-top mx-auto img-responsive" src="images/noun_job_2043873.png" alt="Card image cap">
+								<div class="card-body">
+									<h5 class="card-title text-center"><?php echo $match; ?></h5>
+								</div>
 							</div>
 						</div>
 					</div>
-				</div>
+			
+
 				
-				<p>Jobs List - Testing</p>
-				
+			<?php } ?>
 				
 			
 			<?php 
 			
+				if ($user->userType == 1) {
+				
+					$employer = \Classes\Employer::GetEmployerByUserId($user->userId);
+					$jobs = \Classes\Job::GetJobsByEmployer($employer->employerId);
+				
+					echo '<p>Jobs List - Testing</p>';
+					
 					foreach ($jobs as $job) {
 						echo '<p><a href="create_job.php?j=' . $job->jobId . '">' . $job->jobName . '</a></p>';
 					} 
-					
-					
-					
-					//end employer
-				}
 				
+				} 
+			
 			?>
+			
+			
 			
 		</section>
     

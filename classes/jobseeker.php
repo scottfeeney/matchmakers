@@ -200,6 +200,40 @@
 			return new \Classes\ObjectSave($errorMessage, $objectId);
 		
 		}
+		
+		
+		public static function SaveJobSeekerSkills($jobSeekerId, $selectedSkills) {
+			
+			$jobSeeker = new JobSeeker($jobSeekerId);
+			
+			// TODO check $selectedSkills contains integers
+			
+			$conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);	
+			
+			$sql = " delete from job_seeker_skill where JobSeekerId = ? and SkillId not in";
+			$sql .= " (";
+			$sql .= " 	select SkillId from Skill where SkillCategoryId = ?";
+			$sql .= " 	and SkillId in (" . $selectedSkills . ")";
+			$sql .= " )";
+
+			$stmt = $conn->prepare($sql);
+			$stmt->bind_param("ii", $jobSeeker->jobSeekerId,  $job->skillCategoryId);
+			$stmt->execute();
+			
+			
+			$sql = " insert into job_seeker_skill (JobSeekerId, SkillId)";
+			$sql .= " select ?, SkillId from Skill where SkillCategoryId = ?";
+			$sql .= " and SkillId in (" . $selectedSkills . ")";
+			$sql .= " and SkillId not in (select SkillId from job_seeker_skill where JobSeekerId = ?)";
+			
+			$stmt = $conn->prepare($sql);
+			$stmt->bind_param("iii", $jobSeeker->jobSeekerId,  $jobSeeker->skillCategoryId, $jobSeeker->jobSeekerId);
+			$stmt->execute();
+			
+			$stmt->close();
+			$conn->close();
+
+		}
 	
 		
 		// get job seeker by user id
@@ -224,6 +258,21 @@
 			
 			
 			return null;
+			
+		}
+		
+		
+		public static function GetSkillsByJobSeekerString($jobSeekerId) {
+			
+			$skills = \Classes\Skill::GetSkillsByJobSeeker($jobSeekerId);
+			
+			$skillsList = Array();
+			
+			foreach ($skills as $skill) {
+				$skillsList[] = $skill->skillId;
+			}
+			
+			return join(",",$skillsList);
 			
 		}
 		
