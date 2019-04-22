@@ -17,11 +17,20 @@ $(document).ready(function () {
 			$(form).find('input:text').each(function(){
 				$(this).val($.trim($(this).val()));
 			});
-	  
+			
+			
 			if (form.checkValidity() === false) {
 				event.preventDefault();
 				event.stopPropagation();
 			}
+			
+			if ($(form).find('#SkillsControlSelectedSkills').length > 0) {
+				if ($(form).find('#SkillsControlSelectedSkills').val() == '') {
+					event.preventDefault();
+					event.stopPropagation();
+				}
+			}
+			
 			form.classList.add('was-validated');
 		}, false);
 	});
@@ -36,6 +45,16 @@ $(document).ready(function () {
 			//$('.job-seeker-current-study-level-group select').prop('required',false);
 		}
 	});
+	
+
+	$('.textarea-limit').keyup(function() {
+		var textlimit = $(this).attr('data-limit');
+		var tlength = $(this).val().length;
+		$(this).val($(this).val().substring(0, textlimit));
+		var tlength = $(this).val().length;
+		remain = textlimit - parseInt(tlength);
+		$(this).closest('.form-group').find('.text-limit-remain').html('Characters remaining: ' + remain);
+	 });  
 
 });	
 
@@ -273,12 +292,14 @@ function skillsControlGetSelectedSkills() {
 
 function skillsControlUpdate() {
 	
+	var selectedCount = 0;
+	
 	if (typeof skills != "undefined") {
 	
 		var selectedSkills = "," + $('#SkillsControlSelectedSkills').val() + ",";
 		var dropdownHtml = '';
 		var badgeHtml = '';
-		var selectedCount = 0;
+		
 		var dropdownMessage = '';
 
 		for (var i = 0; i < skills.length; i++){
@@ -304,8 +325,22 @@ function skillsControlUpdate() {
 		}
 		
 		$(".skills-control-dropdown-button").text(dropdownMessage);
-	
+		
 	}
+	
+
+	var wrapper = $('.skills-control-wrapper');
+		
+		
+	if (selectedCount == 0) {
+		wrapper.removeClass('has-selected');
+		wrapper.addClass('none-selected');
+	}
+	else {
+		wrapper.removeClass('none-selected');
+		wrapper.addClass('has-selected');
+	}
+	
 }
 
 
@@ -319,8 +354,6 @@ function skillsControlLoadCategory(id) {
 	data['SkillCategoryId'] = id;
 
 
-	//console.log(data);
-	
 	$.ajax({
 		type: 'POST',
 		url: '/api/skills_control.php',

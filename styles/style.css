@@ -385,3 +385,23 @@ footer {
     max-height: 280px;
     overflow-y: auto;
 }
+
+.invalid-skills-control-feedback {
+	display: none;
+	color: #dc3545;
+	width: 100%;
+    margin-top: .25rem;
+    font-size: 80%;
+}
+
+.was-validated .skills-control-wrapper.none-selected .card {
+	border-color: #dc3545;
+}
+
+.was-validated .skills-control-wrapper.has-selected .card {
+	border-color: #28a745;
+}
+
+.was-validated .skills-control-wrapper.none-selected .invalid-skills-control-feedback {
+	display: block;
+}
