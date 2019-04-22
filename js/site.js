@@ -65,7 +65,7 @@ function resizePage() {
 		$('.home-page .jumbotron').css({'height' : 'auto'})
 	}
 	
-	console.log($(window).height(), $('.main-container').height());
+	//console.log($(window).height(), $('.main-container').height());
 	var screenHeight = $(window).height();
 	var mainContainerHeight = $('.main-container').height();
 	
@@ -353,7 +353,8 @@ function skillsControlLoadCategory(id) {
 	data['Mode'] = "control";
 	data['SkillCategoryId'] = id;
 
-
+	//console.log(data);
+	
 	$.ajax({
 		type: 'POST',
 		url: '/api/skills_control.php',

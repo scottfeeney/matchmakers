@@ -38,7 +38,7 @@
 						header('Location: /employer_details.php');
 						exit;
 					}
-					else if ($user->userType == 2 && $pageName != "job_seeker_details.php")
+					else if ($user->userType == 2 && ($pageName != "job_seeker_details.php" && $pageName != "skills_control.php"))
 					{
 						header('Location: /job_seeker_details.php');
 						exit;
