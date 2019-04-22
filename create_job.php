@@ -278,10 +278,6 @@
 										
 				</div>
 				
-				
-				
-				
-				
 				<div class="row">	
 					<div class="col-sm-12">
 						<div class="form-group">
@@ -319,13 +315,22 @@
 							</div>
 						</div>
 					</div>
-				</div>	
-
+				</div>
 					
 				<div class="row">	
 					<div class="col-sm-12">
 						<div class="form-group mt-3">
-							<button class="btn btn-primary">Post Job</button>  
+							<?php
+								// Change button text if the job has been posted or not
+								if (strLen($jobName) > 0) {
+									$submitBtn = "Save";
+								}
+								else{
+									$submitBtn = "Post Job";
+								}
+							?>
+						
+							<button class="btn btn-primary"><?php echo $submitBtn; ?></button>  
 						</div>
 					</div>
 				</div>
