@@ -239,23 +239,18 @@
 				$errorMessages[] = $objectSave->errorMessage;
 			}
 			else {
+				//save job seeker skills
+				$jobSeekerId = $objectSave->objectId;
+				\Classes\JobSeeker::SaveJobSeekerSkills($jobSeekerId, $selectedSkills);
+				
 				
 				//update user object enteredDetails fields
-
 				if ($user->enteredDetails == false) {
 					$user->enteredDetails = true;
 					$objectSave = $user->Save();
 					if ($objectSave->hasError) {
 						$errorMessages[] = $objectSave->errorMessage;
 					}
-				}
-				else {
-			
-			
-					//save job seeker skills
-					$jobSeekerId = $objectSave->objectId;
-					
-					\Classes\JobSeeker::SaveJobSeekerSkills($jobSeekerId, $selectedSkills);
 				}
 				
 			}
@@ -266,6 +261,7 @@
 				header("Location: home.php");
 				die();	
 			}
+			
 		}
 	}
 	else {
