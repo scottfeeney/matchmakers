@@ -477,7 +477,7 @@
 					<div class="col-sm-3">
 						<div class="form-group">
 							<label for="Postcode">*Postcode:</label>
-							<input type="text" class="form-control" name="Postcode" id="Postcode" maxlength="6" value="<?php echo htmlspecialchars($postcode) ?>" required>
+							<input type="text" class="form-control" name="Postcode" id="Postcode" maxlength="4" value="<?php echo htmlspecialchars($postcode) ?>" required>
 							<div class="invalid-feedback">Please enter a Postcode</div>
 						</div>
 					</div>
