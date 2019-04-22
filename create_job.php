@@ -81,6 +81,11 @@
 			$errorMessages[] = "Please enter the Position Description";
 		}
 		
+		if (strlen($jobDescription) > 600 ) {
+			$errorMessages[] = "Please only enter a Position Description of 600 characters";
+			$jobDescription = "";
+		}
+		
 		if ($positionAvailability == "") {
 			$errorMessages[] = "Please select the Position Availability";
 		}
@@ -207,7 +212,7 @@
 					<div class="col-sm-12">
 						<div class="form-group">
 							<label for="JobDescription">*Position Description:</label>
-							<textarea type="text" class="form-control textarea-limit" rows="5" name="JobDescription" id="JobDescription" data-limit="600" required><?php echo htmlspecialchars($jobDescription) ?></textarea>
+							<textarea type="text" class="form-control textarea-limit" rows="5" name="JobDescription" id="JobDescription" maxlength="600" data-limit="600" required><?php echo htmlspecialchars($jobDescription) ?></textarea>
 							<div class="text-limit-remain"></div>
 							<div class="invalid-feedback">Please enter the Position Description</div>
 						</div>
