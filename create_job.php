@@ -83,7 +83,6 @@
 		
 		if (strlen($jobDescription) > 600 ) {
 			$errorMessages[] = "Please only enter a Position Description of 600 characters";
-			$jobDescription = "";
 		}
 		
 		if ($positionAvailability == "") {
