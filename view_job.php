@@ -95,20 +95,20 @@
 			<!-- Company name -->
 			<div class="row mt-2">
 				<div class="col-sm-12">
-					<h3><?php echo $companyName; ?></h3>
+					<h3><?php echo "$companyName (TODO)"; ?></h3>
 				</div>
 			</div>
 			
 			<!-- Job Type, Start period, and Reference No.-->
 			<div class="row mt-2">
 				<div class="col-sm-4">
-					<p>Job Type: <?php echo $jobTypeName; ?><p>
+					<p><strong>Job Type: </strong><?php echo $jobTypeName; ?><p>
 				</div>
 				<div class="col-sm-4">
-					<p>Start Period: <?php echo $positionAvailability; ?></p>
+					<p><strong>Start Period: </strong><?php echo $positionAvailability; ?></p>
 				</div>				
 				<div class="col-sm-4">
-					<p><?php echo "Reference Number: $referenceNumber"; ?></p>
+					<p><strong>Reference Number: </strong><?php echo $referenceNumber; ?></p>
 				</div>
 			</div>
 			
@@ -122,7 +122,7 @@
 			
 			<!-- Skills -->
 			<div id="skillsSection">
-				<h2>Required Skills</h2>
+				<h3>Required Skills</h3>
 				<div>
 					<ul>
 						<li>TODO</li>
@@ -139,16 +139,14 @@
 			<!-- Location-->
 			<div id="locationSection">
 				<div>
-					<h2>Location</h2>
-					<?php 
-						echo $locationName;
-					?>
+					<h2>Location: <?php echo $locationName; ?></h2>
+					
 					<div>
 						<iframe width="400" 
 								height="400" 
 								src=<?php echo $maps[$locationName]; ?> 
 								scrolling="no">
-						</iframe-->
+						</iframe>
 					</div>
 				</div>
 			</div>
