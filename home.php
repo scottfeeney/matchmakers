@@ -44,7 +44,7 @@
 					
 					echo GetCard("fa-hard-hat", "Click here to post a new job listing", "/create_job.php");
 					
-					echo GetCard("fa-stream", "Click here to view your job listings", "/job_listings.php");
+					echo GetCard("fa-stream", "Click here to view your job listings", "/employer_jobs.php");
 					
 
 

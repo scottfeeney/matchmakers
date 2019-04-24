@@ -425,3 +425,14 @@ footer {
 	text-align: center;
 	line-height: 4em;
 }
+
+.list-title {
+	font-weight: bold;
+	font-size: 1.2em;
+}
+.listing-card {
+	margin-top: 20px;
+}
+.listing-card a {
+	text-decoration: none;
+}

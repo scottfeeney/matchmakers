@@ -192,6 +192,18 @@
 			
 		}
 		
+		
+		public static function DisplayDate($value) {
+			
+			if (empty($value)) {
+				return "";
+			}
+			else {
+				return date('d-M-Y', strtotime($value));
+			}
+			
+		}
+		
 	}
 	
 ?>		

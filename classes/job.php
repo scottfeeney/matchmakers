@@ -24,6 +24,7 @@
 		public $skillCategoryId;
 		public $positionAvailability;
 		public $active;
+		public $created;
 				
 		public function __construct($jobId = 0) {
         
@@ -69,6 +70,7 @@
 			$object->positionAvailability = $row['PositionAvailability'];
 			$object->jobDescription = $row['JobDescription'];
 			$object->active = $row['Active'];
+			$object->created = $row['Created'];
 			
 		}
 		
