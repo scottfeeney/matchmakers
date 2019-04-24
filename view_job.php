@@ -92,16 +92,14 @@
 			<!-- Skills -->
 			<div id="skillsSection">
 				<h3>Required Skills</h3>
-				<div>
-					<ul>
-						<?php					
-							// Loop through array of skills to display skill name
-							foreach($selectedSkills as $skill){
-								echo "<li>$skill->skillName</li>";
-							}
-						?>
-					</ul>					
-				</div>				
+				<div class="col-sm-12">
+					<?php					
+						// Loop through array of skills to display skill name
+						foreach($selectedSkills as $skill){
+							echo "<span class='badge badge-info jobSkillDisplay'>$skill->skillName</span>";
+						}
+					?>
+				</div>
 			</div>
 			
 			<!-- Location-->
