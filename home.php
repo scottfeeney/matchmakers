@@ -5,6 +5,7 @@
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/footer.php';
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/adminstaff.php';
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/employer.php';
+		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/jobseeker.php';
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/job.php';		
 	} else {
 		require_once './utilities/common.php';
@@ -12,6 +13,7 @@
 		require_once './classes/footer.php';
 		require_once './classes/adminstaff.php';
 		require_once './classes/employer.php';
+		require_once './classes/jobseeker.php';
 		require_once './classes/job.php';
 	}
 	
@@ -29,108 +31,92 @@
 		
 			<h2>Welcome to Job Matcher</h2>
 		
-			<h3>Dashboard</h3>
-			
 			<?php
 				if ($user->userType == 1) {
-					$details = "href='employer_details.php'";
-					$newJob = "href='create_job.php'";
-					$match = "View Your Jobs";
+					
+					//employer
+					
+					$employer = \Classes\Employer::GetEmployerByUserId($user->userId);
+					
+					echo GetCardDetail("<strong>Employer: </strong>" . htmlspecialchars($employer->companyName));
+					
+					echo GetCard("fa-building", "Click here to update your details", "/employer_details.php");
+					
+					echo GetCard("fa-hard-hat", "Click here to post a new job listing", "/create_job.php");
+					
+					echo GetCard("fa-stream", "Click here to view your job listings", "/job_listings.php");
+					
+
+
 				}
 				else if ($user->userType == 2) {
-					$details = "href='job_seeker_details.php'";
-					$match = "View Your Matches";
+					
+					//job seeker
+					
+					$jobSeeker = \Classes\JobSeeker::GetJobSeekerByUserId($user->userId);
+					
+					echo GetCardDetail("<strong>Job Seeker: </strong>" . htmlspecialchars($jobSeeker->firstName . " " . $jobSeeker->lastName));
+					
+					echo GetCard("fa-user-tie", "Click here to update your details", "/job_seeker_details.php");
+					
+					echo GetCard("fa-stream", "Click here to view your job matches", "/job_seeker_matches.php");
+					
+
+				}
+				else if ($user->userType == 3) {
+					
+					//staff
+					
+					$adminStaff = \Classes\AdminStaff::GetAdminStaffByUserId($user->userId);
+					
+					echo GetCardDetail("<strong>Staff member: </strong>" . htmlspecialchars($adminStaff->firstName . " " . $adminStaff->lastName));
+					
+					echo GetCard("fa-user", "Click here to manage skills", "/skills_manage.php");
+					
 				}
 			?>
 			
 			
-			<?php if ($user->userType == 3) { 
-			
-				$adminStaff = \Classes\AdminStaff::GetAdminStaffByUserId($user->userId);
-		
-			?>
-			
-					<p>Welcome staff member: <?php echo htmlspecialchars($adminStaff->firstName . " " . $adminStaff->lastName) ?>
-					
-					
-					<p><a href="skills_manage.php">Click here</a> to manage skills.</p>
-			
-			
-			<?php } else { ?>
-				
-				
-				
-				
-				
-				
-					<div id="dashboard" class="row">
-						<div class="col-sm-3">
-							<a <?php echo $details; ?> data-toggle="tooltip" data-placement="top" title="View or update your details">
-								<div class="card p-1 mb-2">
-									<!-- detail by priyanka from the Noun Project
-										 https://thenounproject.com/search/?q=details&i=2336354 -->
-									<img class="card-img-top mx-auto img-responsive" src="images/noun_detail_2336354_resized.png" alt="Card image cap">
-									<div class="card-body">
-										<h5 class="card-title text-center">Your Details</h5>
-									</div>
-								</div>
-							</a>
-						</div>
-						
-						<?php if ($user->userType == 1) { ?>
-							<div class="col-sm-3">
-								<a <?php echo $newJob; ?> data-toggle="tooltip" data-placement="top" title="Create a new job listing">
-									<div class="card p-1 mb-2" data-toggle="tooltip" data-placement="top" title="Create new job listings">
-										<!-- Job Search by Thomas' designs from the Noun Project
-											 https://thenounproject.com/term/job-search/1018640/ -->
-										<img class="card-img-top mx-auto img-responsive" src="images/noun_Job_Search_1018640.png" alt="Card image cap">
-										<div class="card-body">
-											<h5 class="card-title text-center">Create New Job</h5>
-										</div>
-									</div>
-								</a>
-							</div>
-						<?php } ?>
-						
-						<div class="col-sm-3">
-							<div class="card p-1 mb-2" data-toggle="tooltip" data-placement="top" title="View and edit your job listings">
-								<!-- job by Adrien Coquet from the Noun Project
-									 https://thenounproject.com/search/?q=job&i=2043873 -->
-								<img class="card-img-top mx-auto img-responsive" src="images/noun_job_2043873.png" alt="Card image cap">
-								<div class="card-body">
-									<h5 class="card-title text-center"><?php echo $match; ?></h5>
-								</div>
-							</div>
-						</div>
-					</div>
-			
-
-				
-			<?php } ?>
-				
-			
-			<?php 
-			
-				if ($user->userType == 1) {
-				
-					$employer = \Classes\Employer::GetEmployerByUserId($user->userId);
-					$jobs = \Classes\Job::GetJobsByEmployer($employer->employerId);
-				
-					echo '<p>Jobs List - Testing</p>';
-					
-					foreach ($jobs as $job) {
-						echo '<p><a href="create_job.php?j=' . $job->jobId . '">' . $job->jobName . '</a></p>';
-					} 
-				
-				} 
-			
-			?>
 			
 			
 			
 		</section>
     
 <?php
+	
 	$footer = new \Template\Footer();
 	echo $footer->Bind();
+	
+	
+	function GetCard($icon, $text, $url) {
+		
+		$html = '<div class="card dashboard-card" onclick="window.location.href=\'' . $url .'\';">
+			<div class="card-body">
+				<div class="row">	
+					<div class="col-sm-2 dashboard-icon">
+						<i class="fas ' . $icon . '"></i>
+					</div>
+					<div class="col-sm-10 dashboard-text">' . $text . '</div>
+				</div>
+			</div>
+		</div>';
+		
+		
+		return $html;
+		
+		
+	}
+	
+	function GetCardDetail($text) {
+		
+		$html = '<div class="card dashboard-detail-card">
+			<div class="card-body">' . $text . '</div>
+		</div>';
+		
+		return $html;
+		
+	}
+	
+	
+	
 ?>

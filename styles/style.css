@@ -405,3 +405,23 @@ footer {
 .was-validated .skills-control-wrapper.none-selected .invalid-skills-control-feedback {
 	display: block;
 }
+
+
+.dashboard-detail-card {
+	margin-top: 40px;
+}
+
+.dashboard-card {
+	margin-top: 40px;
+	cursor: pointer;
+}
+.dashboard-icon {
+	font-size: 4em;
+	text-align: center;
+}
+
+.dashboard-text {
+	font-size: 1.6em;
+	text-align: center;
+	line-height: 4em;
+}

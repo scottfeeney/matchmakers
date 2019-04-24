@@ -296,8 +296,7 @@
 		}
 	}
 	
-	echo "Active:" . $active;
-	
+
 	//get arrys list for dropdown
 
 	$titles = \Classes\JobSeeker::GetTitles() ;
