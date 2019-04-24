@@ -58,6 +58,7 @@
 	$jobDescription = "";
 	$skillCategoryId = "";
 	$selectedSkills = "";
+	$active = "1";
 	
 	
 	if (\Utilities\Common::IsSubmitForm())
@@ -72,6 +73,7 @@
 		$jobDescription = \Utilities\Common::GetRequest("JobDescription");
 		$skillCategoryId = \Utilities\Common::GetRequest("SkillCategoryId");
 		$selectedSkills = \Utilities\Common::GetRequest("SkillsControlSelectedSkills");
+		$active = (\Utilities\Common::GetRequest("Active") == "1" ? "1" : "0");
 		
 		if ($jobName == "") {
 			$errorMessages[] = "Please enter the Position Title";
@@ -123,6 +125,7 @@
 			$job->positionAvailability = $positionAvailability;
 			$job->jobDescription = $jobDescription;
 			$job->skillCategoryId = $skillCategoryId;
+			$job->active = $active;
 			$objectSave = $job->Save();
 			
 			if ($objectSave->hasError) {
@@ -156,6 +159,7 @@
 		$jobDescription = $job->jobDescription;
 		$skillCategoryId = $job->skillCategoryId;
 		$selectedSkills = \Classes\Job::GetSkillsByJobString($job->jobId);
+		$active = $job->active;
 	}
 	
 	//get arrys list for dropdown
@@ -316,49 +320,27 @@
 						</div>
 					</div>
 				</div>
+				
+				<div class="row">
+					<div class="col-sm-12">
+						<div class="form-check-inline">
+							<label class="form-check-label">
+								<input type="checkbox" class="form-check-input" id="Active" name="Active" value="1" <?php if ($active == "1") { echo "checked"; } ?>> Active
+							</label>
+						</div>
+					</div>
+				</div>
 					
 				<div class="row">	
 					<div class="col-sm-12">
 						<div class="form-group mt-3">
-							<?php
-								// Change button text if the job has been posted or not
-								if (strLen($jobName) > 0) {
-									$submitBtn = "Save";
-								}
-								else{
-									$submitBtn = "Post Job";
-								}
-							?>
-						
-							<button class="btn btn-primary"><?php echo $submitBtn; ?></button>
+							<button class="btn btn-primary"><?php echo ($job->jobId == 0 ? "Post Job" : "Save"); ?></button>
 						</div>
 					</div>
 				</div>
 				
 			</form>
-			<?php if($submitBtn == "Save"){ ?>
-				<!-- Delete job button -->
-				<button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteJob">Delete Job</button>
-				
-				<!-- Delete Job modal -->
-				<div class="modal fade" id="deleteJob">
-					<div class="modal-dialog modal-sm">
-						<div class="modal-content">
-							<div class="modal-header">
-								<h5 class="modal-title" id="deleteJob">Delete Job?</h5>
-								<button type="button" class="close" data-dismiss="modal" aria-label="Close">&times;</button>
-							</div>
-							<div class="modal-body">
-								<p>Are you sure you want to delete this job?</p>
-							</div>
-							<div class="modal-footer">
-								<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-								<button type="button" class="btn btn-danger">Delete Job</button>
-							</div>
-						</div>
-					</div>
-				</div>
-			<?php } ?>
+
 			
 		</section>
     

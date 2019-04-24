@@ -23,7 +23,7 @@
 		public $jobDescription;
 		public $skillCategoryId;
 		public $positionAvailability;
-
+		public $active;
 				
 		public function __construct($jobId = 0) {
         
@@ -53,6 +53,7 @@
 			}
 			else {
 				$this->jobId = 0;
+				$this->active = 1;
 			}
 		}
 		
@@ -67,6 +68,7 @@
 			$object->numberAvailable = $row['NumberAvailable'];
 			$object->positionAvailability = $row['PositionAvailability'];
 			$object->jobDescription = $row['JobDescription'];
+			$object->active = $row['Active'];
 			
 		}
 		
@@ -87,18 +89,18 @@
 
 					$sql = "insert into job";
 					$sql .= " (EmployerId, JobName, SkillCategoryId,";
-					$sql .= " ReferenceNumber, LocationId, JobTypeId, NumberAvailable, PositionAvailability, JobDescription,";
+					$sql .= " ReferenceNumber, LocationId, JobTypeId, NumberAvailable, PositionAvailability, JobDescription, Active,";
 					$sql .= " Created)";
 					$sql .= " values";
 					$sql .= " (?,?,?,";
-					$sql .= " ?,?,?,?,?,?,";
+					$sql .= " ?,?,?,?,?,?,?,";
 					$sql .= " UTC_TIMESTAMP())";
 	
 					$conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);	
 					
 					if($stmt = $conn->prepare($sql)) {
-						$stmt->bind_param("isisiiiss", $this->employerId, $this->jobName, $this->skillCategoryId,
-						$this->referenceNumber, $this->locationId, $this->jobTypeId, $this->numberAvailable, $this->positionAvailability, $this->jobDescription);
+						$stmt->bind_param("isisiiissi", $this->employerId, $this->jobName, $this->skillCategoryId,
+						$this->referenceNumber, $this->locationId, $this->jobTypeId, $this->numberAvailable, $this->positionAvailability, $this->jobDescription, $this->active);
 						$stmt->execute();
 						$objectId = $stmt->insert_id;
 					} 
@@ -128,14 +130,15 @@
 				$sql .= " NumberAvailable = ?,";
 				$sql .= " PositionAvailability = ?,";
 				$sql .= " JobDescription = ?,";
+				$sql .= " Active = ?,";
 				$sql .= " Modified = UTC_TIMESTAMP()";
 				$sql .= " where JobId = ?";
 
 				$conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);	
 				
 				if($stmt = $conn->prepare($sql)) {
-					$stmt->bind_param("isisiiissi", $this->employerId, $this->jobName, $this->skillCategoryId,
-							$this->referenceNumber, $this->locationId, $this->jobTypeId, $this->numberAvailable, $this->positionAvailability, $this->jobDescription,
+					$stmt->bind_param("isisiiissii", $this->employerId, $this->jobName, $this->skillCategoryId,
+							$this->referenceNumber, $this->locationId, $this->jobTypeId, $this->numberAvailable, $this->positionAvailability, $this->jobDescription, $this->active,
 							$this->jobId);
 					$stmt->execute();
 				} 

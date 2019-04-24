@@ -39,7 +39,7 @@
 		public $signUpReason;
 		public $jobChangeSpeed;
 		public $jobTypeId;
-		//public $jobType;
+		public $active;
 
 				
 		public function __construct($jobSeekerId = 0) {
@@ -70,6 +70,7 @@
 			}
 			else {
 				$this->jobSeekerId = 0;
+				$this->active = 1;
 			}
 		}
 		
@@ -99,7 +100,7 @@
 			$object->signUpReason = $row['SignUpReason'];
 			$object->jobChangeSpeed = $row['JobChangeSpeed'];
 			$object->jobTypeId = $row['JobTypeId'];
-			//$object->jobType = $row['JobTypeName'];
+			$object->active = $row['Active'];
 		}
 		
 	
@@ -120,20 +121,20 @@
 					$sql = "insert into job_seeker";
 					$sql .= " (UserId, Title, FirstName, LastName, PhoneAreaCode, PhoneNumber, MobileNumber,";
 					$sql .= " Address1, Address2, City, State, Postcode,";
-					$sql .= " SkillCategoryId, AgeGroup, HighestLevelCompleted, CurrentlyStudying, CurrentStudyLevel, SignUpReason, JobChangeSpeed, JobTypeId,";
+					$sql .= " SkillCategoryId, AgeGroup, HighestLevelCompleted, CurrentlyStudying, CurrentStudyLevel, SignUpReason, JobChangeSpeed, JobTypeId,Active,";
 					$sql .= " Created)";
 					$sql .= " values";
 					$sql .= " (?, ?, ?, ?, ?, ?, ?,";
 					$sql .= " ?, ?, ?, ?, ?,";
-					$sql .= " ?, ?, ?, ?, ?, ?, ?, ?,";
+					$sql .= " ?, ?, ?, ?, ?, ?, ?, ?,?,";
 					$sql .= " UTC_TIMESTAMP())";
 	
 					$conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);	
 					
 					if($stmt = $conn->prepare($sql)) {
-						$stmt->bind_param("isssssssssssissssssi", $this->userId, $this->title, $this->firstName, $this->lastName, $this->phoneAreaCode, $this->phoneNumber, $this->mobileNumber,
+						$stmt->bind_param("isssssssssssissssssii", $this->userId, $this->title, $this->firstName, $this->lastName, $this->phoneAreaCode, $this->phoneNumber, $this->mobileNumber,
 								$this->address1, $this->address2, $this->city, $this->state, $this->postcode,
-								$this->skillCategoryId, $this->ageGroup, $this->highestLevelCompleted, $this->currentlyStudying, $this->currentStudyLevel, $this->signUpReason, $this->jobChangeSpeed, $this->jobTypeId
+								$this->skillCategoryId, $this->ageGroup, $this->highestLevelCompleted, $this->currentlyStudying, $this->currentStudyLevel, $this->signUpReason, $this->jobChangeSpeed, $this->jobTypeId, $this->active
 								);
 						$stmt->execute();
 						$objectId = $stmt->insert_id;
@@ -175,15 +176,16 @@
 				$sql .= " SignUpReason = ?,";
 				$sql .= " JobChangeSpeed = ?,";
 				$sql .= " JobTypeId = ?,";
+				$sql .= " Active = ?,";
 				$sql .= " Modified = UTC_TIMESTAMP()";
 				$sql .= " where JobSeekerId = ?";
 
 				$conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);	
 				
 				if($stmt = $conn->prepare($sql)) {
-					$stmt->bind_param("isssssssssssissssssii", $this->userId, $this->title, $this->firstName, $this->lastName, $this->phoneAreaCode, $this->phoneNumber, $this->mobileNumber,
+					$stmt->bind_param("isssssssssssissssssiii", $this->userId, $this->title, $this->firstName, $this->lastName, $this->phoneAreaCode, $this->phoneNumber, $this->mobileNumber,
 							$this->address1, $this->address2, $this->city, $this->state, $this->postcode,
-							$this->skillCategoryId, $this->ageGroup, $this->highestLevelCompleted, $this->currentlyStudying, $this->currentStudyLevel, $this->signUpReason, $this->jobChangeSpeed, $this->jobTypeId,
+							$this->skillCategoryId, $this->ageGroup, $this->highestLevelCompleted, $this->currentlyStudying, $this->currentStudyLevel, $this->signUpReason, $this->jobChangeSpeed, $this->jobTypeId, $this->active,
 							$this->jobSeekerId);
 					$stmt->execute();
 				} 

@@ -57,6 +57,7 @@
 	$jobChangeSpeed = "";
 	$jobType = "";
 	$selectedSkills = "";
+	$active = "1";
 	
 	if (\Utilities\Common::IsSubmitForm())
 	{
@@ -85,6 +86,7 @@
 		$jobChangeSpeed = \Utilities\Common::GetRequest("JobChangeSpeed");
 		$jobType = \Utilities\Common::GetRequest("JobType");
 		$selectedSkills = \Utilities\Common::GetRequest("SkillsControlSelectedSkills");
+		$active = (\Utilities\Common::GetRequest("Active") == "1" ? "1" : "0");
 
 		// Name/Title validation
 		if ($title == "") {
@@ -233,6 +235,7 @@
 			$jobSeeker->signUpReason = $signUpReason;
 			$jobSeeker->jobChangeSpeed = $jobChangeSpeed;
 			$jobSeeker->jobTypeId = $jobType;
+			$jobSeeker->active = $active;
 			$objectSave = $jobSeeker->Save();
 			
 			if ($objectSave->hasError) {
@@ -288,8 +291,11 @@
 			$jobChangeSpeed = $jobSeeker->jobChangeSpeed;
 			$jobType = $jobSeeker->jobTypeId;
 			$selectedSkills = \Classes\JobSeeker::GetSkillsByJobSeekerString($jobSeeker->jobSeekerId);
+			$active = $jobSeeker->active;
 		}
 	}
+	
+	echo "Active:" . $active;
 	
 	//get arrys list for dropdown
 
@@ -549,6 +555,17 @@
 					</div>
 				</div>
 				
+				<div class="row">
+					<div class="col-sm-12">
+						<div class="form-check-inline">
+							<label class="form-check-label">
+								<input type="checkbox" class="form-check-input" id="Active" name="Active" value="1" <?php if ($active == "1") { echo "checked"; } ?>> Active
+							</label>
+						</div>
+					</div>
+				</div>
+				
+					
 				<div class="form-group mt-3">
 					<button type="submit" class="btn btn-primary">Save</button>  
 				</div>
