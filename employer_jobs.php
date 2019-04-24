@@ -76,9 +76,10 @@
 				</div>
 				
 				<div class="row">	
-					<div class="col-sm-4">Posted: ' . \Utilities\Common::DisplayDate($job->created) . '</div>
-					<div class="col-sm-4 text-center"><a href="/create_job.php?j=' . $job->jobId . '"><i class="far fa-edit"></i> Edit</a></div>
-					<div class="col-sm-4 text-center"><a href="/create_job_matches.php?j=' . $job->jobId . '"><i class="fas fa-users"></i> View Matches</a></div>
+					<div class="col-sm-3">Posted: ' . \Utilities\Common::DisplayDate($job->created) . '</div>
+					<div class="col-sm-3 text-center"><a href="/view_job.php?j=' . $job->jobId . '"><i class="far fa-eye"></i> View</a></div>
+					<div class="col-sm-3 text-center"><a href="/create_job.php?j=' . $job->jobId . '"><i class="far fa-edit"></i> Edit</a></div>
+					<div class="col-sm-3 text-center"><a href="/create_job_matches.php?j=' . $job->jobId . '"><i class="fas fa-users"></i> View Matches</a></div>
 				</div>
 				
 			</div>
