@@ -108,12 +108,10 @@
 		
 		if(strlen($phoneAreaCode) <> 2){
 			$errorMessages[] = "Your area code has to be 2 characters (eg 02)";
-			$phoneAreaCode = "";
 		}
 		
 		if(ctype_digit($phoneAreaCode)){
 		}else{$errorMessages[] = "Your area code can only contain numbers";
-			$phoneAreaCode = "";
 		}
 		
 		if ($phoneNumber == "") {
@@ -122,12 +120,10 @@
 		
 		if(strlen($phoneNumber) <> 8){
 			$errorMessages[] = "Your phone number must be 8 digits long";
-			$phoneNumber = "";
 		}
 		
 		if(ctype_digit($phoneNumber)){
 		}else{$errorMessages[] = "Your phone number can only be numbers";
-			$phoneNumber = "";
 		}
 		
 		if ($mobileNumber == "") {
@@ -136,12 +132,10 @@
 		
 		if(ctype_digit($mobileNumber)){
 		}else{$errorMessages[] = "Your mobile number can only be numbers";
-			$mobileNumber = "";
 		}
 		
 		if(strlen($mobileNumber) <> 10){
 			$errorMessages[] = "Your mobile number must be 10 digits long";
-			$mobileNumber = "";
 		}
 		
 		// Address validation
@@ -168,7 +162,6 @@
 		
 		if(strlen($postcode) <> 4){
 		$errorMessages[] = "Post code must be 4 digits long";
-			$postcode = "";	
 		}
 		
 		
