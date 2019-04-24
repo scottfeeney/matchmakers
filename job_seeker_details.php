@@ -58,6 +58,7 @@
 	$jobType = "";
 	$selectedSkills = "";
 	$active = "1";
+	$locationId = "";
 	
 	if (\Utilities\Common::IsSubmitForm())
 	{
@@ -87,6 +88,7 @@
 		$jobType = \Utilities\Common::GetRequest("JobType");
 		$selectedSkills = \Utilities\Common::GetRequest("SkillsControlSelectedSkills");
 		$active = (\Utilities\Common::GetRequest("Active") == "1" ? "1" : "0");
+		$locationId = \Utilities\Common::GetRequest("LocationId");
 
 		// Name/Title validation
 		if ($title == "") {
@@ -195,6 +197,10 @@
 			$errorMessages[] = "Please select a type of work";
 		}
 		
+		if ($locationId == "") {
+			$errorMessages[] = "Please select a Job Location";
+		}
+		
 		if ($selectedSkills == "") {
 			$errorMessages[] = "Please select at least one skill";
 		}
@@ -229,6 +235,7 @@
 			$jobSeeker->jobChangeSpeed = $jobChangeSpeed;
 			$jobSeeker->jobTypeId = $jobType;
 			$jobSeeker->active = $active;
+			$jobSeeker->locationId = $locationId;
 			$objectSave = $jobSeeker->Save();
 			
 			if ($objectSave->hasError) {
@@ -285,6 +292,7 @@
 			$jobType = $jobSeeker->jobTypeId;
 			$selectedSkills = \Classes\JobSeeker::GetSkillsByJobSeekerString($jobSeeker->jobSeekerId);
 			$active = $jobSeeker->active;
+			$locationId = $jobSeeker->locationId;
 		}
 	}
 	
@@ -300,6 +308,7 @@
 	$signupReasons = \Classes\JobSeeker::GetSignupReasons();
 	$jobChangeSpeeds = \Classes\JobSeeker::GetJobChangeSpeeds();
 	$jobTypes = \Classes\JobType::GetJobTypes();
+	$locations = \Classes\Location::GetLocations();
 
 	$header = new \Template\Header();
 	$header->isSignedIn = true;
@@ -524,6 +533,21 @@
 					</div>
 				</div>
 				
+				<div class="row">	
+					<div class="col-sm-12">
+						<div class="form-group">
+							<label for="Location">*Job Location:</label>
+							<select name="LocationId" id="LocationId" class="form-control" required>
+								<option value=""></option>
+								<?php foreach ($locations as $location) { ?>
+									<option value="<?php echo $location->locationId; ?>" <?php if ($location->locationId == $locationId) {echo "selected";} ?>><?php echo $location->name; ?></option>
+								<?php } ?>
+							</select>
+							<div class="invalid-feedback">Please select a Job Location</div>
+						</div>
+					</div>
+				</div>
+				
 				<div class="row">		
 					<div class="col-sm-12">
 						<div class="form-group">
@@ -547,6 +571,7 @@
 						</div>
 					</div>
 				</div>
+				
 				
 				<div class="row">
 					<div class="col-sm-12">
