@@ -251,6 +251,39 @@
 		}
 		
 		
+		// Get Job Matches By Job Seeker
+		public static function GetJobMatchesByJobSeeker($jobSeekerId) {
+			
+			$jobMatches = Array();
+			
+			$sql = "call JobSeeker_JobMatches(?)";
+
+				
+			$conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);
+			
+			$stmt = $conn->prepare($sql);
+			$stmt->bind_param("i", $jobSeekerId);
+			$stmt->execute();
+			$result = mysqli_stmt_get_result($stmt);
+			$stmt->close();
+			$conn->close();
+			
+			while($row = mysqli_fetch_array($result))
+			{
+				$object = new \StdClass;
+				$object->jobId = $row['JobId'];
+				$object->jobName = $row['JobName'];
+				$object->employerName = $row['EmployerName'];
+				$object->locationName = $row['LocationName'];
+				$object->jobTypeName = $row['JobTypeName'];
+				$object->score = $row['Score'];
+				$jobMatches[] = $object;
+			}
+			
+			return $jobMatches;
+			
+		}
+		
 	}
 	
 ?>	
