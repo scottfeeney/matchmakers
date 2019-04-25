@@ -337,6 +337,43 @@
 				"Other");
 	
 		}
+		
+		
+		// Get Job Seeker Matches By Job
+		public static function GetJobSeekerMatchesByJob($jobId) {
+			
+			$jobMatches = Array();
+			
+			$sql = "call Job_JobSeekerMatches(?)";
+
+				
+			$conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);
+			
+			$stmt = $conn->prepare($sql);
+			$stmt->bind_param("i", $jobId);
+			$stmt->execute();
+			$result = mysqli_stmt_get_result($stmt);
+			$stmt->close();
+			$conn->close();
+			
+			while($row = mysqli_fetch_array($result))
+			{
+				$object = new \StdClass;
+				$object->jobSeekerId = $row['JobSeekerId'];
+				$object->firstName = $row['FirstName'];
+				$object->lastName = $row['LastName'];
+				$object->locationName = $row['LocationName'];
+				$object->jobTypeName = $row['JobTypeName'];
+				$object->skillCategoryName = $row['SkillCategoryName'];
+				$object->score = $row['Score'];
+				$jobMatches[] = $object;
+			}
+			
+			return $jobMatches;
+			
+		}
+		
+		
 	
 	}
 	
