@@ -1,3 +1,40 @@
 {
-    
+    "No Authentication required" : {
+        "authDesc" : "",
+        "endpoints" : {
+            "/api/external/authenticate.php" : {
+                "desc" : "Get Authentication Token",
+                "input" : "",
+                "headersInput" : {
+                    "EMAIL" : "Email address of the user you wish to log in as",
+                    "PASSWORD" : "Password of the user you wish to log in as"
+                },
+                "headerOutput" : {
+                    "Token" : "Authentication token to be provided in 'TOKEN' header field when querying any of the other endpoints"
+                }
+            }
+        }
+    },
+    "Any Authentication required" : {
+        "authDesc" : "To use the endpoints detailed in this section, a valid authentication token must be supplied in a HTTP header named 'TOKEN'",
+        "endpoints" : {
+            "/api/external/index.php" : {
+                "desc" : "List API Endpoints",
+                "output" : "This page. Listing of all API endpoints, the authentication type required to access them, what they output, any input required (beyond the relevant authentication token), and any notes related to their implementation and behaviour"
+            },
+            "/api/external/categories.php" : {
+                "desc" : "List skill categories data",
+                "output" : "Skill Categories IDs and corresponding names",
+                "exampleOutput" : "{                    \"result\": \"success\",                    \"details\": [                      {                        \"skillCategoryId\": 1,                        \"skillCategoryName\": \"Finance\"                      },                      {                        \"skillCategoryId\": 2,                        \"skillCategoryName\": \"Health\"                      },                      {                        \"skillCategoryId\": 3,                        \"skillCategoryName\": \"Information Technology\"                      },                      {                        \"skillCategoryId\": 4,                        \"skillCategoryName\": \"Marketing\"                      },                      {                        \"skillCategoryId\": 5,                        \"skillCategoryName\": \"Sales\"                      }                    ],                    \"documentation\": \"HTTP://ec2-18-221-135-88.us-east-2.compute.amazonaws.com/api/external/index.php\"                  }"            }
+        }
+    },
+    "Employer Authentication required" : {
+
+    },
+    "User Authentication required" : {
+
+    },
+    "Admin Authentication required" : {
+
+    }
 }

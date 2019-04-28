@@ -16,7 +16,16 @@
 
     //File intended to grab data from index.json in same directory and display it nicely
 
+
+   // $test = array("1" => array("1" => "a\"b", 2 => "b"), "c" => 3, "d" => "4", 5 => array("a" => array("b" => 1, "d" => 4), "c" => 2, "f" => array("a" => 1, "b" => array("a" => 1, "b" => 2))));
+  //  var_dump(json_encode($test));
+ //   echo "<HR>";
+//    var_dump(json_decode(json_encode($test)));
+
     $jsonData = file_get_contents("./index.json");
+    $apiDesc = json_decode($jsonData);
+//    var_dump($jsonData);
+    var_dump($apiDesc);
 
 ?>
 
@@ -45,7 +54,7 @@
 -->
 
 							<div class="alert alert-success" role="alert">
-								If the email you entered is associated with a user account in our system, you can expect to receive a password reset email shortly.
+
 							</div>
 <?php endif; ?>
 						</div>
