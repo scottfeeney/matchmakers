@@ -10,6 +10,12 @@
         require_once './classes/jobtype.php';
     }
 
+    if (!isset($_SERVER['HTTP_TOKEN'])) {
+        header("HTTP/1.1 401 Unauthorized");
+        echo (new \api\APIResult("failure","Token not supplied"))->getJSON();
+        die();
+    }
+
     $jobTypes = \Classes\JobType::GetJobTypes();
 
 

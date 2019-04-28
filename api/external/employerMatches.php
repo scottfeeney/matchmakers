@@ -30,7 +30,7 @@
 
     $jobid = \Utilities\Common::GetRequest("jobId");
     if ($jobid == "") {
-        echo (new \api\APIResult("failure","Must provide both jobId via POST or GET"))->getJSON();
+        echo (new \api\APIResult("failure","Must provide jobId via POST or GET"))->getJSON();
         exit();
     }
 

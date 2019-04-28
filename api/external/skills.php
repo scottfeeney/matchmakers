@@ -14,6 +14,12 @@
         require_once '../../utilities/common.php';
     }
 
+    if (!isset($_SERVER['HTTP_TOKEN'])) {
+        header("HTTP/1.1 401 Unauthorized");
+        echo (new \api\APIResult("failure","Token not supplied"))->getJSON();
+        die();
+    }
+
     $categoryId = \Utilities\Common::GetRequest("categoryId");
     if ($categoryId == "") {
         echo (new APIResult("failure","categoryId not provided"))->getJSON();
