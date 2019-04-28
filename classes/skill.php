@@ -245,7 +245,7 @@
 		}
 		
 		
-		private static function GetSkillExists($object) {
+		public static function GetSkillExists($object) {
 			
 			$sql = "select * from skill where SkillCategoryId = ? and SkillName = ? and SkillId <> ?";
 				

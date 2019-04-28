@@ -39,16 +39,20 @@ if ($user != null) {
             exit();
         }
 
-        $category = \Classes\SkillCategory($categoryId);
+        $category = new \Classes\SkillCategory($categoryId);
         if ($category != null) {
             $skill = new \Classes\Skill();
             $skill->skillCategoryId = $categoryId;
             $skill->skillName = $skillName;
-            $objSave = $skill->save();
-            if ($objSave->hasError) {
-                echo (new \api\APIResult("failure","Error attempting to save skill: " . $objSave->errorMessage))->getJSON();
+            if (\Classes\Skill::GetSkillExists($skill)) {
+                echo (new \api\APIResult("failure","Error attempting to save skill: Skill with same name already exists in specified category"))->getJSON();
             } else {
-                echo (new \api\APIResult("success", "Skill successfully added"))->getJSON();
+                $objSave = $skill->save($user);
+                if ($objSave->hasError) {
+                    echo (new \api\APIResult("failure","Error attempting to save skill: " . $objSave->errorMessage))->getJSON();
+                } else {
+                    echo (new \api\APIResult("success", "Skill successfully added"))->getJSON();
+                }
             }
         } else {
             echo (new \api\APIResult("failure","categoryId does not match a category in our system"))->getJSON();

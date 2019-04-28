@@ -4,10 +4,14 @@
         require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/user.php';
         require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/jobseeker.php';
         require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/location.php';
+        require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/skillcategory.php';
+        require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/jobtype.php';
         require_once $_SERVER['DOCUMENT_ROOT'] . '/api/external/apiresult.php';
     } else {
         require_once '../../classes/user.php';
+        require_once '../../classes/skillcategory.php';
         require_once '../../classes/jobseeker.php';
+        require_once '../../classes/jobtype.php';
         require_once '../../classes/location.php';
         require_once './apiresult.php';
     }
@@ -39,6 +43,16 @@
             }
  
             unset($jobSeeker->locationId);
+
+            //Convert skillCategoryId to name
+            $skillCat = new \Classes\SkillCategory($jobSeeker->skillCategoryId);
+            $jobSeeker->skillCategory = $skillCat->skillCategoryName;
+            unset($jobSeeker->skillCategoryId);
+
+            //Convert jobTypeId to name
+            $jobType = new \Classes\JobType($jobSeeker->jobTypeId);
+            $jobSeeker->jobType = $jobType->jobTypeName;
+            unset($jobSeeker->jobTypeId);
  
             $jobSeeker->email = $user->email;
             echo (new \api\APIResult("success", json_encode($jobSeeker), true))->getJSON();

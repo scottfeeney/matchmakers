@@ -33,20 +33,20 @@ if ($user != null) {
         
         //Code to add skill
         $categoryId = \Utilities\Common::GetRequest("categoryId");
-        $skillId = \Utilities\Common::GetRequest("categoryId");
+        $skillId = \Utilities\Common::GetRequest("skillId");
         $skillName = \Utilities\Common::GetRequest("newName");
         if ($categoryId == "" or $skillName == "" or $skillId == "") {
             echo (new \api\APIResult("failure","Must provide categoryId, skillId and new skillName via POST or GET"))->getJSON();
             exit();
         }
 
-        $category = \Classes\SkillCategory($categoryId);
+        $category = new \Classes\SkillCategory($categoryId);
         if ($category != null) {
             $skill = new \Classes\Skill($skillId);
             if ($skill != null) {
                 if ($skill->skillCategoryId == $category->skillCategoryId) {
                     $skill->skillName = $skillName;
-                    $objSave = $skill->save();
+                    $objSave = $skill->save($user);
                     if ($objSave->hasError) {
                         echo (new \api\APIResult("failure","Error attempting to rename skill: " . $objSave->errorMessage))->getJSON();
                     } else {

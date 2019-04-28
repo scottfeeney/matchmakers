@@ -4,8 +4,7 @@
         "endpoints" : {
             "/api/external/authenticate.php" : {
                 "desc" : "Get Authentication Token",
-                "input" : "",
-                "headersInput" : {
+                "headerInput" : {
                     "EMAIL" : "Email address of the user you wish to log in as",
                     "PASSWORD" : "Password of the user you wish to log in as"
                 },
@@ -16,7 +15,7 @@
         }
     },
     "Any Authentication required" : {
-        "authDesc" : "To use the endpoints detailed in this section, a valid authentication token must be supplied in a HTTP header named 'TOKEN'",
+        "authDesc" : "To use the endpoints detailed in this section, a valid authentication token must be supplied in a HTTP header named 'TOKEN'. Tokens last for one hour after being generated.",
         "endpoints" : {
             "/api/external/index.php" : {
                 "desc" : "List API Endpoints",
@@ -25,16 +24,93 @@
             "/api/external/categories.php" : {
                 "desc" : "List skill categories data",
                 "output" : "Skill Categories IDs and corresponding names",
-                "exampleOutput" : "{                    \"result\": \"success\",                    \"details\": [                      {                        \"skillCategoryId\": 1,                        \"skillCategoryName\": \"Finance\"                      },                      {                        \"skillCategoryId\": 2,                        \"skillCategoryName\": \"Health\"                      },                      {                        \"skillCategoryId\": 3,                        \"skillCategoryName\": \"Information Technology\"                      },                      {                        \"skillCategoryId\": 4,                        \"skillCategoryName\": \"Marketing\"                      },                      {                        \"skillCategoryId\": 5,                        \"skillCategoryName\": \"Sales\"                      }                    ],                    \"documentation\": \"HTTP://ec2-18-221-135-88.us-east-2.compute.amazonaws.com/api/external/index.php\"                  }"            }
+                "exampleOutput" : "\n{\n\t\"result\": \"success\",\n\t\"details\": [\n\t\t{\n\t\t\t\"skillCategoryId\": 1,\n\t\t\t\"skillCategoryName\": \"Finance\"\n\t\t},\n\t\t{\n\t\t\t\"skillCategoryId\": 2,\n\t\t\t\"skillCategoryName\": \"Health\"\n\t\t},\n\t\t{\n\t\t\t\"skillCategoryId\": 3,\n\t\t\t\"skillCategoryName\": \"Information Technology\"\n\t\t},\n\t\t{\n\t\t\t\"skillCategoryId\": 4,\n\t\t\t\"skillCategoryName\": \"Marketing\"\n\t\t},\n\t\t{\n\t\t\t\"skillCategoryId\": 5,\n\t\t\t\"skillCategoryName\": \"Sales\"\n\t\t}\n\t],\n\t\"documentation\": \"HTTP://ec2-18-221-135-88.us-east-2.compute.amazonaws.com/api/external/index.php\"\n}"
+            }
+            ,
+            "/api/external/skills.php" : {
+                "desc" : "List skills for specific category",
+                "input" : {
+                    "categoryId" : "ID for the chosen skill category"
+                },
+                "output" : "List of skill objects for the specified category, each containing an ID for the skill, the ID of the category the skill belongs to, and the skill name",
+                "exampleOutput" : "\n{\n\t\"result\": \"success\",\n\t\"details\": [\n\t\t{\n\t\t\t\"skillId\": 120,\n\t\t\t\"skillCategoryId\": 4,\n\t\t\t\"skillName\": \"A/B Testing\"\n\t\t},\n\t\t{\n\t\t\t\"skillId\": 122,\n\t\t\t\"skillCategoryId\": 4,\n\t\t\t\"skillName\": \"Aesthetic Sensibility\"\n\t\t},\n\t\t{\n\t\t\t\"skillId\": 123,\n\t\t\t\"skillCategoryId\": 4,\n\t\t\t\"skillName\": \"Analytics\"\n\t\t},\n\t\t{\n\t\t\t\"skillId\": 157,\n\t\t\t\"skillCategoryId\": 4,\n\t\t\t\"skillName\": \"Audio Production\"\n\t\t},\n\t\t{\n\t\t\t\"skillId\": 124,\n\t\t\t\"skillCategoryId\": 4,\n\t\t\t\"skillName\": \"Business to Business Marketing\"\n\t\t},\n\t\t...,\n\t\t{\n\t\t\t\"skillId\": 152,\n\t\t\t\"skillCategoryId\": 4,\n\t\t\t\"skillName\": \"UX Design\"\n\t\t},\n\t\t{\n\t\t\t\"skillId\": 153,\n\t\t\t\"skillCategoryId\": 4,\n\t\t\t\"skillName\": \"Video Production\"\n\t\t},\n\t\t{\n\t\t\t\"skillId\": 158,\n\t\t\t\"skillCategoryId\": 4,\n\t\t\t\"skillName\": \"Website Management\"\n\t\t}\n\t],\n\t\"documentation\": \"HTTP://ec2-18-221-135-88.us-east-2.compute.amazonaws.com/api/external/index.php\"\n}"
+            },
+            "api/external/jobTypes.php" : {
+                "desc" : "List job/work schedule types",
+                "output" : "List of job/work schedule types by ID",
+                "exampleOutput" : "\n{\n\t\"result\": \"success\",\n\t\"details\": [\n\t\t{\n\t\t\t\"jobTypeId\": 1,\n\t\t\t\"jobTypeName\": \"Casual\"\n\t\t},\n\t\t{\n\t\t\t\"jobTypeId\": 4,\n\t\t\t\"jobTypeName\": \"Contract\"\n\t\t},\n\t\t{\n\t\t\t\"jobTypeId\": 2,\n\t\t\t\"jobTypeName\": \"Full-time\"\n\t\t},\n\t\t{\n\t\t\t\"jobTypeId\": 3,\n\t\t\t\"jobTypeName\": \"Part-time\"\n\t\t},\n\t\t{\n\t\t\t\"jobTypeId\": 5,\n\t\t\t\"jobTypeName\": \"Temporary\"\n\t\t}\n\t],\n\t\"documentation\": \"HTTP://ec2-18-221-135-88.us-east-2.compute.amazonaws.com/api/external/index.php\"\n}"
+            }
         }
     },
     "Employer Authentication required" : {
-
+        "authDesc" : "To use the endpoints detailed in this section, a valid <i>Employer</i> authentication token must be supplied in a HTTP header named 'TOKEN'. Tokens last for one hour after being generated.",
+        "endpoints" : {
+            "api/external/employer.php" : {
+                "desc" : "Display information for the currently logged-in employer",
+                "output" : "All fields stored in the system specific to this employer",
+                "exampleOutput" : "\n{\n\t\"result\": \"success\",\n\t\"details\": {\n\t\t\"companyName\": \"Red N Blue Pty Ltd\",\n\t\t\"title\": \"Mrs\",\n\t\t\"firstName\": \"Myra\",\n\t\t\"lastName\": \"Atkins\",\n\t\t\"phoneAreaCode\": \"08\",\n\t\t\"phoneNumber\": \"99046371\",\n\t\t\"mobileNumber\": \"0416172771\",\n\t\t\"otherTitle\": \"Mrs\",\n\t\t\"otherFirstName\": \"Regina\",\n\t\t\"otherLastName\": \"Rodriquez\",\n\t\t\"otherPhoneAreaCode\": \"08\",\n\t\t\"otherPhoneNumber\": \"98004649\",\n\t\t\"address1\": \"127 Marie Dodd Cres.\",\n\t\t\"address2\": \"\",\n\t\t\"city\": \"Perth\",\n\t\t\"state\": \"WA\",\n\t\t\"postcode\": \"6000\",\n\t\t\"companyType\": \"2\",\n\t\t\"companySize\": \"100-499\",\n\t\t\"expectedGrowth\": \"20-49\",\n\t\t\"location\": \"Perth\",\n\t\t\"email\": \"Myra.Atkins@rednblue.com.au\"\n\t},\n\t\"documentation\": \"HTTP://ec2-18-221-135-88.us-east-2.compute.amazonaws.com/api/external/index.php\"\n}"
+            },
+            "api/external/employerJobs.php" : {
+                "desc" : "List all jobs posted by this employer",
+                "output" : "Details of each job posted by this employer, incl. their jobID",
+                "exampleOutput" : "\n{\n\t\"result\": \"success\",\n\t\"details\": [\n\t\t{\n\t\t\t\"jobId\": 51,\n\t\t\t\"jobName\": \"Accounting Specialist\",\n\t\t\t\"referenceNumber\": \"6538492\",\n\t\t\t\"numberAvailable\": 1,\n\t\t\t\"jobDescription\": \"Great opportunity – global organization needs a Accounting Specialist to fulfil a Part-time  role. Must be able to start Within 2 weeks\",\n\t\t\t\"positionAvailability\": \"Within 2 weeks\",\n\t\t\t\"active\": 1,\n\t\t\t\"created\": \"2018-09-14 10:42:38\",\n\t\t\t\"location\": \"Perth\",\n\t\t\t\"jobType\": \"Part-time\",\n\t\t\t\"skillCategory\": \"Finance\"\n\t\t},\n\t\t{\n\t\t\t\"jobId\": 123,\n\t\t\t\"jobName\": \"Telemarketer\",\n\t\t\t\"referenceNumber\": \"8361891\",\n\t\t\t\"numberAvailable\": 1,\n\t\t\t\"jobDescription\": \"Great opportunity – global organization needs a Telemarketer to fulfil a Casual  role. Must be able to start Within 2 weeks\",\n\t\t\t\"positionAvailability\": \"Within 2 weeks\",\n\t\t\t\"active\": 1,\n\t\t\t\"created\": \"2018-04-26 17:16:07\",\n\t\t\t\"location\": \"Perth\",\n\t\t\t\"jobType\": \"Casual\",\n\t\t\t\"skillCategory\": \"Sales\"\n\t\t},\n\t\t{\n\t\t\t\"jobId\": 143,\n\t\t\t\"jobName\": \"Client Success Manager\",\n\t\t\t\"referenceNumber\": \"P-839137\",\n\t\t\t\"numberAvailable\": 1,\n\t\t\t\"jobDescription\": \" Client Success Manager - Contract  - Large global organization. Need to be able to start immediately\",\n\t\t\t\"positionAvailability\": \"Immediate\",\n\t\t\t\"active\": 1,\n\t\t\t\"created\": \"2018-01-10 21:24:58\",\n\t\t\t\"location\": \"Perth\",\n\t\t\t\"jobType\": \"Contract\",\n\t\t\t\"skillCategory\": \"Sales\"\n\t\t}\n\t],\n\t\"documentation\": \"HTTP://ec2-18-221-135-88.us-east-2.compute.amazonaws.com/api/external/index.php\"\n}"
+            },
+            "api/external/employerMatches.php" : {
+                "desc" : "List all Job Seekers matching the specified job",
+                "input" : {
+                    "jobId" : "The ID for the job the employer wishes to see matches for"
+                },
+                "output" : "List details for Job Seekers matching the specified job",
+                "exampleOutput" : "\n{\n\t\"result\": \"success\",\n\t\"details\": [\n\t\t{\n\t\t\t\"jobSeekerId\": 1319,\n\t\t\t\"firstName\": \"Otha\",\n\t\t\t\"lastName\": \"Desjardin\",\n\t\t\t\"locationName\": \"Perth\",\n\t\t\t\"jobTypeName\": \"Part-time\",\n\t\t\t\"skillCategoryName\": \"Marketing\",\n\t\t\t\"score\": \"50.000000000000\"\n\t\t},\n\t\t{\n\t\t\t\"jobSeekerId\": 1312,\n\t\t\t\"firstName\": \"Mica\",\n\t\t\t\"lastName\": \"Wiens\",\n\t\t\t\"locationName\": \"Perth\",\n\t\t\t\"jobTypeName\": \"Part-time\",\n\t\t\t\"skillCategoryName\": \"Marketing\",\n\t\t\t\"score\": \"50.000000000000\"\n\t\t},\n\t\t{\n\t\t\t\"jobSeekerId\": 1309,\n\t\t\t\"firstName\": \"Madie\",\n\t\t\t\"lastName\": \"Pitkin\",\n\t\t\t\"locationName\": \"Perth\",\n\t\t\t\"jobTypeName\": \"Part-time\",\n\t\t\t\"skillCategoryName\": \"Marketing\",\n\t\t\t\"score\": \"50.000000000000\"\n\t\t},\n\t\t{\n\t\t\t\"jobSeekerId\": 1307,\n\t\t\t\"firstName\": \"Cathie\",\n\t\t\t\"lastName\": \"Herder\",\n\t\t\t\"locationName\": \"Perth\",\n\t\t\t\"jobTypeName\": \"Part-time\",\n\t\t\t\"skillCategoryName\": \"Marketing\",\n\t\t\t\"score\": \"50.000000000000\"\n\t\t}\n\t],\n\t\"documentation\": \"HTTP://ec2-18-221-135-88.us-east-2.compute.amazonaws.com/api/external/index.php\"\n}"
+            }
+        }
     },
-    "User Authentication required" : {
-
+    "Job Seeker Authentication required" : {
+        "authDesc" : "To use the endpoints detailed in this section, a valid <i>Job Seeker</i> authentication token must be supplied in a HTTP header named 'TOKEN'. Tokens last for one hour after being generated.",
+        "endpoints" : {
+            "/api/external/jobseeker.php" : {
+                "desc" : "Display information for the currently logged-in Job Seeker",
+                "output" : "All fields stored in the system specific to this job seeker",
+                "exampleOutput" : "\n{\n\t\"result\": \"success\",\n\t\"details\": {\n\t\t\"title\": \"Dr\",\n\t\t\"firstName\": \"Enriqueta\",\n\t\t\"lastName\": \"Woltz\",\n\t\t\"phoneAreaCode\": \"08\",\n\t\t\"phoneNumber\": \"97169821\",\n\t\t\"mobileNumber\": \"0465064592\",\n\t\t\"address1\": \"Ap #769-2703 Molestie Rd.\",\n\t\t\"address2\": \"\",\n\t\t\"city\": \"Perth\",\n\t\t\"state\": \"WA\",\n\t\t\"postcode\": \"6000\",\n\t\t\"ageGroup\": \"Rather Not Say\",\n\t\t\"highestLevelCompleted\": \"Diploma\",\n\t\t\"currentlyStudying\": \"NO\",\n\t\t\"currentStudyLevel\": \"\",\n\t\t\"signUpReason\": \"Currently without employment\",\n\t\t\"jobChangeSpeed\": \"Other\",\n\t\t\"active\": 1,\n\t\t\"location\": \"Perth\",\n\t\t\"skillCategory\": \"Health\",\n\t\t\"jobType\": \"Part-time\",\n\t\t\"email\": \"tortor.Nunc@necmetus.edu\"\n\t},\n\t\"documentation\": \"HTTP://ec2-18-221-135-88.us-east-2.compute.amazonaws.com/api/external/index.php\"\n}"
+            },
+            "api/external/jobSeekerMatches.php" : {
+                "desc" : "Display details of jobs that the job seeker is a match for",
+                "output" : "Job data, including jobIDs",
+                "exampleOutput" : "\n{\n\t\"result\": \"success\",\n\t\"details\": [\n\t\t{\n\t\t\t\"jobId\": 80,\n\t\t\t\"jobName\": \"Optometrist\",\n\t\t\t\"employerName\": \"North-Western Health District\",\n\t\t\t\"locationName\": \"Perth\",\n\t\t\t\"jobTypeName\": \"Part-time\",\n\t\t\t\"score\": \"50.000000000000\"\n\t\t},\n\t\t{\n\t\t\t\"jobId\": 73,\n\t\t\t\"jobName\": \"Cardiology Fellow\",\n\t\t\t\"employerName\": \"Prince of Wales Hospital\",\n\t\t\t\"locationName\": \"Sydney\",\n\t\t\t\"jobTypeName\": \"Full-time\",\n\t\t\t\"score\": \"50.000000000000\"\n\t\t}\n\t],\n\t\"documentation\": \"HTTP://ec2-18-221-135-88.us-east-2.compute.amazonaws.com/api/external/index.php\"\n}"
+            }
+        }
     },
     "Admin Authentication required" : {
-
+        "authDesc" : "To use the endpoints detailed in this section, a valid <i>Admin</i> authentication token must be supplied in a HTTP header named 'TOKEN'. Tokens last for one hour after being generated.",
+        "endpoints" : {
+            "/api/external/admin/addSkill.php" : {
+                "desc" : "Add a new skill to the specified category",
+                "input" : {
+                    "categoryId" : "The ID for the category the new skill should be added to",
+                    "skillName" : "The name of the new skill"
+                },
+                "output" : "",
+                "exampleOutput" : "\n{\n\t\"result\": \"success\",\n\t\"details\": \"Skill successfully added\",\n\t\"documentation\": \"HTTP://ec2-18-221-135-88.us-east-2.compute.amazonaws.com/api/external/index.php\"\n}"
+            },
+            "/api/external/admin/renameSkill.php" : {
+                "desc" : "Rename an existing skill",
+                "input" : {
+                    "categoryId" : "The ID for the category the skill currently belongs to",
+                    "skillId" : "The ID for the skill to be renamed",
+                    "newName" : "The new name for the skill"
+                },
+                "output" : "",
+                "exampleOutput" : "\n{\n\t\"result\": \"success\",\n\t\"details\": \"Skill successfully renamed\",\n\t\"documentation\": \"HTTP://ec2-18-221-135-88.us-east-2.compute.amazonaws.com/api/external/index.php\"\n}"
+            },
+            "/api/external/admin/deleteSkill.php" : {
+                "desc" : "Delete a skill",
+                "input" : {
+                    "categoryId" : "The ID for the category the skill currently belongs to",
+                    "skillId" : "The ID for the skill to be deleted"
+                },
+                "output" : "",
+                "exampleOutput" : "\n{\n\t\"result\": \"success\",\n\t\"details\": \"Skill successfully deleted\",\n\t\"documentation\": \"HTTP://ec2-18-221-135-88.us-east-2.compute.amazonaws.com/api/external/index.php\"\n}"                
+            }
+        }
     }
 }

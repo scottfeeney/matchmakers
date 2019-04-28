@@ -33,13 +33,13 @@ if ($user != null) {
         
         //Code to add skill
         $categoryId = \Utilities\Common::GetRequest("categoryId");
-        $skillId = \Utilities\Common::GetRequest("categoryId");
+        $skillId = \Utilities\Common::GetRequest("skillId");
         if ($categoryId == "" or $skillId == "") {
             echo (new \api\APIResult("failure","Must provide categoryId and skillId via POST or GET"))->getJSON();
             exit();
         }
 
-        $category = \Classes\SkillCategory($categoryId);
+        $category = new \Classes\SkillCategory($categoryId);
         if ($category != null) {
             $skill = new \Classes\Skill($skillId);
             if ($skill != null) {
