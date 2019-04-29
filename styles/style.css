@@ -437,7 +437,19 @@ footer {
 	text-decoration: none;
 }
 
+.jobSkillsList{
+	padding-left: 0px
+}
+
 .jobSkillDisplay{
 	margin: 0px 10px 15px 0px;
 	padding: 10px;
 }
+
+#jobQtyBadge{
+	font-size: 1rem;
+	margin-left: 0.5em;	
+	vertical-align: text-top;
+}
+
+
