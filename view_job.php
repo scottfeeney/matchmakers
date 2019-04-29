@@ -57,7 +57,13 @@
 			<!-- Position name -->
 			<div class="row">
 				<div class="col-sm-12">
-					<h2><?php echo htmlspecialchars($positionName) . " (x$numberAvailable)"; ?></h2>
+					<h2>
+						<?php echo htmlspecialchars($positionName);
+							if($numberAvailable > 1){
+								echo "<span id='jobQtyBadge' class='badge badge-success'>$numberAvailable</span>";
+							}
+						?>
+					</h2>					
 				</div>
 			</div>
 			
@@ -92,7 +98,7 @@
 			<!-- Skills -->
 			<div id="skillsSection">
 				<h3>Required Skills</h3>
-				<div class="col-sm-12">
+				<div class="col-sm-12 jobSkillsList">
 					<?php					
 						// Loop through array of skills to display skill name
 						foreach($selectedSkills as $skill){

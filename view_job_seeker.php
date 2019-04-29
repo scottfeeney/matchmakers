@@ -191,7 +191,7 @@
 			</div>
 			
 			<div id="skillsSection">
-				<div class="col-sm-12">
+				<div class="col-sm-12 jobSkillsList">
 					<?php					
 						// Loop through array of skills to display skill name
 						foreach($selectedSkills as $skill){
