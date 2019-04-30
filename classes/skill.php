@@ -54,9 +54,13 @@
 			$errorMessage = "";
 			$objectId = $this->skillId;
 			
+
 			
+
 			if ($this->skillName == "") {
-				$errorMessage = "Please enter a Skill Name";
+
+				$errorMessage = "Please enter a Skill N
+ame";
 			}
 			
 			
@@ -132,34 +136,40 @@
 		
 
 		//Delete a skill
-		public static function DeleteSkill($skillId) {
+		public static function DeleteSkill($skillId, $deleteReferencedSkill = false) {
 			
 			$skills = Array();
 			
-			//Will need to delete any children
-			//(assuming you mean entries in job_skill or job_seeker_skill referencing this skill)
+			//Only delete skill that is in use currently if user indicates that they are
+			//aware skill is in use and still want to delete it
+			if ($deleteReferencedSkill) {
 
-			$sql = "delete from job_skill where skillId = ?";
+				//Will need to delete any children
+				//(assuming you mean entries in job_skill or job_seeker_skill referencing this skill)
+				//....although - do we want to do that without warning the user?
 
-			$conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);
-			
-			$stmt = $conn->prepare($sql);
-			$stmt->bind_param("i", $skillId);
-			$stmt->execute();
-			$result = mysqli_stmt_get_result($stmt);
-			$stmt->close();
-			//No point checking for success via rowsAffected here - can legitimately be zero
+				$sql = "delete from job_skill where skillId = ?";
 
-			$sql = "delete from job_seeker_skill where skillId = ?";
+				$conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);
+				
+				$stmt = $conn->prepare($sql);
+				$stmt->bind_param("i", $skillId);
+				$stmt->execute();
+				$result = mysqli_stmt_get_result($stmt);
+				$stmt->close();
+				//No point checking for success via rowsAffected here - can legitimately be zero
 
-			$conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);
-			
-			$stmt = $conn->prepare($sql);
-			$stmt->bind_param("i", $skillId);
-			$stmt->execute();
-			$result = mysqli_stmt_get_result($stmt);
-			$stmt->close();
-			//No point checking for success via rowsAffected here - can legitimately be zero
+				$sql = "delete from job_seeker_skill where skillId = ?";
+
+				$conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);
+				
+				$stmt = $conn->prepare($sql);
+				$stmt->bind_param("i", $skillId);
+				$stmt->execute();
+				$result = mysqli_stmt_get_result($stmt);
+				$stmt->close();
+				//No point checking for success via rowsAffected here - can legitimately be zero
+			}
 
 			//Then can delete actual skill record
 			
