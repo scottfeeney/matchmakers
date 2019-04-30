@@ -136,10 +136,23 @@
 			
 			$skills = Array();
 			
-			//will need to delete children
+			//Will need to delete any children
+
+			$sql = "delete from job_skill where skillId = ?";
+
+			$conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);
+			
+			$stmt = $conn->prepare($sql);
+			$stmt->bind_param("i", $skillId);
+			$stmt->execute();
+			$result = mysqli_stmt_get_result($stmt);
+			$stmt->close();
+			//No point checking for success via rowsAffected here - can legitimately be zero
+
+			//Then can delete actual skill record
 			
 			$sql = "delete from skill where SkillId = ?;";
-				
+
 			$conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);
 			
 			$stmt = $conn->prepare($sql);
@@ -149,8 +162,13 @@
 			$stmt->close();
 			$conn->close();
 			
-			//TODO: some object to indicate success
-			return new \Classes\ObjectSave("", 0);
+
+			//Indicate success or failure
+			if (mysqli_affected_rows() == 1) {
+				return new \Classes\ObjectSave("", 0);
+			} else {
+				return new \Classes\ObjectSave(mysqli_error($conn), 0);
+			}
 		}
 	
 		
