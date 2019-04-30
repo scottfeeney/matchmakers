@@ -130,15 +130,27 @@
 		
 		}
 		
-		// Get All skills by Category
-		
+
+		//Delete a skill
 		public static function DeleteSkill($skillId) {
 			
 			$skills = Array();
 			
 			//Will need to delete any children
+			//(assuming you mean entries in job_skill or job_seeker_skill referencing this skill)
 
 			$sql = "delete from job_skill where skillId = ?";
+
+			$conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);
+			
+			$stmt = $conn->prepare($sql);
+			$stmt->bind_param("i", $skillId);
+			$stmt->execute();
+			$result = mysqli_stmt_get_result($stmt);
+			$stmt->close();
+			//No point checking for success via rowsAffected here - can legitimately be zero
+
+			$sql = "delete from job_seeker_skill where skillId = ?";
 
 			$conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);
 			
@@ -173,7 +185,6 @@
 	
 		
 		// Get All skills by Category
-		
 		public static function GetSkillsBySkillCategory($skillCategoryId) {
 			
 			$skills = Array();
@@ -200,6 +211,7 @@
 			
 		}
 		
+
 		// Get skills by Job
 		public static function GetSkillsByJob($jobId) {
 			
@@ -231,7 +243,8 @@
 			
 		}
 		
-		// Get skills by Job
+
+		// Get skills by JobSeeker
 		public static function GetSkillsByJobSeeker($jobSeekerId) {
 			
 			$skills = Array();
@@ -262,7 +275,8 @@
 			
 		}
 		
-		
+
+		//Check if skill already exists
 		public static function GetSkillExists($object) {
 			
 			$sql = "select * from skill where SkillCategoryId = ? and SkillName = ? and SkillId <> ?";
