@@ -423,7 +423,29 @@ footer {
 .dashboard-text {
 	font-size: 1.6em;
 	text-align: center;
-	line-height: 4em;
+	padding: 30px 10px;
+}
+
+.card-link {
+	text-align: center;
+}
+
+.card-match {
+	text-align: center;
+}
+
+@media (max-width: 767px)
+{
+	.card-link {
+		text-align: left;
+		margin-top: 10px;
+	}
+	
+	.card-match {
+		text-align: left;
+		margin-top: 10px;
+	}
+	
 }
 
 .list-title {

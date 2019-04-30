@@ -89,12 +89,12 @@
 						<div class="row mt-2">	
 							<div class="col-sm-4">Location: ' . htmlspecialchars($jobSeekerMatch->locationName) . '</div>
 							<div class="col-sm-4">Job Type: ' . htmlspecialchars($jobSeekerMatch->jobTypeName) . '</div>
-							<div class="col-sm-4"><a href="/view_job_seeker.php?js=' . $jobSeekerMatch->jobSeekerId . '"><i class="far fa-eye"></i> View Job Seeker</a></div>
+							<div class="col-sm-4"><div class="card-link"><a href="/view_job_seeker.php?js=' . $jobSeekerMatch->jobSeekerId . '"><i class="far fa-eye"></i> View Job Seeker</a></div></div>
 						</div>
 				
 					</div>
 				
-					<div class="col-sm-2 text-center" ><span>Match</span><br /><span style="font-size: 3em;">' . round($jobSeekerMatch->score) . '%</span></div>
+					<div class="col-sm-2"><div class="card-match"><span>Match</span><br /><span style="font-size: 3em;">' . round($jobSeekerMatch->score) . '%</span></div></div>
 				
 				</div>
 				
