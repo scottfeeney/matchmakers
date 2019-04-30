@@ -195,13 +195,13 @@ final class JobTest extends TestCase {
                     $stmt->execute();
                     $result = mysqli_stmt_get_result($stmt);
 
-                    //uncomment after code adding skills to job is working
-                    //if (mysqli_stmt_affected_rows($stmt) != 1) {
-                    //    $this->assertTrue(false, "Could not delete test job from database");
-                    //}
+                    if ($sql == 'delete from job where jobid = ?' && mysqli_stmt_affected_rows($stmt) != 1) {
+                        $this->assertTrue(false, "Could not delete test job from database");
+                    }
                     $stmt->close();
                 } else {
                     var_dump($errorMessage = $conn->errno . ' ' . $conn->error);
+                    $this->assertTrue(false, "Error in database query in tearDown function");
                 }
             }
         }
@@ -222,6 +222,7 @@ final class JobTest extends TestCase {
                     $stmt->close();
                 } else {
                     var_dump($errorMessage = $conn->errno . ' ' . $conn->error);
+                    $this->assertTrue(false, "Error in database query in tearDown function");
                 }
             }
 
@@ -243,6 +244,7 @@ final class JobTest extends TestCase {
             } else {
                 //var_dump
                 var_dump($errorMessage = $conn->errno . ' ' . $conn->error);
+                $this->assertTrue(false, "Error in database query in tearDown function");
             }
         }
         $conn->close();

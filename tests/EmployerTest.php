@@ -91,6 +91,7 @@ final class EmployerTest extends TestCase {
                     $stmt->close();
                 } else {
                     var_dump($errorMessage = $conn->errno . ' ' . $conn->error);
+                    $this->assertTrue(false, "Error in database query in tearDown function");
                 }
             }
             $sql = 'delete from employer where userid in (Select userid from user where email = ?)';
@@ -101,6 +102,7 @@ final class EmployerTest extends TestCase {
                 $stmt->close();
             } else {
                 var_dump($errorMessage = $conn->errno . ' ' . $conn->error);
+                $this->assertTrue(false, "Error in database query in tearDown function");
             }
             $sql = 'delete from employer where userid is null';
             if ($stmt = $conn->prepare($sql)) {
@@ -110,6 +112,7 @@ final class EmployerTest extends TestCase {
             } else {
                 //var_dump
                 var_dump($errorMessage = $conn->errno . ' ' . $conn->error);
+                $this->assertTrue(false, "Error in database query in tearDown function");
             }
         }
         $conn->close();

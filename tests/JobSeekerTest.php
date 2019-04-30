@@ -76,6 +76,7 @@ final class JobSeekerTest extends TestCase {
                     $stmt->close();
                 } else {
                     var_dump($errorMessage = $conn->errno . ' ' . $conn->error);
+                    $this->assertTrue(false, "Error in database query in tearDown function");
                 }
             }
             $sql = 'delete from job_seeker where userid in (Select userid from user where email = ?)';
@@ -86,6 +87,7 @@ final class JobSeekerTest extends TestCase {
                 $stmt->close();
             } else {
                 var_dump($errorMessage = $conn->errno . ' ' . $conn->error);
+                $this->assertTrue(false, "Error in database query in tearDown function");
             }
             $sql = 'delete from job_seeker where userid is null';
             if ($stmt = $conn->prepare($sql)) {
@@ -94,6 +96,7 @@ final class JobSeekerTest extends TestCase {
                 $stmt->close();
             } else {
                 var_dump($errorMessage = $conn->errno . ' ' . $conn->error);
+                $this->assertTrue(false, "Error in database query in tearDown function");
             }
         }
         $conn->close();

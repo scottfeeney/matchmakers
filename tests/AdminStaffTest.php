@@ -77,6 +77,7 @@ final class AdminStaffTest extends TestCase {
                     $stmt->close();
                 } else {
                     var_dump($errorMessage = $conn->errno . ' ' . $conn->error);
+                    $this->assertTrue(false, "Error in database query in tearDown function");
                 }
             }
         }

@@ -34,6 +34,13 @@ use PHPUnit\Framework\TestCase;
  * the autloader can only track one of the two class hierarchies at any given time)
  * remains at this stage.
  * 
+ * UDPATE: Standalone version of PHPUnit (i.e. not installed via composer) appears to
+ * work when the optional (apparently not so optional) phpunit.xml file is added and
+ * a custom bootstrap.php file is created.
+ * 
+ * Syntax is php phpunit.phar --debug tests in top-level directory of dev site
+ * to run all tests in classes in the tests/ subdirectory.
+ * 
  */
 
 final class UserTest extends TestCase {
@@ -241,6 +248,7 @@ final class UserTest extends TestCase {
             } else {
                 //var_dump
                 var_dump($errorMessage = $conn->errno . ' ' . $conn->error);
+                $this->assertTrue(false, "Error in database query in tearDown function");
             }
         }
         foreach ($this->testEmails as $testEmail) {
@@ -255,6 +263,7 @@ final class UserTest extends TestCase {
             } else {
                 //var_dump
                 var_dump($errorMessage = $conn->errno . ' ' . $conn->error);
+                $this->assertTrue(false, "Error in database query in tearDown function");
             }
         }
         $sql = 'delete from user where email is null';
@@ -265,6 +274,7 @@ final class UserTest extends TestCase {
         } else {
             //var_dump
             var_dump($errorMessage = $conn->errno . ' ' . $conn->error);
+            $this->assertTrue(false, "Error in database query in tearDown function");
         }
         $conn->close();
         parent::tearDown();
