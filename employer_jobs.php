@@ -67,12 +67,18 @@
 	
 	
 	function GetJobCard($job) {
+				
+		$active = "";
+		
+		if($job->active == 0){
+			$active = "(Inactive)";
+		}
 		
 		$html = '<div class="card listing-card">
 			<div class="card-body">
 			
 				<div class="row">	
-					<div class="col-sm-12 list-title">' . htmlspecialchars($job->jobName) . '</div>
+					<div class="col-sm-12 list-title">' . htmlspecialchars($job->jobName) . ' '. htmlspecialchars($active) .'</div>
 				</div>
 				
 				<div class="row">	
