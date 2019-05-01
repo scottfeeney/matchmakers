@@ -57,7 +57,7 @@
 				
 				
 				foreach ($jobSeekerMatches as $jobSeekerMatch) {
-					echo GetJobSeekerMatchCard($jobSeekerMatch);
+					echo GetJobSeekerMatchCard($jobSeekerMatch, $jobId);
 				}
 				
 				
@@ -70,7 +70,7 @@
 	echo $footer->Bind();
 	
 	
-	function GetJobSeekerMatchCard($jobSeekerMatch) {
+	function GetJobSeekerMatchCard($jobSeekerMatch, $jobId) {
 		
 		$html = '<div class="card listing-card">
 			<div class="card-body">
@@ -85,11 +85,11 @@
 						<div class="row mt-2">	
 							<div class="col-sm-12">Field of Expertise: ' . htmlspecialchars($jobSeekerMatch->skillCategoryName) . '</div>
 						</div>
-						
+					
 						<div class="row mt-2">	
 							<div class="col-sm-4">Location: ' . htmlspecialchars($jobSeekerMatch->locationName) . '</div>
 							<div class="col-sm-4">Job Type: ' . htmlspecialchars($jobSeekerMatch->jobTypeName) . '</div>
-							<div class="col-sm-4"><div class="card-link"><a href="/view_job_seeker.php?js=' . $jobSeekerMatch->jobSeekerId . '"><i class="far fa-eye"></i> View Job Seeker</a></div></div>
+							<div class="col-sm-4"><div class="card-link"><a href="/view_job_seeker.php?js=' . $jobSeekerMatch->jobSeekerId . "&j=" . $jobId . '"><i class="far fa-eye"></i> View Job Seeker</a></div></div>
 						</div>
 				
 					</div>

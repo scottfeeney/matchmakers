@@ -139,8 +139,8 @@
 			}
 			
 			if (count($errorMessages) == 0) {
-				//	no errors, send to view job page;
-				header("Location: home.php");
+				//	no errors, send to employer_jobs list;
+				header("Location: employer_jobs.php");
 				die();	
 			}
 		}	
