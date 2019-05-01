@@ -54,6 +54,8 @@
 ?>	
 
         <section>
+		<div class="card listing-card">
+			<div class="card-body">
 			<!-- Position name -->
 			<div class="row">
 				<div class="col-sm-12">
@@ -121,7 +123,8 @@
 					</div>
 				</div>
 			</div>
-			
+		</div>
+		</div>
 		</section>
     
 <?php
