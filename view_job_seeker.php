@@ -52,6 +52,8 @@
 	echo $header->Bind();	
 ?>	
         <section>
+		<div class="card listing-card">
+			<div class="card-body">
 			<!-- Job Seeker name -->
 			<div class="row">
 				<div class="col-sm-12">
@@ -200,7 +202,9 @@
 					?>
 				</div>
 			</div>
-		</section>
+			</div>
+		</div>
+	</section>
     
 <?php
 	$footer = new \Template\Footer();
