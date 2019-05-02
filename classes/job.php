@@ -190,6 +190,8 @@
 			$stmt->close();
 			$conn->close();
 
+			//TODO Should return DB error message on failure?
+
 		}
 		
 		// Get Jobs By Employer

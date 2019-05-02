@@ -11,6 +11,8 @@ final class SkillTest extends TestCase {
     private $testEmail = "someadminuserguy$#!@123.com";
     private $adminUser;
     private $skillCatId;
+    private $testJobName = "Cloud Counter";
+    private $uidsToDelete;
 
 
     public function testConstructorZero() {
@@ -58,17 +60,98 @@ final class SkillTest extends TestCase {
     
     //static function DeleteSkill($skillId)
     //Attempt to delete a skill using Id that doesn't exist
+
+    public function testDeleteSkillFailure() {
+        $result = \Classes\Skill::DeleteSkill(-1);
+        $this->assertTrue($result->hasError);
+    }
+
+    //Attempt to delete a real skill
+
+    public function testDeleteSkillSuccess() {
+        $objSave = createSkill("Some Skill", $this->skillCatId, $this->adminUser);
+        $skillId = $objSave->objectId;
+        $result = \Classes\Skill::DeleteSkill($skillId);
+        $this->assertFalse($result->hasError);
+    }
+
+
     //Attempt to delete a skill that has related entries in both job_skill and job_seeker_skill tables
-    //(should we be able to do that, really?)
+    //with and without using the "I'm sure" flag
+
+    public static function createJobAddSkill($testEmail, $testJobName, $skillCatId, $adminUser) {
+        $result = JobTest::createEmployerAndJob($testEmail, $testJobName);
+        extract($result); //jid
+        $skillObjSave = SkillTest::createSkill("Looking Up",
+                $skillCatId, $adminUser);
+        $skillId = $skillObjSave->objectId;
+        \Classes\Job::SaveJobSkills($jid, $skillId);
+        return array('jid' => $jid, 'skillId' => $skillId);
+        
+        //anything calling this method should also call the below at the end
+        //JobTest::deleteJobTestTempRecords($testEmail);
+    }
+
+    public function testDeleteUsedSkill() {
+        extract(SkillTest::createJobAddSkill($this->testEmail, $this->testJobName, $this->skillCatId, $this->adminUser));
+        $deleteTestOneResult = \Classes\Skill::DeleteSkill($skillId);
+        $deleteTestTwoResult = \Classes\Skill::DeleteSkill($skillId, true);
+        $jobTestCleanupResult = JobTest::deleteJobTestTempRecords($this->testEmail);
+        if ($jobTestCleanupResult[0] == false) {
+            $this->assertTrue(false, $jobTestCleanupResult[1]);
+        }
+        $this->assertTrue($deleteTestOneResult->has_error);
+        $this->assertFalse($deleteTestTwoResult->has_error);
+    }
+
+    //
 
     //static function GetSkillsBySkillCategory($skillCategoryId)
     //Try with both legit and illegit skillCategoryIds
 
+    public function testGetSkillsBySkillCategoryFailure() {
+        $result = \Classes\Skills::GetSkillsBySkillCategory(-1);
+        $this->assertTrue(count($result) == 0);
+    }
+
+    public function testGetSkillsBySkillCategorySuccess() {
+        SkillTest::createSkill("Some test skill", $this->skillCatId, $this->adminUser);
+        $result = \Classes\Skills::GetSkillsBySkillCategory($this->skillCatId);
+        $this->assertTrue(count($result) == 1);
+    }
+
+
     //static function GetSkillsByJob($jobId)
+    public function testGetSkillsByJob() {
+        extract(SkillTest::createJobAddSkill($this->testEmail, $this->testJobName, $this->skillCatId, $this->adminUser));
+        //gives jid, skillId
+        $skillsArr = \Classes\Skill::GetSkillsByJob($jid);
+        $jobTestCleanupResult = JobTest::deleteJobTestTempRecords($this->testEmail);
+        if ($jobTestCleanupResult[0] == false) {
+            $this->assertTrue(false, $jobTestCleanupResult[1]);
+        }
+        $this->assertTrue(count($skillsArr) == 1);
+        $this->assertTrue(($skillsArr[0])->skillId == $skillId);
+    }
 
     //static function GetSkillsByJobSeeker($jobSeekerId)
 
+    
+
     //static function GetSkillExists($object)
+
+    public function testGetSkillExists($object) {
+        $dodgySkill = new \Classes\Skill();
+        $dodgySkill->skillName = "Whatever";
+        $dodgySkill->skillCategoryId = "-1";
+        $realSkillSave = createSkill("Some Skill", $this->skillCatId, $this->adminUser);
+        $realSkillId = $realSkillSave->objectId;
+        $realSkillDuplicate = new \Classes\Skill();
+        $realSkillDuplicate->skillName = "Some Skill";
+        $realSkillDuplicate->skillCategoryId = $this->skillCatId;
+        $this->assertFalse(\Classes\Skill::GetSkillExists($dodgySkill));
+        $this->assertFalse(\Classes\Skill::GetSkillExists($realSkillDuplicate));
+    }
 
 
     protected function setUp(): void {

@@ -13,7 +13,12 @@ spl_autoload_register(function ($class)
 	//that was not installed with composer and shouldn't even know that it's installed on the system
 	//much less be trying to look for components of it - but it is
 	if ($class != 'Composer\Autoload\ClassLoader') {
-	    include getcwd() . '/' . strtolower(str_replace("\\","/",$class)) . '.php';
+		try {
+			include getcwd() . '/' . strtolower(str_replace("\\","/",$class)) . '.php';
+		} catch (Exception $e) {
+			//in case of case sensitivity issues
+			include getcwd() . '/' . str_replace("\\","/",$class) . '.php';
+		}
 	}
 });
 

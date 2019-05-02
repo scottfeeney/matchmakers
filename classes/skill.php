@@ -147,6 +147,9 @@ ame";
 				//Will need to delete any children
 				//(assuming you mean entries in job_skill or job_seeker_skill referencing this skill)
 				//....although - do we want to do that without warning the user?
+				//adding required optional flag to be set in order to do this (if skill is in use
+				//obviously the below (delete skill from table) will fail if the flag isn't set
+				//and these cleanup queries aren't run first)
 
 				$sql = "delete from job_skill where skillId = ?";
 

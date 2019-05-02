@@ -57,11 +57,6 @@ final class UserTest extends TestCase {
         $this->assertEquals(0, (new \Classes\User(-1))->userId);
     }
 
-    public function testConstructorDBServerInaccessible() {
-        //not yet implemented
-        $this->markTestIncomplete();
-    }
-
     public function testSaveEmailExists() {
         $oid = $this->saveNewUser($this->testEmails[1]);
         $this->idsToDelete[] = $oid;
@@ -84,10 +79,6 @@ final class UserTest extends TestCase {
         $user->resetCode = NULL;
         $objSave = $user->Save();
         //var_dump($objSave);
-
-        //Actually can't use the below as the tearDown function is run per-test, not per test class as I'd thought
-        //$idsToDelete[] = $objSave->objectId;
-
         return $objSave->objectId;
     }
 
@@ -98,10 +89,6 @@ final class UserTest extends TestCase {
         $objSave = $user->Save();
         $oid2 = $objSave->objectId;
         $user2 = new \Classes\User($oid2);
-        //Cleanup DB BEFORE assertions as it seems code after them doesn't get executed (according to hacky var_dump testing)
-        //$this->cleanup($oid);
-        //$this->cleanup($oid2);
-
         $this->idsToDelete[] = $oid;
         $this->idsToDelete[] = $oid2;
 
@@ -113,11 +100,7 @@ final class UserTest extends TestCase {
         $oid = $this->saveNewUser($this->testEmails[1]);
         $user = new \Classes\User($oid);
         //var_dump("Testing with oid ".$oid);
-        //Cleanup DB BEFORE assertions as it seems code after them doesn't get executed (according to hacky var_dump testing)
-        //$this->cleanup($oid);
-
         $this->idsToDelete[] = $oid;
-
         $this->assertEquals($this->testEmails[1], $user->email);
         $this->assertEquals(NULL, $user->password);
         $this->assertEquals(1, $user->userType);

@@ -23,6 +23,7 @@ final class JobTest extends TestCase {
         extract($result); //$oid, $eid, $employer (employer obj)
 
         $job = new \Classes\Job();
+        //Assumes there are 5 legitimate skillcategories with ids 1-5
         $categoryId = mt_rand(1,5);
         
         //$jid, $objSave
@@ -179,75 +180,66 @@ final class JobTest extends TestCase {
         //$this->jidsToDelete[] = 2146;
     }
 
-    protected function tearDown(): void {
+    private static function runDelete($query, $failStr, $checkAffected, $testEmail) {
         $conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);
-        //var_dump($conn);
-        //var_dump("In cleanup with oid ".$oid);
 
-
-
-        foreach ($this->jidsToDelete as $jid) {
-            var_dump("Should now delete job_skill entries and job with jobid ".$jid);
-            foreach(array('delete from job_skill where jobId = ?','delete from job where jobid = ?') as $sql) {
-                if ($stmt = $conn->prepare($sql)) {
-                    $stmt->bind_param("i", $jid);
-                    //var_dump("Cleaning up - deleting user with id ".$oid);
-                    $stmt->execute();
-                    $result = mysqli_stmt_get_result($stmt);
-
-                    if ($sql == 'delete from job where jobid = ?' && mysqli_stmt_affected_rows($stmt) != 1) {
-                        $this->assertTrue(false, "Could not delete test job from database");
-                    }
-                    $stmt->close();
-                } else {
-                    var_dump($errorMessage = $conn->errno . ' ' . $conn->error);
-                    $this->assertTrue(false, "Error in database query in tearDown function");
+        //delete skills
+        if ($stmt = $conn->prepare($query)) {
+            $stmt->bind_param("s", $testEmail);
+            //var_dump("Cleaning up - deleting user with id ".$oid);
+            $stmt->execute();
+            $result = mysqli_stmt_get_result($stmt);
+            if ($checkAffected > 0) {
+                if (mysqli_stmt_affected_rows($stmt) != $checkAffected) {
+                    $conn->close();
+                    return array(false, $failStr);
                 }
             }
-        }
-
-        foreach ($this->uidsToDelete as $idd) {
-            var_dump("Should now delete employer and user with userid ".$idd);
-            foreach (array('delete from employer where userid = ?', 'delete from user where UserId = ?') as $sql) {
-            //$sql = 'delete from employer where userid = ?';
-                if ($stmt = $conn->prepare($sql)) {
-                    //var_dump($stmt);
-                    $stmt->bind_param("i", $idd);
-                    //var_dump("Cleaning up - deleting user with id ".$oid);
-                    $stmt->execute();
-                    $result = mysqli_stmt_get_result($stmt);
-                    if (mysqli_stmt_affected_rows($stmt) != 1) {
-                        $this->assertTrue(false, "Failure to delete employer or user record with userid ". $idd);
-                    }
-                    $stmt->close();
-                } else {
-                    var_dump($errorMessage = $conn->errno . ' ' . $conn->error);
-                    $this->assertTrue(false, "Error in database query in tearDown function");
-                }
-            }
-
-            //Cleanup code that shouldn't be necessary unless something goes wrong in a previous run
-            $sql = 'delete from employer where userid in (Select userid from user where email = ?)';
-            if ($stmt = $conn->prepare($sql)) {
-                $stmt->bind_param("s", $this->testEmail);
-                $stmt->execute();
-                $result = mysqli_stmt_get_result($stmt);
-                $stmt->close();
-            } else {
-                var_dump($errorMessage = $conn->errno . ' ' . $conn->error);
-            }
-            $sql = 'delete from employer where userid is null';
-            if ($stmt = $conn->prepare($sql)) {
-                $stmt->execute();
-                $result = mysqli_stmt_get_result($stmt);
-                $stmt->close();
-            } else {
-                //var_dump
-                var_dump($errorMessage = $conn->errno . ' ' . $conn->error);
-                $this->assertTrue(false, "Error in database query in tearDown function");
-            }
+            $stmt->close();
+        } else {
+            var_dump($errorMessage = $conn->errno . ' ' . $conn->error);
+            $conn->close();
+            return array(false, "Error in database query in deleteJobTestTempRecords function");
         }
         $conn->close();
+        return array(true,"");
+    }
+
+
+    //Refactored to allow use from other test classes
+    public static function deleteJobTestTempRecords($testEmail) {
+
+        $cleanupQueries = array(
+            array("delete from job_skill where jobId in (Select jobId from job where employerId in (select employerId from employer where userId in (select userId from user where email = ?)))",
+                "",0),
+            array("delete from job where employerId in (select employerId from employer where userId in (select userId from user where email = ?))",
+                "Could not delete test Job from database", 1),
+            array("delete from employer where userId in (select userId from user where email = ?)",
+                "Could not delete test Employer from database", 1),
+            array("delete from user where email = ?",
+                "Could not delete test user from database", 1)
+            
+        );
+
+        foreach ($cleanupQueries as $cleanupQuery) {
+            $query = $cleanupQuery[0];
+            $failStr = $cleanupQuery[1];
+            $checkAffected = $cleanupQuery[2];
+            $result = JobTest::runDelete($query, $failStr, $checkAffected, $testEmail);
+            if ($result[0] == false) {
+                return $result;
+            }
+        }
+
+        return array(true,"");
+    }
+
+    protected function tearDown(): void {
+        $result = JobTest::deleteJobTestTempRecords($this->testEmail);
+        //var_dump($result);
+        if ($result[0] == false) {
+            $this->assertTrue(false, $result[1]);
+        }
         parent::tearDown();
     }
 }
