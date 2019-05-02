@@ -17,10 +17,6 @@
     "Any Authentication required" : {
         "authDesc" : "To use the endpoints detailed in this section, a valid authentication token must be supplied in a HTTP header named 'TOKEN'. Tokens last for one hour after being generated.",
         "endpoints" : {
-            "/api/external/index.php" : {
-                "desc" : "List API Endpoints",
-                "output" : "This page. Listing of all API endpoints, the authentication type required to access them, what they output, any input required (beyond the relevant authentication token), and any notes related to their implementation and behaviour"
-            },
             "/api/external/categories.php" : {
                 "desc" : "List skill categories data",
                 "output" : "Skill Categories IDs and corresponding names",
