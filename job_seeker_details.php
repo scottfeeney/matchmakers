@@ -60,6 +60,9 @@
 	$active = "1";
 	$locationId = "";
 	
+	$cancelBtn = false;
+	
+	
 	if (\Utilities\Common::IsSubmitForm())
 	{
 		//form submitted
@@ -293,6 +296,9 @@
 			$selectedSkills = \Classes\JobSeeker::GetSkillsByJobSeekerString($jobSeeker->jobSeekerId);
 			$active = $jobSeeker->active;
 			$locationId = $jobSeeker->locationId;
+			
+			// Load cancel button
+			$cancelBtn = true;
 		}
 	}
 	
@@ -585,7 +591,11 @@
 					
 				<div class="form-group mt-3">
 					<button type="submit" class="btn btn-primary">Save</button> 
-					<a class="btn btn-secondary ml-3" href="home.php" role="button">Cancel</a>
+					<?php
+						if($cancelBtn == true){
+					?>
+						<a class="btn btn-secondary ml-3" href="home.php" role="button">Cancel</a>
+					<?php } ?>
 				</div>
 			</form>
 		</section>

@@ -47,7 +47,7 @@
 	$companyType = "";
 	$companySize = "";
 	$expectedGrowth = "";
-	
+	$cancelBtn = false;
 	
 	if (\Utilities\Common::IsSubmitForm())
 	{
@@ -290,6 +290,9 @@
 			$companyType = $employer->companyType;
 			$companySize = $employer->companySize;
 			$expectedGrowth = $employer->expectedGrowth;
+			
+			// Load cancel button
+			$cancelBtn = true;
 		}
 	}
 	
@@ -528,7 +531,11 @@
 				
 				<div class="form-group mt-3">
 					<button type="submit" class="btn btn-primary">Save</button> 
-					<a class="btn btn-secondary ml-3" href="home.php" role="button">Cancel</a>
+					<?php
+						if($cancelBtn == true){
+					?>
+						<a class="btn btn-secondary ml-3" href="home.php" role="button">Cancel</a>
+					<?php } ?>
 				</div>
 				
 			</form>
