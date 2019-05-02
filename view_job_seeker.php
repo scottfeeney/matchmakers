@@ -74,6 +74,8 @@
 	echo $header->Bind();	
 ?>	
         <section>
+		<a class="btn btn-primary" href="job_matches.php?j=<?php echo $jobId; ?>" role="button">Back to Matches</a>
+		
 		<div class="card listing-card">
 			<div class="card-body">
 				<!-- Job Seeker name -->
@@ -232,7 +234,7 @@
 								}
 							}
 							else {
-								// Loop through array of skills to display skill name
+								// Display skills as one colour
 								foreach($selectedSkills as $skill){
 									echo "<span class='badge badge-info jobSkillDisplay'>$skill->skillName</span>";
 								}
@@ -254,7 +256,7 @@
 						</div>
 						<div class="row">
 							<div class="col-sm-12">
-								<p>This job seeker does not have the following skill(s) required for your <?php echo htmlspecialchars($jobName); ?> position:</p>
+								<p>This job seeker does <strong>not</strong> have the following skill(s) required for your <?php echo htmlspecialchars($jobName); ?> position:</p>
 							</div>
 						</div>
 						<div class="col-sm-12 jobSkillsList">

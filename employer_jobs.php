@@ -24,29 +24,17 @@
 	
 	$employer = \Classes\Employer::GetEmployerByUserId($user->userId);
 	
-	
 	$header = new \Template\Header();
 	$header->isSignedIn = true;
 	echo $header->Bind();
 	
-	
-	
 	$jobs = \Classes\Job::GetJobsByEmployer($employer->employerId);
-				
-				
-					
-	
-	
-	
 ?>	
-
-
         <section>
-		
+			<a class="btn btn-primary mb-3" href="home.php" role="button">Back to Dashboard</a>
+			
 			<h2>Jobs</h2>
 			
-			
-		
 			<?php
 			
 				echo GetCardDetail("<strong>Employer: </strong>" . htmlspecialchars($employer->companyName));
@@ -54,10 +42,7 @@
 				foreach ($jobs as $job) {
 					echo GetJobCard($job);
 				} 
-				
-				
 			?>
-			
 		</section>
     
 <?php

@@ -44,10 +44,10 @@
 	echo $header->Bind();
 
 	$jobSeekerMatches = \Classes\JobSeeker::GetJobSeekerMatchesByJob($job->jobId);
-					
 ?>	
         <section>
-		
+			<a class="btn btn-primary mb-3" href="employer_jobs.php" role="button">Back to Jobs</a>
+			
 			<h2>Job Matches</h2>
 		
 			<?php

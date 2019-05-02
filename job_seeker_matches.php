@@ -24,28 +24,20 @@
 	
 	$jobSeeker = \Classes\JobSeeker::GetJobSeekerByUserId($user->userId);
 	
-	
+
 	$header = new \Template\Header();
 	$header->isSignedIn = true;
 	echo $header->Bind();
 	
-	
-	
 	$jobMatches = \Classes\Job::GetJobMatchesByJobSeeker($jobSeeker->jobSeekerId);
-				
-				
-					
-	
-	
-	
 ?>	
 
 
         <section>
 		
+			<a class="btn btn-primary mb-3" href="home.php" role="button">Back to Dashboard</a>
+		
 			<h2>Job Matches</h2>
-			
-			
 		
 			<?php
 			

@@ -8,6 +8,7 @@
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/job.php';
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/location.php';
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/employer.php';
+		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/jobseeker.php';
 	} else {
 		require_once './utilities/common.php';
 		require_once './classes/header.php';
@@ -17,6 +18,7 @@
 		require_once './classes/job.php';
 		require_once './classes/location.php';
 		require_once './classes/employer.php';
+		require_once './classes/jobseeker.php';
 	}
 	
 	$user = \Utilities\Common::GetSessionUser();
@@ -36,6 +38,21 @@
 	$selectedSkills = \Classes\Skill::GetSkillsByJob($jobId);
 	$locationName = (new \Classes\Location($job->locationId))->name;
 
+	// Load job seeker information (for Job Seeker view only)
+	if ($user->userType == 2) {
+		$jobseekerId = (\Classes\JobSeeker::GetJobSeekerByUserId($user->userId))->jobSeekerId;		
+		$jobSeekerSkills = \Classes\Skill::GetSkillsByJobSeeker($jobseekerId);
+		$missingSkills = array();
+		
+		// Determine if job seeker is missing any required skills
+		foreach($selectedSkills as $skill){
+			if (!in_array($skill, $jobSeekerSkills)){
+				array_push($missingSkills, $skill);
+			}
+		}
+	}
+	
+	
 	// Associative array of maps for each location
 	$maps = array();
 	$maps['Adelaide'] = "cp=-34.9242062953014~138.59462275247796&lvl=13&typ=d&sty=r&src=SHELL&FORM=MBEDV8";
@@ -54,77 +71,138 @@
 ?>	
 
         <section>
-		<div class="card listing-card">
-			<div class="card-body">
-			<!-- Position name -->
-			<div class="row">
-				<div class="col-sm-12">
-					<h2 class="job-view-title"><?php echo htmlspecialchars($positionName); ?></h2>					
-					<?php 	if($numberAvailable > 1){
-								echo '<span class="badge badge-success job-positions">' . $numberAvailable . ' positions</span>';
+			<?php
+				if($user->userType == 1){
+			?>
+				<a class="btn btn-primary" href="employer_jobs.php" role="button">Back to Jobs</a>
+			<?php	
+				}
+			
+				elseif($user->userType == 2){
+			?>
+					<a class="btn btn-primary" href="job_seeker_matches.php" role="button">Back to Matches</a>
+			<?php	
+				}
+			?>
+			
+			<div class="card listing-card">
+				<div class="card-body">
+					<!-- Position name -->
+					<div class="row">
+						<div class="col-sm-12">
+							<h2 class="job-view-title"><?php echo htmlspecialchars($positionName); ?></h2>					
+							<?php 	
+								if($numberAvailable > 1){
+									echo '<span class="badge badge-success job-positions">' . $numberAvailable . ' positions</span>';
+								}
+							?>
+						</div>
+					</div>
+					
+					<!-- Company name -->
+					<div class="row mt-2">
+						<div class="col-sm-12">
+							<p><strong>Employer: </strong><?php echo $companyName; ?></p>
+						</div>
+					</div>
+					
+					<!-- Job Type, Start period, and Reference No.-->
+					<div class="row mt-2">
+						<div class="col-sm-4">
+							<p><strong>Job Type: </strong><?php echo $jobTypeName; ?></p>
+						</div>
+						<div class="col-sm-4">
+							<p><strong>Start Period: </strong><?php echo $positionAvailability; ?></p>
+						</div>				
+						<div class="col-sm-4">
+							<p><strong>Reference Number: </strong><?php echo htmlspecialchars($referenceNumber); ?></p>
+						</div>
+					</div>
+					
+					<!-- Description -->
+					<div class="row mt-2">
+						<div class="col-sm-12">
+							<h2>Job Description</h2>
+							<p><?php echo htmlspecialchars($positionDescription); ?></p>
+						</div>
+					</div>
+					
+					<!-- Skills -->
+					<div id="skillsSection">
+						<h3>Required Skills</h3>
+						<div class="col-sm-12 jobSkillsList">
+							<?php
+							// If the user is an employer and the job skills have been loaded display skills in different colours
+							if ($user->userType == 2 && sizeof($jobSeekerSkills) > 0) {
+								// Loop through array of skills to display skill name
+								foreach($selectedSkills as $skill){
+									if (in_array($skill, $jobSeekerSkills)){
+										// Show skill as green if it's a required skill
+										echo "<span class='badge badge-success jobSkillDisplay'>$skill->skillName</span>";
+									}
+									else {
+										// Show skill as blue if it's not
+										echo "<span class='badge badge-info jobSkillDisplay'>$skill->skillName</span>";
+									}
+								}
+							}
+							else {
+								// Display skills as one colour
+								foreach($selectedSkills as $skill){
+									echo "<span class='badge badge-info jobSkillDisplay'>$skill->skillName</span>";
+								}
 							}
 						?>
-				</div>
-			</div>
-			
-			<!-- Company name -->
-			<div class="row mt-2">
-				<div class="col-sm-12">
-					<p><strong>Employer: </strong><?php echo $companyName; ?></p>
-				</div>
-			</div>
-			
-			<!-- Job Type, Start period, and Reference No.-->
-			<div class="row mt-2">
-				<div class="col-sm-4">
-					<p><strong>Job Type: </strong><?php echo $jobTypeName; ?></p>
-				</div>
-				<div class="col-sm-4">
-					<p><strong>Start Period: </strong><?php echo $positionAvailability; ?></p>
-				</div>				
-				<div class="col-sm-4">
-					<p><strong>Reference Number: </strong><?php echo htmlspecialchars($referenceNumber); ?></p>
-				</div>
-			</div>
-			
-			<!-- Description -->
-			<div class="row mt-2">
-				<div class="col-sm-12">
-					<h2>Job Description</h2>
-					<p><?php echo htmlspecialchars($positionDescription); ?></p>
-				</div>
-			</div>
-			
-			<!-- Skills -->
-			<div id="skillsSection">
-				<h3>Required Skills</h3>
-				<div class="col-sm-12 jobSkillsList">
-					<?php					
-						// Loop through array of skills to display skill name
-						foreach($selectedSkills as $skill){
-							echo "<span class='badge badge-info jobSkillDisplay'>" . htmlspecialchars($skill->skillName) . "</span>";
-						}
-					?>
-				</div>
-			</div>
-			
-			<!-- Location-->
-			<div id="locationSection">
-				<div>
-					<h2>Location: <?php echo $locationName; ?></h2>
+							
+							
+						</div>
+					</div>
 					
-					<div class="map-container">
-						<iframe width="485" 
-								height="300" 
-								src="<?php echo "https://www.bing.com/maps/embed?h=300&w=485&" . $maps[$locationName]; ?>"
-								scrolling="no"
-								frameborder="0" >
-						</iframe>
+					<!-- Location-->
+					<div id="locationSection">
+						<div>
+							<h2>Location: <?php echo $locationName; ?></h2>
+							
+							<div class="map-container">
+								<iframe width="485" 
+										height="300" 
+										src="<?php echo "https://www.bing.com/maps/embed?h=300&w=485&" . $maps[$locationName]; ?>"
+										scrolling="no"
+										frameborder="0" >
+								</iframe>
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>
-		</div>
-		</div>
+			
+			<?php if ($user->userType == 2 && sizeof($missingSkills) > 0) { ?>
+			<div class="card mt-2">
+				<div class="card-body">
+					<div id="jobRequiredSkills">
+						<div class="row mt-4">
+							<div class="col-sm-12">
+								<h4>Missing Skills</h4>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-sm-12">
+								<p>You do <strong>not</strong> have the following skill(s) required this position:</p>
+							</div>
+						</div>
+						<div class="col-sm-12 jobSkillsList">
+							<?php
+								// Loop through array of skills to display skill name
+								foreach($missingSkills as $skill){
+									echo "<span class='badge badge-warning jobSkillDisplay'>$skill->skillName</span>";
+								}
+							?>
+						</div>
+					</div>
+				</div>
+			</div>
+			<?php } ?>
+			
 		</section>
     
 <?php

@@ -332,10 +332,11 @@
 				</div>
 					
 				<div class="row">	
-					<div class="col-sm-12">
+					<div class="col-12">
 						<div class="form-group mt-3">
 							<button class="btn btn-primary"><?php echo ($job->jobId == 0 ? "Post Job" : "Save"); ?></button>
-						</div>
+							<a class="btn btn-secondary ml-3" href="home.php" role="button">Cancel</a>
+						</div>						
 					</div>
 				</div>
 				
