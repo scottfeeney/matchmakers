@@ -459,13 +459,18 @@ footer {
 	text-decoration: none;
 }
 
-.jobSkillsList{
+.jobSkillsList {
 	padding-left: 0px
 }
 
-.jobSkillDisplay{
+.jobSkillDisplay {
 	margin: 0px 10px 15px 0px;
 	padding: 10px;
+}
+
+.skillsInfo {
+	font-size: 0.8em;
+	color: 	#DCDCDC;
 }
 
 .job-positions {
