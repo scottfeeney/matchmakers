@@ -584,7 +584,8 @@
 				
 					
 				<div class="form-group mt-3">
-					<button type="submit" class="btn btn-primary">Save</button>  
+					<button type="submit" class="btn btn-primary">Save</button> 
+					<a class="btn btn-secondary ml-3" href="home.php" role="button">Cancel</a>
 				</div>
 			</form>
 		</section>
