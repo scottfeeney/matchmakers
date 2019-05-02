@@ -114,9 +114,11 @@
 						<div class="col-sm-4">
 							<p><strong>Start Period: </strong><?php echo $positionAvailability; ?></p>
 						</div>				
-						<div class="col-sm-4">
-							<p><strong>Reference Number: </strong><?php echo htmlspecialchars($referenceNumber); ?></p>
-						</div>
+						<?php if(strlen($referenceNumber) != 0) { ?>
+							<div class="col-sm-4">						
+								<p><strong>Reference Number: </strong><?php echo htmlspecialchars($referenceNumber); ?></p>						
+							</div>
+						<?php } ?>
 					</div>
 					
 					<!-- Description -->
@@ -145,6 +147,7 @@
 										echo "<span class='badge badge-info jobSkillDisplay'>$skill->skillName</span>";
 									}
 								}
+								echo "<p class='skillsInfo'><span style='color:#28a745'>Green</span> skills are your skills that match this jobs requirements.</p>";
 							}
 							else {
 								// Display skills as one colour
