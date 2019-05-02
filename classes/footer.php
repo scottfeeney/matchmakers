@@ -10,7 +10,7 @@
 			
 					</div>
 					<footer>
-						<div>Job Matcher © 2019</div>
+						<div>Job Matcher © 2019 - <a href="/signup.php">Sign Up</a> | <a href="/api/external/index.php">API</a></div>
 					</footer>
 		
 					<script

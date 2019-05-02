@@ -48,7 +48,7 @@
 							<div class="row">
 							
 								<div class="col-6">
-									<div class="logo"><a href="home.php"><img src="/images/logo.png" alt="Job Matcher Logo" /></a></div>
+									<div class="logo"><a href="/home.php"><img src="/images/logo.png" alt="Job Matcher Logo" /></a></div>
 								</div>
 
 								<div class="col-6">';

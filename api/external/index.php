@@ -26,15 +26,17 @@
     $apiDesc = json_decode($jsonData, TRUE);
 //    var_dump($jsonData);
    // var_dump($apiDesc);
+   
+   $mainSectionCount = 0;
 
 ?>
 
     <section>
-			<div class="jumbotron jumbotron-fluid">
+			<div class="jumbotron jumbotron-fluid jumbotron-api">
 				<div class="container">
 					<div class="row">
 						
-						<div class="col-lg-6 ml-lg-auto mr-lg-auto">
+						<div class="col-lg-8 ml-lg-auto mr-lg-auto">
 
 <?php if ($jsonData === null): ?>
 							<h2>Server Error</h2>
@@ -44,83 +46,123 @@
 							</div>
 
 <?php else: ?>                    
-                            <h1>JobMatcher API documentation</h1>
-							<br />
-                            <div class="alert alert-light" role="alert">
-    <?php foreach ($apiDesc as $authType => $authArr): ?>
-                            <HR>
-                            <h2><?php echo $authType; ?></h2>
-                            <br />
-                            <?php echo $authArr['authDesc']; ?>
+
+                            <div class="alert alert-light api-documentation" role="alert">
+							
+
+		<h1>JobMatcher API Documentation</h1>
+		
+		
+		
+		<?php 
+			/* links */
+			
+			$mainSectionCount++;
+			
+			foreach ($apiDesc as $authType => $authArr): ?>
+		
+			<div class="api-section-link"><a href="#ApiMainSection<?php echo $mainSectionCount; ?>"><span style="margin-right: 10px;"><i class="fas fa-caret-square-right"></i></span><?php echo $authType; ?></a></div>
+		<?php endforeach; ?>
+		
+
+
+							
+    <?php 
+	
+			$mainSectionCount=0;
+	
+			foreach ($apiDesc as $authType => $authArr): 
+			
+				$mainSectionCount++;
+			?>
+			
+				
+                            
+                            <div class="api-section-heading" id="ApiMainSection<?php echo $mainSectionCount; ?>"><?php echo $authType; ?></div>
+                            <div class="card api-section">
+								<div class="card-body"><?php echo $authArr['authDesc']; ?></div>
+							</div>
+							
+							
 
         <?php foreach ($authArr['endpoints'] as $relativeURL => $endpointArr): ?>
-                            <br />
-                            <br />
-                            <br />
-                            <br />
-                            <h3><?php echo $endpointArr['desc']; ?></h3>
-                            <br />
-                            <pre>
-                                <code>
-                                    <?php echo "\n"."GET ".$relativeURL; ?>
-                                </code>
-                            </pre>
+                           <div class="card api-main-title">
+								<div class="card-body"><?php echo $endpointArr['desc']; ?></div>
+							</div>
+                            
+                            <div class="section-title">Resource URL</div>
+							<div class="card api-section">
+								<div class="card-body"><pre><?php echo "\n"."GET ".$relativeURL; ?></pre></div>
+							</div>
+							
+							
+							
             <?php if (isset($endpointArr['headerInput'])): ?>
-                            <br />
-                            <br />
-                            HTTP Header input required<?php if ($authType != "No Authentication required") { 
-                                                                echo " (excluding authentication token required to be sent via 'TOKEN' header)"; 
-                                                            } ?>:
+			
+					<div class="section-title">HTTP Headers (Required)</div>
+					<div class="card api-section">
+						<div class="card-body">
+							<?php if ($authType != "No Authentication required") { 
+								echo " (excluding authentication token required to be sent via 'TOKEN' header)"; 
+							} ?>
 
-                <?php foreach ($endpointArr['headerInput'] as $headerName => $headerDesc): ?>
-                            <br />
-                            <br />
-                            <?php echo $headerName.": ".$headerDesc; ?>
-                <?php endforeach; ?>
+							<?php foreach ($endpointArr['headerInput'] as $headerName => $headerDesc): ?>
 
-                            <br />
+								<div><?php echo "<code class=\"api-code\">" . $headerName . "</code> ".$headerDesc; ?></div>
+							<?php endforeach; ?>
+					
+						</div>
+					</div>
+					
             <?php endif; ?>
 
             <?php if (isset($endpointArr['headerOutput'])): ?>
-                            <br />
-                            <br />
-                            HTTP Header output returned:
-
-                <?php foreach ($endpointArr['headerOutput'] as $headerName => $headerDesc): ?>
-                            <br />
-                            <br />
-                            <?php echo $headerName.": ".$headerDesc; ?>
-                <?php endforeach; ?>
-
-                            <br />
+			
+					<div class="section-title">HTTP Headers Returned</div>
+					<div class="card api-section">
+						<div class="card-body">
+							<?php foreach ($endpointArr['headerOutput'] as $headerName => $headerDesc): ?>
+								<div><?php echo "<code class=\"api-code\">" . $headerName . "</code>  ".$headerDesc; ?></div>
+							<?php endforeach; ?>
+					
+						</div>
+					</div>
+			
             <?php endif; ?>
 
             <?php if (isset($endpointArr['input'])): ?>
-                            <br />
-                            <br />
-                            GET Parameter input required:                
-                <?php foreach ($endpointArr['input'] as $paramName => $paramDesc): ?>
+			
+					<div class="section-title">GET Parameters (Required)</div>
+					<div class="card api-section">
+						<div class="card-body">
+							<?php foreach ($endpointArr['input'] as $paramName => $paramDesc): ?>
 
-                            <br />
-                            <br />
-                            <?php echo $paramName.": ".$paramDesc; ?>
+                            <div><?php echo "<code class=\"api-code\">" . $paramName . "</code> ".$paramDesc; ?></div>
                 <?php endforeach; ?>
+						
+						</div>
+					</div>
+			
+			
 
             <?php endif; ?>
 
             <?php if (isset($endpointArr['output'])): ?>
-                            <br />
-                            <br />
-                            Output: <?php echo $endpointArr['output']; ?>
+
+							
+						<div class="section-title">Output</div>
+						<div class="card api-section">
+							<div class="card-body"><?php echo $endpointArr['output']; ?></div>
+						</div>
+							
+							
                 <?php if (isset($endpointArr['exampleOutput'])): ?>
-                            <br />
-                            <br />
-                            Example:
-                            <pre>
-                                <code>
-                                    <?php echo $endpointArr['exampleOutput']; ?>
-                                </code>
-                            </pre>
+				
+						<div class="section-title">Example</div>
+						<div class="card api-section">
+							<div class="card-body"><pre><?php echo $endpointArr['exampleOutput']; ?></pre></div>
+						</div>
+	
 
                 <?php endif; ?>
 
