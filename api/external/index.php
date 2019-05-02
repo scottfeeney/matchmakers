@@ -57,9 +57,11 @@
 		<?php 
 			/* links */
 			
-			$mainSectionCount++;
+			foreach ($apiDesc as $authType => $authArr): 
 			
-			foreach ($apiDesc as $authType => $authArr): ?>
+				$mainSectionCount++;
+			
+			?>
 		
 			<div class="api-section-link"><a href="#ApiMainSection<?php echo $mainSectionCount; ?>"><span style="margin-right: 10px;"><i class="fas fa-caret-square-right"></i></span><?php echo $authType; ?></a></div>
 		<?php endforeach; ?>
