@@ -55,6 +55,10 @@
 					
 					$jobSeeker = \Classes\JobSeeker::GetJobSeekerByUserId($user->userId);
 					
+					if($jobSeeker->active == 0){
+						echo GetInactiveAlert();
+					}
+					
 					echo GetCardDetail("<strong>Job Seeker: </strong>" . htmlspecialchars($jobSeeker->firstName . " " . $jobSeeker->lastName));
 					
 					echo GetCard("fa-user-tie", "Click here to update your details", "/job_seeker_details.php");
@@ -112,6 +116,16 @@
 		$html = '<div class="card dashboard-detail-card">
 			<div class="card-body">' . $text . '</div>
 		</div>';
+		
+		return $html;
+		
+	}
+	
+	function GetInactiveAlert() {
+		
+		$html = '<div class="alert alert-warning mt-3" role="alert">
+			Your profile is currently inactive (Employer\'s won\'t see it). <a class="alert-link" href="job_seeker_details.php">Update your details</a> to reactivate it.
+		</div>	';
 		
 		return $html;
 		

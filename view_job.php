@@ -37,6 +37,8 @@
 	$positionDescription = $job->jobDescription;
 	$selectedSkills = \Classes\Skill::GetSkillsByJob($jobId);
 	$locationName = (new \Classes\Location($job->locationId))->name;
+	$active = $job->active;
+	
 
 	// Load job seeker information (for Job Seeker view only)
 	if ($user->userType == 2) {
@@ -83,8 +85,14 @@
 					<a class="btn btn-primary" href="job_seeker_matches.php" role="button">Back to Matches</a>
 			<?php	
 				}
-			?>
 			
+				if($active == 0){ 
+			?>
+					<div class="alert alert-warning mt-3" role="alert">
+						This job is currently inactive. <a class="alert-link" href="create_job.php?j=<?php echo $jobId; ?>">Edit Job</a> to reactivate it.
+					</div>					
+			<?php }	?>
+
 			<div class="card listing-card">
 				<div class="card-body">
 					<!-- Position name -->

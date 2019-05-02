@@ -232,7 +232,7 @@
 										echo "<span class='badge badge-info jobSkillDisplay'>$skill->skillName</span>";
 									}
 								}
-								echo "<p class='skillsInfo'><span style='color:#28a745'>Green</span> skills are required for this position. <span style='color:#17a2b8'>Blue</span> skills are the job seekers additional skills</p>";
+								echo "<p class='skillsInfo'><span style='color:#28a745'>Green</span> skills are your required skills for this position. <span style='color:#17a2b8'>Blue</span> skills are this job seekers additional skills</p>";
 							}
 							else {
 								// Display skills as one colour
