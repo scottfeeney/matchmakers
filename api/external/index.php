@@ -94,7 +94,7 @@
                             
                             <div class="section-title">Resource URL</div>
 							<div class="card api-section">
-								<div class="card-body"><pre><?php echo "\n"."GET ".$relativeURL; ?></pre></div>
+								<div class="card-body"><pre><?php if (isset($endpointArr['input'])) { echo "\n"."POST "; } else { echo "\n"."GET "; } echo $relativeURL; ?></pre></div>
 							</div>
 							
 							
@@ -134,7 +134,7 @@
 
             <?php if (isset($endpointArr['input'])): ?>
 			
-					<div class="section-title">GET Parameters (Required)</div>
+					<div class="section-title">POST Parameters (Required)</div>
 					<div class="card api-section">
 						<div class="card-body">
 							<?php foreach ($endpointArr['input'] as $paramName => $paramDesc): ?>
