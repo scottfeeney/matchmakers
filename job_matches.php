@@ -45,10 +45,17 @@
 
 	$jobSeekerMatches = \Classes\JobSeeker::GetJobSeekerMatchesByJob($job->jobId);
 ?>	
-        <section>
-			<a class="btn btn-primary mb-3" href="employer_jobs.php" role="button">Back to Jobs</a>
-			
-			<h2>Job Matches</h2>
+        <section>		
+			<div class="row">
+				<!-- Page heading -->
+				<div class="col-6">
+					<h2>Job Matches</h2>
+				</div>
+				<!-- Back Button -->
+				<div class="col-6">
+					<a class="float-right btn btn-primary mb-3 backButton" href="employer_jobs.php" role="button"><i class="fas fa-arrow-left"></i> Back to Jobs</a>
+				</div>
+			</div>			
 		
 			<?php
 			

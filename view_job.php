@@ -65,7 +65,16 @@
 	$maps['Melbourne'] = "cp=-37.81607137280399~144.9636397932391&lvl=13&typ=d&sty=r&src=SHELL&FORM=MBEDV8";
 	$maps['Perth'] = "cp=-31.913550691161007~115.88006194312811&lvl=13&typ=d&sty=r&src=SHELL&FORM=MBEDV8";
 	$maps['Sydney'] = "cp=-33.86960029335556~151.2059159744571&lvl=13&typ=d&sty=r&src=SHELL&FORM=MBEDV8";	
-
+	
+	// Set Back button link and text based on user type
+	if($user->userType == 1){
+		$btnLink = "employer_jobs.php";
+		$btnTxt = "Back to Jobs";
+	}
+	elseif($user->userType == 2){
+		$btnLink = "employer_jobs.php";
+		$btnTxt = "Back to Matches";
+	}
 	// Display header section	
 	$header = new \Template\Header();
 	$header->isSignedIn = true;
@@ -73,19 +82,18 @@
 ?>	
 
         <section>
+			<div class="row">
+				<!-- Page heading-->
+				<div class="col-6">
+					<h2>Job Details</h2>
+				</div>
+				<!-- Back Button -->
+				<div class="col-6">
+					<a class="float-right btn btn-primary mb-3 backButton" href="<?php echo $btnLink; ?>" role="button"><i class="fas fa-arrow-left"></i> <?php echo $btnTxt; ?></a>
+				</div>
+			</div>
+			
 			<?php
-				if($user->userType == 1){
-			?>
-				<a class="btn btn-primary" href="employer_jobs.php" role="button">Back to Jobs</a>
-			<?php	
-				}
-			
-				elseif($user->userType == 2){
-			?>
-					<a class="btn btn-primary" href="job_seeker_matches.php" role="button">Back to Matches</a>
-			<?php	
-				}
-			
 				if($active == 0){ 
 			?>
 					<div class="alert alert-warning mt-3" role="alert">

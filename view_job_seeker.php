@@ -28,6 +28,7 @@
 	// Load Job seeker details
 	$firstName = $jobseeker->firstName;
 	$lastName = $jobseeker->lastName;
+	//$email = (new \Classes\User($jobSeeker->userid))->email;
 	$phoneAreaCode = $jobseeker->phoneAreaCode;
 	$phoneNumber = $jobseeker->phoneNumber;
 	$mobileNumber = $jobseeker->mobileNumber;
@@ -46,6 +47,7 @@
 	$jobChangeSpeed = $jobseeker->jobChangeSpeed;
 	$active = $jobseeker->active;
 	$selectedSkills = \Classes\Skill::GetSkillsByJobSeeker($jobseekerId);
+
 
 	// Load job information (for Employer view only)
 	if ($user->userType == 1) {
@@ -74,8 +76,18 @@
 	echo $header->Bind();	
 ?>	
         <section>
-		<a class="btn btn-primary" href="job_matches.php?j=<?php echo $jobId; ?>" role="button">Back to Matches</a>
 		
+			<div class="row">
+				<!-- Page heading-->
+				<div class="col-6 col-xs-12">
+					<h2>Match Profile</h2>
+				</div>
+				<!-- Back Button -->
+				<div class="col-6">
+					<a class="float-right btn btn-primary mb-3 backButton" href="job_matches.php?j=<?php echo $jobId; ?>" role="button"><i class="fas fa-arrow-left"></i> Back to Matches</a>
+				</div>
+			</div>
+			
 		<div class="card listing-card">
 			<div class="card-body">
 				<!-- Job Seeker name -->
@@ -105,6 +117,10 @@
 				
 				<!-- Job Seeker Contact Details -->
 				<div class="row mt-2">
+					<div class="col-sm-12">
+						<p><strong>Email: </strong><?php echo (new \Classes\User($jobseeker->userId))->email; ?></p>
+					</div>
+					
 					<div class="col-sm-6">
 						<p><strong>Phone Number: </strong><?php echo "(" . htmlspecialchars($phoneAreaCode) . ") " . htmlspecialchars($phoneNumber); ?></p>
 					</div>

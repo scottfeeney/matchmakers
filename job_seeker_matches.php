@@ -34,10 +34,16 @@
 
 
         <section>
-		
-			<a class="btn btn-primary mb-3" href="home.php" role="button">Back to Dashboard</a>
-		
-			<h2>Job Matches</h2>
+			<div class="row">
+				<!-- Page heading-->
+				<div class="col-6">
+					<h2>Job Matches</h2>
+				</div>
+				<!-- Back Button -->
+				<div class="col-6">
+					<a class="float-right btn btn-primary mb-3 backButton" href="home.php" role="button"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
+				</div>
+			</div>
 		
 			<?php
 			
