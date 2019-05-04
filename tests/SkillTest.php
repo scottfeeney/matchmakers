@@ -1,7 +1,7 @@
 <?php
 
 /** 
- * Class to test functionality of JobSeeker Class
+ * Class to test functionality of Skill Class
  * 
  * Author(s): Blair
  * 

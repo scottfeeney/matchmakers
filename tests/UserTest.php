@@ -77,7 +77,7 @@ final class UserTest extends TestCase {
         $this->assertEquals(true, $objSave->hasError);
     }
 
-    public static function saveNewUser($email, $userType = 1) {
+    public static function saveNewUser($email, $userType = 1, $errorExpected = false) {
         $user = new \Classes\User(0);
         $user->userType = $userType;
         $user->email = $email;
@@ -144,7 +144,7 @@ final class UserTest extends TestCase {
         $this->idsToDelete[] = $oid;
         $user->verified = false;
         $user->active = true;
-        $user->save();
+        $user->Save();
         $this->assertEquals($user, \Classes\User::GetUserByVerifyCode($user->verifyCode));
     }
 
@@ -152,7 +152,7 @@ final class UserTest extends TestCase {
         $oid = $this->saveNewUser($this->testEmails[1]);
         $user = new \Classes\User($oid);
         $user->verified = true;
-        $user->save();
+        $user->Save();
         $this->idsToDelete[] = $oid;
         $this->assertEquals(null, \Classes\User::GetUserByVerifyCode($user->verifyCode));
     }
@@ -163,7 +163,7 @@ final class UserTest extends TestCase {
         $this->idsToDelete[] = $oid;
         $user->verified = true;
         $user->active = true;
-        $user->save();
+        $user->Save();
         $this->assertEquals($user, \Classes\User::GetUserByEmailAddress($user->email));
     }
 
@@ -181,7 +181,7 @@ final class UserTest extends TestCase {
         $user->verified = true;
         $user->active = true;
         $user->resetCode = \Utilities\Common::GetGuid();
-        $user->save();
+        $user->Save();
         $this->assertEquals($user, \Classes\User::GetUserByResetCode($user->resetCode));
     }
 
@@ -198,7 +198,7 @@ final class UserTest extends TestCase {
         $this->idsToDelete[] = $oid;
         $user->verified = true;
         $user->active = true;
-        $user->save();
+        $user->Save();
         $this->assertEquals(null, \Classes\User::GetUserByResetCode("123"));
     }
 
@@ -209,7 +209,7 @@ final class UserTest extends TestCase {
         $user->verified = true;
         $user->active = true;
         $user->password = password_hash($this->testPassword, PASSWORD_BCRYPT);
-        $user->save();
+        $user->Save();
         $this->assertEquals($user, \Classes\User::GetUserLogin($user->email, $this->testPassword));
     }
 
@@ -220,7 +220,7 @@ final class UserTest extends TestCase {
         $user->verified = true;
         $user->active = true;
         $user->password = password_hash($this->testPassword, PASSWORD_BCRYPT);
-        $user->save();
+        $user->Save();
         $this->assertSame(null, \Classes\User::GetUserLogin($user->email, "Wrong password"));
     }
 

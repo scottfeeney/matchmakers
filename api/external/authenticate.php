@@ -7,8 +7,20 @@
 		require_once '../../utilities/common.php';
 		require_once '../../classes/user.php';
 	}
-	
-	if (!isset($_SERVER['HTTP_EMAIL']) || !isset($_SERVER['HTTP_PASSWORD'])) {
+
+	$emailFound = false;
+	$passwordFound = false;
+
+	foreach ($_SERVER as $key => $value) {
+		if ($key == 'HTTP_EMAIL') { 
+			$emailFound = true;
+		} elseif ($key == 'HTTP_PASSWORD') {
+			$passwordFound = true;
+		}
+	}
+
+	if (!$emailFound || !$passwordFound) {
+		//exit early to prevent HTML error messages being returned
 		header("HTTP/1.1 401 Unauthorized");
 		exit;
 	}
