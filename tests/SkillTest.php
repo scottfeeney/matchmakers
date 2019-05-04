@@ -33,10 +33,7 @@ final class SkillTest extends TestCase {
     //Attempt to insert new skill to category that doesn't exist
 
     public static function createAdminUser($testEmail) {
-        $user = UserTest::saveNewUser($testEmail);
-        $user->userType = 3;
-        $user->Save();
-        return $user;
+        return new \Classes\User(UserTest::saveNewUser($testEmail,3));
     }
 
     public static function createSkill($skillName, $skillCatId, $adminUser) {
@@ -279,6 +276,28 @@ final class SkillTest extends TestCase {
     
     //Refactored to static to allow use from another test class
 
+    public static function tearDownAdminByEmail($email) {
+        $conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);
+        $sql = "delete from user where email = ?";
+
+        if ($stmt = $conn->prepare($sql)) {
+            $stmt->bind_param("s", $email);
+            //var_dump("Cleaning up - deleting user with id ".$oid);
+            $stmt->execute();
+            $result = mysqli_stmt_get_result($stmt);
+            if (mysqli_stmt_affected_rows($stmt) != 1) {
+                return array(false, "Failure to delete adminUser with email '"
+                                        .$adminUser->email."'");
+            }
+            $stmt->close();
+        } else {
+            var_dump($errorMessage = $conn->errno . ' ' . $conn->error);
+            return array(false, "Error in database query in tearDown function");
+        }        
+        $conn->close();
+        return array(true, "");
+    }
+
     public static function staticTearDown($skillCategoryName, $adminUser) {
         //var_dump("Attempting to teardown skillcategory ".$skillCategoryName);
         $conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);
@@ -303,27 +322,12 @@ final class SkillTest extends TestCase {
             }
         }
 
+        $conn->close();
+
         //delete the adminUser created to create the skills
 
-        $sql = "delete from user where email = ?";
-
-        if ($stmt = $conn->prepare($sql)) {
-            $stmt->bind_param("s", $adminUser->email);
-            //var_dump("Cleaning up - deleting user with id ".$oid);
-            $stmt->execute();
-            $result = mysqli_stmt_get_result($stmt);
-            if (mysqli_stmt_affected_rows($stmt) != 1) {
-                return array(false, "Failure to delete adminUser with email '"
-                                        .$adminUser->email."'");
-            }
-            $stmt->close();
-        } else {
-            var_dump($errorMessage = $conn->errno . ' ' . $conn->error);
-            return array(false, "Error in database query in tearDown function");
-        }
-
-        $conn->close();
-        return array(true, "");
+        $adminRes = SkillTest::tearDownAdminByEmail($adminUser->email);
+        return $adminRes;
     }
 
     protected function tearDown(): void {

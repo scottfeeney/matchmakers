@@ -65,7 +65,7 @@ final class AdminStaffTest extends TestCase {
         //commented out - instead assume that there is a staff record created with adminstaffid 1
         //extract($this->createUserAndAdminStaff());
         //$this->assertEquals(\Classes\AdminStaff::GetAdminStaffByUserId($oid), $adminStaff);
-        $this->assertTrue((new \Classes\AdminStaff(1))->userId > 0);
+        $this->assertTrue((new \Classes\AdminStaff(1))->userId > 0, "Test failed OR there is no adminStaff record in DB with adminStaffId = 1");
     }
 
     protected function setUp(): void {

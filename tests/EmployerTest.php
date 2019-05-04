@@ -44,7 +44,7 @@ final class EmployerTest extends TestCase {
         }
         $employer = new \Classes\Employer(0);
         $employer->userId = $oid;
-        $oSave = $employer->save();
+        $oSave = $employer->Save();
         $eid = $oSave->objectId;
         $employer->employerId = $eid;
         return array('oid' => $oid, 'eid' => $eid, 'employer' => $employer);
@@ -81,6 +81,28 @@ final class EmployerTest extends TestCase {
         parent::setUp();
         $this->uidsToDelete = array();
        // $this->eidsToDelete = array();
+    }
+
+    //created to provide teardown functionality to other classes
+    public static function tearDownByEmail($email) {
+        $conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);
+        foreach (array( "delete from employer where userid in (select userId from user where email = ?)",
+                        "delete from user where email = ?") as $sql) {
+            if ($stmt = $conn->prepare($sql)) {
+                //var_dump($stmt);
+                $stmt->bind_param("s", $email);
+                //var_dump("Cleaning up - deleting user with id ".$oid);
+                $stmt->execute();
+                $result = mysqli_stmt_get_result($stmt);
+                $stmt->close();
+            } else {
+                var_dump($errorMessage = $conn->errno . ' ' . $conn->error);
+                $conn->close();
+                return array(false, "Error in database query in tearDown function");
+            }
+        }
+        $conn->close();
+        return array(true, "");
     }
 
     protected function tearDown(): void {

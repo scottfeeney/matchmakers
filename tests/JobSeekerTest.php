@@ -33,7 +33,7 @@ final class JobSeekerTest extends TestCase {
      */
 
     public static function createUserAndJobSeeker($testEmail) {
-        $oid = UserTest::saveNewUser($testEmail);
+        $oid = UserTest::saveNewUser($testEmail, 2);
         $jobSeeker = new \Classes\JobSeeker(0);
         $jobSeeker->userId = $oid;
         $oSave = $jobSeeker->Save();
