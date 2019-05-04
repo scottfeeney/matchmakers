@@ -1,10 +1,19 @@
 <?php
 
+/** 
+ * Class to test functionality of User Class
+ * 
+ * Author(s): Blair
+ * 
+ */
+
 use PHPUnit\Framework\TestCase;
+
+
 
 /**
  * 
- * List of gotchas for prospective unit test authors:
+ * List of gotchas for other prospective unit test authors:
  * 
  * Any code after the first $this->assertXYZ statement in a test function,
  * will not be executed (unless that code is other $this->assert statements).
@@ -64,13 +73,13 @@ final class UserTest extends TestCase {
         $newUser = new \Classes\User();
         $newUser->email = $user->email;
         $objSave = $newUser->Save();
-        $this->assertEquals('Email address exists in system', $objSave->errorMessage);
+        $this->assertEquals('Email address '.$user->email.' exists in system', $objSave->errorMessage);
         $this->assertEquals(true, $objSave->hasError);
     }
 
-    public static function saveNewUser($email) {
+    public static function saveNewUser($email, $userType = 1) {
         $user = new \Classes\User(0);
-        $user->userType = 1;
+        $user->userType = $userType;
         $user->email = $email;
         $user->active = 1;
         $user->password = NULL;
@@ -79,6 +88,11 @@ final class UserTest extends TestCase {
         $user->resetCode = NULL;
         $objSave = $user->Save();
         //var_dump($objSave);
+        if ($objSave->hasError) {
+            //var_dump($objSave->errorMessage);
+//            $existingUser = \Classes\User::GetUserByEmailAddress($email);
+//            var_dump("Existing user with id: ".$existingUser->userId);
+        }
         return $objSave->objectId;
     }
 
@@ -215,7 +229,33 @@ final class UserTest extends TestCase {
         $this->idsToDelete = array();
     }
 
+    //Refactored to allow use from other test classes
+
+    public static function staticTearDown($testEmails) {
+        $conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);
+        foreach ($testEmails as $testEmail) {
+            $sql = "delete from user where email = ?";
+            if ($stmt = $conn->prepare($sql)) {
+                //var_dump($stmt);
+                $stmt->bind_param("s", $testEmail);
+                //var_dump("Cleaning up - deleting user with id ".$oid);
+                $stmt->execute();
+                $result = mysqli_stmt_get_result($stmt);
+                $stmt->close();
+            } else {
+                //var_dump
+                var_dump($errorMessage = $conn->errno . ' ' . $conn->error);
+                return array(false, "Error in database query in tearDown function");
+            }
+        }
+        $conn->close();
+        return array(true, "");
+    }
+
     protected function tearDown(): void {
+        $this->staticTearDown($this->testEmails);
+
+        /**
         $conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);
         //var_dump($conn);
         //var_dump("In cleanup with oid ".$oid);
@@ -260,6 +300,7 @@ final class UserTest extends TestCase {
             $this->assertTrue(false, "Error in database query in tearDown function");
         }
         $conn->close();
+        */
         parent::tearDown();
     }
 

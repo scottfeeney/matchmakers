@@ -212,6 +212,7 @@
 			$jobSeeker = new JobSeeker($jobSeekerId);
 			
 			// TODO check $selectedSkills is an integer/string rep of an integer, or a string of comma-joined integers
+			// Also checking whether attempted execution of the query caused an error would be good
 			
 			$conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);	
 			
@@ -221,8 +222,10 @@
 			$sql .= " 	and SkillId in (" . $selectedSkills . ")";
 			$sql .= " )";
 
+			//var_dump($sql);
+
 			$stmt = $conn->prepare($sql);
-			$stmt->bind_param("ii", $jobSeeker->jobSeekerId,  $job->skillCategoryId);
+			$stmt->bind_param("ii", $jobSeeker->jobSeekerId,  $jobSeeker->skillCategoryId);
 			$stmt->execute();
 			
 			
@@ -230,6 +233,8 @@
 			$sql .= " select ?, SkillId from Skill where SkillCategoryId = ?";
 			$sql .= " and SkillId in (" . $selectedSkills . ")";
 			$sql .= " and SkillId not in (select SkillId from job_seeker_skill where JobSeekerId = ?)";
+
+			//var_dump($sql);
 			
 			$stmt = $conn->prepare($sql);
 			$stmt->bind_param("iii", $jobSeeker->jobSeekerId,  $jobSeeker->skillCategoryId, $jobSeeker->jobSeekerId);

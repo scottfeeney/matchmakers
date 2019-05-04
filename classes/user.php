@@ -74,7 +74,7 @@
 			
 			// check email does not exist for another user
 			if (User::GetEmailExists($this->email, $this->userId)) {
-				$errorMessage = "Email address exists in system";
+				$errorMessage = "Email address ".$this->email." exists in system for userId other than ".$this->userId;
 			}
 				
 		

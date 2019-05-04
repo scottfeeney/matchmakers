@@ -59,8 +59,7 @@
 
 			if ($this->skillName == "") {
 
-				$errorMessage = "Please enter a Skill N
-ame";
+				$errorMessage = "Please enter a Skill Name";
 			}
 			
 			
@@ -89,6 +88,11 @@ ame";
 						$stmt->bind_param("isi", $this->skillCategoryId, $this->skillName, $user->userId);
 						$stmt->execute();
 						$objectId = $stmt->insert_id;
+						//If foreign key constraint fails we seem end up here with objectId zero
+						//obviously this should be an error case
+						if ($objectId === 0) {
+							$errorMessage = "Insert appears to have failed - did you fail to satisfy a foreign key constraint?";
+						}
 					} 
 					else {
 						$errorMessage = $conn->errno . ' ' . $conn->error;
@@ -137,7 +141,7 @@ ame";
 
 		//Delete a skill
 		public static function DeleteSkill($skillId, $deleteReferencedSkill = false) {
-			
+
 			$skills = Array();
 			
 			//Only delete skill that is in use currently if user indicates that they are
@@ -184,15 +188,17 @@ ame";
 			$stmt->bind_param("i", $skillId);
 			$stmt->execute();
 			$result = mysqli_stmt_get_result($stmt);
-			$stmt->close();
-			$conn->close();
 			
 
 			//Indicate success or failure
-			if (mysqli_affected_rows() == 1) {
+			if (mysqli_affected_rows($conn) == 1) {
+				$stmt->close();
+				$conn->close();
 				return new \Classes\ObjectSave("", 0);
 			} else {
-				return new \Classes\ObjectSave(mysqli_error($conn), 0);
+				$stmt->close();
+				$conn->close();
+				return new \Classes\ObjectSave("Could not delete skill with id ".$skillId, 0);
 			}
 		}
 	

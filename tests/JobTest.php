@@ -1,5 +1,12 @@
 <?php
 
+/** 
+ * Class to test functionality of Job Class
+ * 
+ * Author(s): Blair
+ * 
+ */
+
 use PHPUnit\Framework\TestCase;
 
 
@@ -9,9 +16,15 @@ final class JobTest extends TestCase {
     private $jidsToDelete;
     private $uidsToDelete;
     private $testEmail = "jobposter@jobpostingplace.com";
+    private $checkJobDeleted;
+    private $checkEmployerDeleted;
+    private $checkUserDeleted;
 
     public function testConstructorNoInput() {
         $job = new \Classes\Job();
+        $this->checkJobDeleted = 0; //indicate to cleanup that there isn't expected to be a job record to delete
+        $this->checkEmployerDeleted = 0; //indicate to cleanup that there isn't expected to be a employer record to delete
+        $this->checkUserDeleted = 0; //indicate to cleanup that there isn't expected to be a user record to delete
         $this->assertSame(0, $job->jobId);
     }
 
@@ -175,6 +188,9 @@ final class JobTest extends TestCase {
         parent::setUp();
         $this->uidsToDelete = array();
         $this->jidsToDelete = array();
+        $this->checkJobDeleted = 1;
+        $this->checkEmployerDeleted = 1;
+        $this->checkUserDeleted = 1;
         //Quick cleanup
         //$this->uidsToDelete[] = 2061;
         //$this->jidsToDelete[] = 2146;
@@ -207,17 +223,17 @@ final class JobTest extends TestCase {
 
 
     //Refactored to allow use from other test classes
-    public static function deleteJobTestTempRecords($testEmail) {
+    public static function deleteJobTestTempRecords($testEmail, $checkJobDeleted = 1, $checkEmployerDeleted = 1, $checkUserDeleted = 1) {
 
         $cleanupQueries = array(
             array("delete from job_skill where jobId in (Select jobId from job where employerId in (select employerId from employer where userId in (select userId from user where email = ?)))",
                 "",0),
             array("delete from job where employerId in (select employerId from employer where userId in (select userId from user where email = ?))",
-                "Could not delete test Job from database", 1),
+                "Could not delete test Job from database based on email ".$testEmail, $checkJobDeleted),
             array("delete from employer where userId in (select userId from user where email = ?)",
-                "Could not delete test Employer from database", 1),
+                "Could not delete test Employer from database based on email ".$testEmail, $checkEmployerDeleted),
             array("delete from user where email = ?",
-                "Could not delete test user from database", 1)
+                "Could not delete test user from database based on email ".$testEmail, $checkUserDeleted)
             
         );
 
@@ -235,7 +251,7 @@ final class JobTest extends TestCase {
     }
 
     protected function tearDown(): void {
-        $result = JobTest::deleteJobTestTempRecords($this->testEmail);
+        $result = JobTest::deleteJobTestTempRecords($this->testEmail, $this->checkJobDeleted, $this->checkEmployerDeleted, $this->checkUserDeleted);
         //var_dump($result);
         if ($result[0] == false) {
             $this->assertTrue(false, $result[1]);

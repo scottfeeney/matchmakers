@@ -1,5 +1,12 @@
 <?php
 
+/** 
+ * Class to test functionality of AdminStaff Class
+ * 
+ * Author(s): Blair
+ * 
+ */
+
 use PHPUnit\Framework\TestCase;
 
 
@@ -17,7 +24,7 @@ final class AdminStaffTest extends TestCase {
      * So nothing to test
      
     public function testSaveUser() {
-        extract($this->createUserAndadminStaff());
+        extract($this->createUserAndAdminStaff());
         $this->assertEquals($adminStaff, new \Classes\AdminStaff($asid));
     }
 */

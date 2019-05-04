@@ -1,5 +1,13 @@
 <?php
 
+
+/** 
+ * Class to test functionality of Employer Class
+ * 
+ * Author(s): Blair
+ * 
+ */
+
 use PHPUnit\Framework\TestCase;
 
 
@@ -29,7 +37,7 @@ final class EmployerTest extends TestCase {
     public static function createUserAndEmployer($email) {
         $oid = UserTest::saveNewUser($email);
         if ($oid == null) {
-            var_dump("ERROR: failure to create new user record");
+            var_dump("ERROR: failure to create new user record with email ".$email);
             return null; //better for stuff to fail here than make a mess
                         //creating records in employer with null userId values
                         //that won't be deleted by cleanup
