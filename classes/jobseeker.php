@@ -211,7 +211,7 @@
 			
 			$jobSeeker = new JobSeeker($jobSeekerId);
 			
-			// TODO check $selectedSkills contains integers
+			// TODO check $selectedSkills is an integer/string rep of an integer, or a string of comma-joined integers
 			
 			$conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);	
 			

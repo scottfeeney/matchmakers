@@ -1,5 +1,12 @@
 <?php
 
+/** 
+ * Class to test functionality of JobSeeker Class
+ * 
+ * Author(s): Blair
+ * 
+ */
+
 use PHPUnit\Framework\TestCase;
 
 
@@ -134,9 +141,53 @@ final class SkillTest extends TestCase {
         $this->assertTrue(($skillsArr[0])->skillId == $skillId);
     }
 
-    //static function GetSkillsByJobSeeker($jobSeekerId)
 
-    
+    //static function GetSkillsByJobSeeker($jobSeekerId)
+    public function testGetSkillsByJobSeeker() {
+        //create jobseeker
+        $jsTestEmail = "I_Seek_jobs@email.com";
+        extract(JobSeekerTest::createUserAndJobSeeker($jsTestEmail));
+        //oid, jid, jobSeeker
+
+        //check empty array if jobseeker has no skills
+        $initRes = \Classes\Skill::GetSkillsByJobSeeker($jid);
+
+        //create skill1
+        $skill1 = SkillTest::createSkill("Some test skill", $this->skillCatId, $this->adminUser);
+
+        //add skill1
+        \Classes\JobSeeker::SaveJobSeekerSkills($jid, $skill1->objectId);
+
+        //check array of 1
+        $res1 = \Classes\Skill::GetSkillsByJobSeeker($jid);
+
+        //create skill2
+        $skill2 = SkillTest::createSkill("Some other test skill", $this->skillCatId, $this->adminUser);
+
+        //add skill2
+        \Classes\JobSeeker::SaveJobSeekerSkills($jid, join(",", array($skill1->objectId, $skill2->objectId)));
+
+        //check array of 2
+        $res2 = \Classes\Skill::GetSkillsByJobSeeker($jid);
+
+        //remove both skills
+        \Classes\JobSeeker::SaveJobSeekerSkills($jid, "");
+
+        //check empty array
+        $finalRes = \Classes\Skill::GetSkillsByJobSeeker($jid);
+
+        $this->assertSame(array(), $initRes);
+        $this->assertSame(array(), $finalRes);
+        $this->assertEquals(1, count($res1));
+        $this->assertEquals(2, count($res2));
+
+        $jsTearDownRes = JobSeekerTest::tearDownByEmail($jsTestEmail);
+        if ($jsTearDownRes[0] == false) {
+            $this->assertTrue(false, $jsTearDownRes[1]);
+        }
+    }
+
+
 
     //static function GetSkillExists($object)
 
@@ -153,25 +204,23 @@ final class SkillTest extends TestCase {
         $this->assertFalse(\Classes\Skill::GetSkillExists($realSkillDuplicate));
     }
 
-
-    protected function setUp(): void {
-        parent::setUp();
-        //Set up test skill category
+    //refactored to allow external use
+    public static function staticSetup($skillCatName) {
         $conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);
         $sql = 'insert into skill_category(SkillCategoryName) values (?)';
         if ($stmt = $conn->prepare($sql)) {
-            $stmt->bind_param("s", $this->testSkillCategoryName);
+            $stmt->bind_param("s", $skillCatName);
             $stmt->execute();
             $result = mysqli_stmt_get_result($stmt);
             if (mysqli_stmt_affected_rows($stmt) != 1) {
-                $this->assertTrue(false, "Failure to insert skillCategory with (intentionally unlikely to be used in reality) name '"
-                                        .$this->testSkillCategoryName."'");
+                return array(false, "Failure to insert skillCategory with (intentionally unlikely to be used in reality) name '"
+                                        .$skillCatName."'");
             }
-            $this->skillCatId = $stmt->insert_id;
+            $skillCatId = $stmt->insert_id;
             $stmt->close();
         } else {
             var_dump($errorMessage = $conn->errno . ' ' . $conn->error);
-            $this->assertTrue(false, "Error in database query in setUp function");
+            return array(false, "Error in database query in setUp function");
         }
         $conn->close();
 
@@ -179,10 +228,24 @@ final class SkillTest extends TestCase {
         $user = UserTest::saveNewUser($testEmail);
         $user->userType = 3;
         $user->Save();
-        $this->adminUser = $user;
+        $adminUser = $user;
+        return array(true, array('adminUser' => $adminUser, 'skillCatId' => $skillCatId));
     }
 
-    protected function tearDown(): void {
+    protected function setUp(): void {
+        parent::setUp();
+        $setupResult = $this->staticSetup($this->testSkillCategoryName);
+        if ($setupResult[0] == false) {
+            $this->assertTrue(false, $setupResult[1]);
+        }
+        $this->adminUser = $setupResult[1]['adminUser'];
+        $this->skillCatId = $setupResult[1]['skillCatId'];
+    }
+
+    
+    //Refactored to static to allow use from another test class
+
+    public static function staticTearDown($skillCategoryName, $adminUser) {
         $conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);
 
         //Delete all skills in test skill category, and category itself
@@ -190,21 +253,51 @@ final class SkillTest extends TestCase {
         foreach (array("delete from skill where skillCategoryId in (select skillcategoryid from skill_category where skillcategoryname = ?",
                         "delete from skill_category where skillCategoryName = ?") as $sql) {
             if ($stmt = $conn->prepare($sql)) {
-                $stmt->bind_param("s", $this->testSkillCategoryName);
+                $stmt->bind_param("s", $skillCategoryName);
                 //var_dump("Cleaning up - deleting user with id ".$oid);
                 $stmt->execute();
                 $result = mysqli_stmt_get_result($stmt);
                 if (mysqli_stmt_affected_rows($stmt) != 1) {
-                    $this->assertTrue(false, "Failure to delete skillCategory with (intentionally unlikely to be used in reality) name '"
-                                            .$this->testSkillCategoryName."'");
+                    return array(false, "Failure to delete skillCategory with (intentionally unlikely to be used in reality) name '"
+                                            .$skillCategoryName."'");
                 }
                 $stmt->close();
             } else {
                 var_dump($errorMessage = $conn->errno . ' ' . $conn->error);
-                $this->assertTrue(false, "Error in database query in tearDown function");
+                return array(false, "Error in database query in tearDown function");
             }
         }
+
+        //delete the adminUser created to create the skills
+
+        $sql = "delete from user where email = ?";
+
+        if ($stmt = $conn->prepare($sql)) {
+            $stmt->bind_param("s", $adminUser->email);
+            //var_dump("Cleaning up - deleting user with id ".$oid);
+            $stmt->execute();
+            $result = mysqli_stmt_get_result($stmt);
+            if (mysqli_stmt_affected_rows($stmt) != 1) {
+                return array(false, "Failure to delete adminUser with email '"
+                                        .$adminUser->email."'");
+            }
+            $stmt->close();
+        } else {
+            var_dump($errorMessage = $conn->errno . ' ' . $conn->error);
+            return array(false, "Error in database query in tearDown function");
+        }
+
         $conn->close();
+        return array(true, "");
+    }
+
+    protected function tearDown(): void {
+        $tearDownResult = $this->staticTearDown($this->skillCategoryName, $this->adminUser);
+        //Actaully do need the if clause - without it the assert function always runs, and it seems in PHPUnit no code after
+        //an assert statement runs, even if the assert statement passes
+        if ($tearDownResult[0] == false) {
+            $this->assertTrue(false, $tearDownResult[1]);
+        }
         parent::tearDown();
     }
     
