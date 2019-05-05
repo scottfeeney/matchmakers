@@ -234,25 +234,31 @@ final class SkillTest extends TestCase {
             $stmt->execute();
             $result = mysqli_stmt_get_result($stmt);
             if (mysqli_stmt_affected_rows($stmt) != 1) {
+                $errMsg = $conn->errno . ' ' . $conn->error;
+                $stmt->close();
+                $conn->close();
                 return array(false, "Failure to insert skillCategory with (intentionally unlikely to be used in reality) name '"
-                                        .$skillCatName."'");
+                                        .$skillCatName."':".PHP_EOL.$errMsg);
             }
             $skillCatId = $stmt->insert_id;
             $stmt->close();
         } else {
-            var_dump($errorMessage = $conn->errno . ' ' . $conn->error);
-            return array(false, "Error in database query in setUp function");
+            //var_dump($conn->errno . ' ' . $conn->error);
+            $errMsg = $conn->errno . ' ' . $conn->error;
+            $conn->close();
+            return array(false, "Error in database query in setUp function:".PHP_EOL.$errMsg);
         }
         $conn->close();
 
         //set up test admin user
         $user = new \Classes\User(UserTest::saveNewUser($testEmail));
         $user->userType = 3;
+        //var_dump($user);
         $adminUserSaveRes = $user->Save();
         if ($adminUserSaveRes->hasError) {
             return array(false, $adminUserSaveRes->errorMessage);
         }
-        $adminUser = $user;
+        $adminUser = new \Classes\User($adminUserSaveRes->objectId);
         return array(true, array('adminUser' => $adminUser, 'skillCatId' => $skillCatId));
     }
 
@@ -286,13 +292,18 @@ final class SkillTest extends TestCase {
             $stmt->execute();
             $result = mysqli_stmt_get_result($stmt);
             if (mysqli_stmt_affected_rows($stmt) != 1) {
+                $stmt->close();
+                $conn->close();
+                var_dump("Failure to delete adminUser with email '".$adminUser->email."'");
                 return array(false, "Failure to delete adminUser with email '"
                                         .$adminUser->email."'");
             }
             $stmt->close();
         } else {
-            var_dump($errorMessage = $conn->errno . ' ' . $conn->error);
-            return array(false, "Error in database query in tearDown function");
+            $errorMessage = $conn->errno . ' ' . $conn->error;
+            $conn->close();
+            var_dump("Error in database query in tearDown function:".PHP_EOL.$errorMessage);
+            return array(false, "Error in database query in tearDown function:".PHP_EOL.$errorMessage);
         }        
         $conn->close();
         return array(true, "");
@@ -312,13 +323,19 @@ final class SkillTest extends TestCase {
                 $stmt->execute();
                 $result = mysqli_stmt_get_result($stmt);
                 if (mysqli_stmt_affected_rows($stmt) != 1 && $sql == "delete from skill_category where skillCategoryName = ?") {
+                    $errorMessage = $conn->errno . ' ' . $conn->error;
+                    $stmt->close();
+                    $conn->close();
+                    var_dump("Failure to delete skillCategory with (intentionally unlikely to be used in reality) name '"
+                            .$skillCategoryName."':".PHP_EOL.$errorMessage);
                     return array(false, "Failure to delete skillCategory with (intentionally unlikely to be used in reality) name '"
-                                            .$skillCategoryName."'");
+                                        .$skillCategoryName."':".PHP_EOL.$errorMessage);
                 }
                 $stmt->close();
             } else {
-                var_dump($errorMessage = $conn->errno . ' ' . $conn->error);
-                return array(false, "Error in database query in tearDown function");
+                $errorMessage = $conn->errno . ' ' . $conn->error;
+                var_dump($errorMessage);
+                return array(false, "Error in database query in tearDown function:".PHP_EOL.$errorMessage);
             }
         }
 

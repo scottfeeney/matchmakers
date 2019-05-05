@@ -89,7 +89,7 @@ final class UserTest extends TestCase {
         $objSave = $user->Save();
         //var_dump($objSave);
         if ($objSave->hasError) {
-            //var_dump($objSave->errorMessage);
+            var_dump($objSave->errorMessage);
 //            $existingUser = \Classes\User::GetUserByEmailAddress($email);
 //            var_dump("Existing user with id: ".$existingUser->userId);
         }

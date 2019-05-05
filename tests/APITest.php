@@ -33,6 +33,7 @@ final class APITest extends TestCase {
     private $testEmployer2;
     private $testJobSeeker;
     private $testAdminStaff;
+    private $testSkillCatId;
     private $userTypes = array(1 => "employer", 2 => "jobseeker", 3 => "admin");
     
     /**
@@ -71,6 +72,9 @@ final class APITest extends TestCase {
         $user->verified = 1;
         $objSave = $user->Save();
         //var_dump($objSave);
+        if ($objSave->hasError) {
+            return array(false, 'Attempt to save user with password set to same as email failed: '.$objSave->errorMessage);
+        }
 
         //set cURL opts and make request
         curl_setopt($curlObj, CURLOPT_HEADER, 1);
@@ -179,7 +183,12 @@ final class APITest extends TestCase {
                                                 $checkType = false, $typeExpected = "", $userTypes = array(),
                                                 $checkPOSTVars = false, $POSTVarsTypeGiven = "", $POSTVars = array(), $POSTErrorMsgExpected = "") {
 
-        $token = APITest::authenticateGetToken($uid, $email, $curlObj, $baseURL)[1];
+        $tokenAttemptRes = APITest::authenticateGetToken($uid, $email, $curlObj, $baseURL);
+        if ($tokenAttemptRes[0] == false) {
+            return array(false, $tokenAttemptRes[1]);
+        }
+
+        $token = $tokenAttemptRes[1];
         
         curl_setopt($curlObj, CURLOPT_URL, $endpointURL);
         $sendHeaders = array("TOKEN: ".$token);
@@ -280,19 +289,54 @@ final class APITest extends TestCase {
     //existing functions borrowed from SkillTest only deal with entries in the User table)
 
     public static function setupAdminStaffRecord($uid) {
-        
-        //TODO
-        //TODO
-        //TODO
+        //In most cases would use relevant class to create record, however
+        //as our frontend isn't designed to facilitate creation of admin accounts
+        //we need to create these records directly
+        $conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);
+        $sql =  "insert into admin_staff (userid, firstname, lastname, created) "
+                ."values (?, 'Bob', 'Smith', UTC_TIMESTAMP())";
 
+        if($stmt = $conn->prepare($sql)) {
+            $stmt->bind_param("i", $uid);
+            $stmt->execute();
+            if ($conn->affected_rows != 1) {
+                $errMsg = $conn->errno.': '.$conn->error;
+                var_dump($errMsg);
+                $conn->close();
+                return array('false', "Could not verify creation of record in adminstaff table for userId ".$uid.":".PHP_EOL.$errMsg);
+            }
+        } 
+        else {
+            $errMsg = $conn->errno.': '.$conn->error;
+            var_dump($errMsg);
+            $conn->close();
+            return array('false', "Could not create record in adminStaff table for userId ".$uid.":".PHP_EOL.$errMsg);
+        }
+        $conn->close();
+        //var_dump("Looks to have successfully set up adminStaff record for ".$uid);
+        return array(true,'');
     }
 
     public static function tearDownAdminStaffrecord($uid) {
+        $conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);
 
-        //TODO
-        //TODO
-        //TODO
+        $sql =  "delete from admin_staff where userId = ?";
 
+        
+        if($stmt = $conn->prepare($sql)) {
+            $stmt->bind_param("i", $uid);
+            $stmt->execute();
+            if ($conn->affected_rows != 1) {
+                $conn->close();
+                return array('false', "Could not verify deletion of record in adminstaff table for userId ".$uid);
+            }
+        } 
+        else {
+            $conn->close();
+            return array('false', "Could not delete record in adminStaff table for userId ".$uid);
+        }
+        $conn->close();
+        return array(true,'');
     }
 
 
@@ -623,12 +667,18 @@ final class APITest extends TestCase {
     }
 
     public function testAddSkillExistingName() {
-
+        $noPOSTVarsRes = $this->checkCurrentToken($this->baseURL.'admin/addskill.php', $this->curlObj, $this->baseProdURL, 
+                $this->testAdminStaff->userId, $this->testAdminEmail, $this->baseURL, true, "admin", $this->userTypes,
+                true, "incorrect", array("categoryId" => $this->testSkillCatId, "skillName" => "Skill To Conflict With"),
+                "Error attempting to save skill: Skill with same name already exists in specified category");
+        $this->assertTrue($noPOSTVarsRes[0], $noPOSTVarsRes[1]);
     }
 
     public function testAddSkillSuccess() {
-
-        //cleanup
+        $noPOSTVarsRes = $this->checkCurrentToken($this->baseURL.'admin/addskill.php', $this->curlObj, $this->baseProdURL, 
+                $this->testAdminStaff->userId, $this->testAdminEmail, $this->baseURL, true, "admin", $this->userTypes,
+                true, "correct", array("categoryId" => $this->testSkillCatId, "skillName" => "Previously Unused Skill Name"), "");
+        $this->assertTrue($noPOSTVarsRes[0], $noPOSTVarsRes[1]);
     }
 
 
@@ -668,17 +718,14 @@ final class APITest extends TestCase {
 
     public function testRenameSkillNotInSpecifiedCategory() {
 
-        //cleanup
     }
 
     public function testRenameSkillExistingName() {
 
-        //cleanup
     }
 
     public function testRenameSkillSuccess() {
         
-        //cleanup
     }
 
     /**
@@ -717,7 +764,6 @@ final class APITest extends TestCase {
 
     public function testDeleteSkillNotInSpecifiedCategory() {
         
-        //cleanup
     }
 
     public function testDeleteSkillSuccess() {
@@ -737,9 +783,22 @@ final class APITest extends TestCase {
         $this->testEmployer2 = new \Classes\Employer($employerRes2['eid']);
         $jsRes = JobSeekerTest::createUserAndJobSeeker($this->testJobSeekerEmail);
         $this->testJobSeeker = new \Classes\JobSeeker($jsRes['jid']);
-        $this->testAdminStaff = new \Classes\User(UserTest::saveNewUser($this->testAdminEmail,3));
-        //The above does not actually create a record in the adminuser table, which is fine for
+        $skillCatRes = SkillTest::staticSetup('SomeRandomTestSkillCategory', $this->testAdminEmail);
+        //var_dump($skillCatRes);
+        //$adminUser, $skillCatId
+        $adminUser = $skillCatRes[1]['adminUser'];
+        //need to set password and verified
+        //$adminUser->password = password_hash($adminUser->email, PASSWORD_BCRYPT);
+        //$adminUser->verified = 1;
+        //$objSave = $adminUser->Save();
+        //var_dump($objSave);
+        $this->testSkillCatId = $skillCatRes[1]['skillCatId'];
+        $this->testAdminStaff = $adminUser;
+        //The above does not actually create a record in the admin_staff table, which is fine for
         //testing the Skill class, but not ok for testing the admin API functions
+        $this->setupAdminStaffRecord($this->testAdminStaff->userId);
+        SkillTest::createSkill("Skill To Conflict With", $this->testSkillCatId, $this->testAdminStaff);
+        //var_dump($this->testAdminStaff);
 
     }
 
@@ -748,7 +807,8 @@ final class APITest extends TestCase {
         EmployerTest::tearDownByEmail($this->testEmployerEmail);
         EmployerTest::tearDownByEmail($this->testEmployer2Email);
         JobSeekerTest::tearDownByEmail($this->testJobSeekerEmail);
-        SkillTest::tearDownAdminByEmail($this->testAdminEmail);
+        $this->tearDownAdminStaffRecord($this->testAdminStaff->userId);
+        SkillTest::staticTearDown('SomeRandomTestSkillCategory', $this->testAdminStaff);
         parent::tearDown();
     }
 

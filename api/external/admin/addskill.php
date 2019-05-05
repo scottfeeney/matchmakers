@@ -50,7 +50,8 @@ if ($user != null) {
         }
 
         $category = new \Classes\SkillCategory($categoryId);
-        if ($category != null) {
+        if ($category->skillCategoryId != null) {
+            //var_dump($category);
             $skill = new \Classes\Skill();
             $skill->skillCategoryId = $categoryId;
             $skill->skillName = $skillName;
