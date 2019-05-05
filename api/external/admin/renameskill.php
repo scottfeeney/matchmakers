@@ -19,9 +19,19 @@ if ($_SERVER['DOCUMENT_ROOT'] != '') {
     require_once '../../../classes/object_save.php';
 }
 
-if (!isset($_SERVER['HTTP_TOKEN'])) {
+$tokenFound = false; 
+
+foreach ($_SERVER as $key => $value) {
+    if ($key == 'HTTP_TOKEN') { 
+        $tokenFound = true;
+    }
+}
+
+if (!$tokenFound) {
+    //exit early to prevent HTML error messages being returned
     header("HTTP/1.1 401 Unauthorized");
     echo (new \api\APIResult("failure","Token not supplied"))->getJSON();
+    die();
 }
 
 $token = $_SERVER['HTTP_TOKEN'];
@@ -46,12 +56,16 @@ if ($user != null) {
             if ($skill != null) {
                 if ($skill->skillCategoryId == $category->skillCategoryId) {
                     $skill->skillName = $skillName;
-                    $objSave = $skill->save($user);
-                    if ($objSave->hasError) {
-                        echo (new \api\APIResult("failure","Error attempting to rename skill: " . $objSave->errorMessage))->getJSON();
+                    if (\Classes\Skill::GetSkillExists($skill)) {
+                        echo (new \api\APIResult("failure","Skill already exists with new name in specified category"))->getJSON();
                     } else {
-                        echo (new \api\APIResult("success", "Skill successfully renamed"))->getJSON();
-                    }                
+                        $objSave = $skill->save($user);
+                        if ($objSave->hasError) {
+                            echo (new \api\APIResult("failure","Error attempting to rename skill: " . $objSave->errorMessage))->getJSON();
+                        } else {
+                            echo (new \api\APIResult("success", "Skill successfully renamed"))->getJSON();
+                        }
+                    }
                 } else {
                     echo (new \api\APIResult("failure","skillId does not represent a skill in the category represented by categoryId"))->getJSON();
                 }

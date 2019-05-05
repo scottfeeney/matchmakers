@@ -14,8 +14,17 @@
         require_once './apiresult.php';
     }
 
-    if (!isset($_SERVER['HTTP_TOKEN'])) {
-        header("HTTP/1.1 401 Unauthorized");
+    $tokenFound = false; 
+
+    foreach ($_SERVER as $key => $value) {
+		if ($key == 'HTTP_TOKEN') { 
+			$tokenFound = true;
+		}
+	}
+
+	if (!$tokenFound) {
+		//exit early to prevent HTML error messages being returned
+		header("HTTP/1.1 401 Unauthorized");
         echo (new \api\APIResult("failure","Token not supplied"))->getJSON();
         die();
     }
@@ -29,11 +38,12 @@
             $jobMatches = \Classes\Job::GetJobMatchesByJobSeeker($jobSeeker->jobSeekerId);
             echo (new \api\APIResult("success", json_encode($jobMatches), true))->getJSON();
         } else {
+            header("HTTP/1.1 401 Unauthorized");
             echo (new \api\APIResult("failure","You are not logged in as an jobseeker"))->getJSON();
         }
     } else {
+        header("HTTP/1.1 401 Unauthorized");
         echo (new \api\APIResult("failure","You are not logged in"))->getJSON();
-
     }
 
     

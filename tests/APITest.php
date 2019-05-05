@@ -206,9 +206,6 @@ final class APITest extends TestCase {
         }
 
         //For endpoints that require user be logged in as a certain type
-        //(As is probably obvious current structure will not handle cases where
-        //user need not be logged in as a specific type, but post var related stuff
-        //is done. There are no cases of that in the current set of API endpoints)
         if ($checkType) {
             $user = new \Classes\User($uid);
             $userType = $userTypes[$user->userType];
@@ -222,25 +219,49 @@ final class APITest extends TestCase {
                 if ($dataArr['details'] != 'You are not logged in as an '.$typeExpected) {
                     return array(false, 'Incorrect (or changed) failure message for wrong user type');
                 }
-                //For endpoints that require POST vars be passed
-                if ($checkPOSTVars) {
-                    if ($POSTVarsTypeGiven != "correct") {
-                        if ($dataArr['result'] == 'success') {
-                            return array(false, "Incorrect POST vars given but success still returned");
-                        }
-                        if ($dataArr['details'] != $POSTErrorMsgExpected) {
-                            return array(false, "Incorrect POST vars given and incorrect (or changed) error message returned: '"
-                                        .$dataArr['details']."' given, '".$POSTErrorMsgExpected."' expected");
-                        }
-                    } else {
-                        if ($dataArr['result'] != 'success') {
-                            return array(false, "Correct POST vars given but failure still returned");
-                        }
+            }
+            //For endpoints that require POST vars be passed AND user type checks performed
+            if ($checkPOSTVars) {
+                if ($POSTVarsTypeGiven != "correct") {
+                    if ($dataArr['result'] == 'success') {
+                        return array(false, "Incorrect POST vars given but success still returned");
+                    }
+                    if ($dataArr['details'] != $POSTErrorMsgExpected) {
+                        return array(false, "Unexpected error message received when incorrect POST vars given: ".PHP_EOL."'"
+                                .$dataArr['details']."'".PHP_EOL."received,".PHP_EOL."'".$POSTErrorMsgExpected."'".PHP_EOL
+                                ."expected. POST vars were:".PHP_EOL.print_r($POSTVars,true));
+                    }
+                } else {
+                    if ($dataArr['result'] != 'success') {
+                        return array(false, "Correct POST vars given but failure still returned");
                     }
                 }
             }
             return array(true,"");
         }
+        //For endpoints that don't require user type checks but do require POST var passing (probably should be refactored)
+        if ($checkPOSTVars) {
+            if ($POSTVarsTypeGiven != "correct") {
+                if ($dataArr['result'] == 'success') {
+                    return array(false, "Incorrect POST vars given but success still returned");
+                }
+                if ($dataArr['details'] != $POSTErrorMsgExpected) {
+                    return array(false, "Unexpected error message received when incorrect POST vars given: ".PHP_EOL."'"
+                            .$dataArr['details']."'".PHP_EOL."received,".PHP_EOL."'".$POSTErrorMsgExpected."'".PHP_EOL
+                            ."expected. POST vars were:".PHP_EOL.print_r($POSTVars,true));
+                }
+            } else {
+                if ($returnCode != 200) {
+                    return array(false, 'Incorrect return code given for legitimate attempt should be 200 is '.$returnCode);
+                }
+                if ($dataArr['result'] != 'success') {
+                    return array(false, "Correct POST vars given but failure still returned");
+                }
+            }
+            return array(true, "");
+        }
+
+        //For endpoints that don't require either user type checks or POST var passing
         if ($returnCode != 200) {
             return array(false, 'Incorrect return code given for legitimate attempt should be 200 is '.$returnCode);
         }
@@ -442,6 +463,119 @@ final class APITest extends TestCase {
         $this->assertTrue($currentTokenRes[0], $currentTokenRes[1]);
     }
 
+
+    /**
+     * JobseekerMatches endpoint
+     * 
+     * As per employer endpoint
+     */
+
+
+    public function testJobSeekerMatchesNoToken() {
+        $noTokenRes = $this->checkNoToken($this->baseURL. 'jobseekerMatches.php', $this->curlObj, $this->baseProdURL);
+        $this->assertTrue($noTokenRes[0], $noTokenRes[1]);
+    }
+
+    public function testJobSeekerMatchesIncorrectToken() {
+        $wrongTokenRes = $this->checkIncorrectToken($this->baseURL. 'jobseekerMatches.php', $this->curlObj, $this->baseProdURL);
+        $this->assertTrue($wrongTokenRes[0], $wrongTokenRes[1]);
+    }
+
+    public function testJobSeekerMatchesWrongUserType() {
+        $currentTokenRes = $this->checkCurrentToken($this->baseURL.'jobseekerMatches.php', $this->curlObj, $this->baseProdURL, 
+                $this->testEmployer->userId, $this->testEmployerEmail, $this->baseURL, true, "jobseeker", $this->userTypes);
+        $this->assertTrue($currentTokenRes[0], $currentTokenRes[1]);
+    }
+
+    public function testJobSeekerMatchesCorrectToken() {
+        $currentTokenRes = $this->checkCurrentToken($this->baseURL.'jobseekerMatches.php', $this->curlObj, $this->baseProdURL, 
+                $this->testJobSeeker->userId, $this->testJobSeekerEmail, $this->baseURL);
+        $this->assertTrue($currentTokenRes[0], $currentTokenRes[1]);
+    }
+
+    /**
+     * JobTypes endpoint
+     * 
+     * Same type of endpoint as categories (in that it doesn't matter what type of user you are logged in as)
+     */
+
+    public function testJobTypesNoToken() {
+        $noTokenRes = $this->checkNoToken($this->baseURL. 'jobtypes.php', $this->curlObj, $this->baseProdURL);
+        $this->assertTrue($noTokenRes[0], $noTokenRes[1]);
+    }
+
+    public function testJobTypesIncorrectToken() {
+        $wrongTokenRes = $this->checkIncorrectToken($this->baseURL. 'jobtypes.php', $this->curlObj, $this->baseProdURL);
+        $this->assertTrue($wrongTokenRes[0], $wrongTokenRes[1]);
+    }
+
+    public function testJobTypesCorrectToken() {
+        $currentTokenRes = $this->checkCurrentToken($this->baseURL.'jobtypes.php', $this->curlObj, $this->baseProdURL, 
+                $this->testEmployer->userId, $this->testEmployerEmail, $this->baseURL);
+        $this->assertTrue($currentTokenRes[0], $currentTokenRes[1]);
+    }
+
+    /**
+     * Skills endpoint
+     * 
+     * Same type of endpoint as categories and jobtypes (as in we don't care about userType),
+     * but different in that we also need to do POST var-related checking
+     */
+
+    public function testSkillsNoToken() {
+        $noTokenRes = $this->checkNoToken($this->baseURL. 'skills.php', $this->curlObj, $this->baseProdURL);
+        $this->assertTrue($noTokenRes[0], $noTokenRes[1]);
+    }
+
+    public function testSkillsIncorrectToken() {
+        $wrongTokenRes = $this->checkIncorrectToken($this->baseURL. 'skills.php', $this->curlObj, $this->baseProdURL);
+        $this->assertTrue($wrongTokenRes[0], $wrongTokenRes[1]);
+    }
+
+    public function testSkillsNoSkillCatId() {
+        $noSkillCatIdRes = $this->checkCurrentToken($this->baseURL.'skills.php', $this->curlObj, $this->baseProdURL, 
+            $this->testEmployer->userId, $this->testEmployerEmail, $this->baseURL, false, "", $this->userTypes,
+            true, "incorrect", array(), "categoryId not provided");
+        $this->assertTrue($noSkillCatIdRes[0], $noSkillCatIdRes[1]);
+    }
+
+    public function testSkillsInvalidSkillCatId() {
+        $noSkillCatIdRes = $this->checkCurrentToken($this->baseURL.'skills.php', $this->curlObj, $this->baseProdURL, 
+            $this->testEmployer->userId, $this->testEmployerEmail, $this->baseURL, false, "", $this->userTypes,
+            true, "incorrect", array("categoryId" => -1), "invalid categoryId");
+        $this->assertTrue($noSkillCatIdRes[0], $noSkillCatIdRes[1]);
+    }
+
+    public function testSkillsCorrectInput() {
+        //Assuming 1 is a valid skillcategoryId
+        $noSkillCatIdRes = $this->checkCurrentToken($this->baseURL.'skills.php', $this->curlObj, $this->baseProdURL, 
+            $this->testEmployer->userId, $this->testEmployerEmail, $this->baseURL, false, "", $this->userTypes,
+            true, "correct", array("categoryId" => 1), "");
+        $this->assertTrue($noSkillCatIdRes[0], $noSkillCatIdRes[1]);
+    }
+
+
+    /**
+     * Admin endpoints
+     */
+
+    /**
+     * Add skill
+     * Need to test token provided, token for user, token for adminUser, categoryId and skillName provided,
+     * categoryId is legitimate, skillName doesn't match already existing skill, success
+     */
+
+    /**
+     * Rename skill
+     * Need to test token provided, token for user, token for adminUser, categoryId, skillId and new skillName provided,
+     * categoryId is legitimate, skillId is legitimate, skillId is in categoryId, skillName doesn't match already existing skill, success
+     */
+
+    /**
+     * Delete skill
+     * Need to test token provided, token for user, token for adminUser, categoryId and skillId provided,
+     * category Id is legitimate, skillId is legitimate, skillId is in categoryId, success
+     */
 
     protected function setUp(): void {
         parent::setUp();

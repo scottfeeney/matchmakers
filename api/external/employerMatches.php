@@ -50,7 +50,8 @@
                 exit();
             }
             $job = new \Classes\Job($jobid);
-            if ($job == null) {
+            //var_dump($job);
+            if ($job->employerId == null) {
                 echo (new \api\APIResult("failure","Provided jobId does not match a job in the system."))->getJSON();
             } elseif ($job->employerId != $employer->employerId) {
                 echo (new \api\APIResult("failure","Job with provided jobId was posted by another employer. You can only view matches for jobs you have posted."))->getJSON();

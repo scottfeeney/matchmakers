@@ -19,9 +19,19 @@ if ($_SERVER['DOCUMENT_ROOT'] != '') {
     require_once '../../../classes/object_save.php';
 }
 
-if (!isset($_SERVER['HTTP_TOKEN'])) {
+$tokenFound = false; 
+
+foreach ($_SERVER as $key => $value) {
+    if ($key == 'HTTP_TOKEN') { 
+        $tokenFound = true;
+    }
+}
+
+if (!$tokenFound) {
+    //exit early to prevent HTML error messages being returned
     header("HTTP/1.1 401 Unauthorized");
     echo (new \api\APIResult("failure","Token not supplied"))->getJSON();
+    die();
 }
 
 $token = $_SERVER['HTTP_TOKEN'];
