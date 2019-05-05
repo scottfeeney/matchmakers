@@ -45,7 +45,7 @@ if ($user != null) {
         $categoryId = \Utilities\Common::GetRequest("categoryId");
         $skillId = \Utilities\Common::GetRequest("skillId");
         if ($categoryId == "" or $skillId == "") {
-            echo (new \api\APIResult("failure","Must provide categoryId and skillId via POST or GET"))->getJSON();
+            echo (new \api\APIResult("failure","Must provide categoryId and skillId via POST"))->getJSON();
             exit();
         }
 
@@ -72,9 +72,11 @@ if ($user != null) {
         }
 
     } else {
+        header("HTTP/1.1 401 Unauthorized");
         echo (new \api\APIResult("failure","You are not logged in as an admin"))->getJSON();
     }
 } else {
+    header("HTTP/1.1 401 Unauthorized");
     echo (new \api\APIResult("failure","You are not logged in"))->getJSON();
 
 }

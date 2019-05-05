@@ -60,6 +60,10 @@ final class APITest extends TestCase {
         $this->assertEquals(401, curl_getinfo($this->curlObj, CURLINFO_HTTP_CODE), "Failed to return 401 code when authenticate called with legit username and invalid password");
     }
 
+    /**
+     * Helper functions
+     */
+
     public static function authenticateGetToken($uid, $email, $curlObj, $baseURL) {
         //set password
         $user = new \Classes\User($uid);
@@ -270,6 +274,29 @@ final class APITest extends TestCase {
         }
         return array(true, "");
     }
+
+
+    //Functions to create adminStaff table records and delete them (i.e. to be called by setup and tearDown, as
+    //existing functions borrowed from SkillTest only deal with entries in the User table)
+
+    public static function setupAdminStaffRecord($uid) {
+        
+        //TODO
+        //TODO
+        //TODO
+
+    }
+
+    public static function tearDownAdminStaffrecord($uid) {
+
+        //TODO
+        //TODO
+        //TODO
+
+    }
+
+
+
     /**
      * categories.php
      * 
@@ -564,6 +591,46 @@ final class APITest extends TestCase {
      * Need to test token provided, token for user, token for adminUser, categoryId and skillName provided,
      * categoryId is legitimate, skillName doesn't match already existing skill, success
      */
+    
+    public function testAddSkillNoToken() {
+        $noTokenRes = $this->checkNoToken($this->baseURL. 'admin/addskill.php', $this->curlObj, $this->baseProdURL);
+        $this->assertTrue($noTokenRes[0], $noTokenRes[1]);
+    }
+
+    public function testAddSkillIncorrectToken() {
+        $wrongTokenRes = $this->checkIncorrectToken($this->baseURL. 'admin/addskill.php', $this->curlObj, $this->baseProdURL);
+        $this->assertTrue($wrongTokenRes[0], $wrongTokenRes[1]);
+    }
+    
+    public function testAddSkillWrongUserType() {
+        $currentTokenRes = $this->checkCurrentToken($this->baseURL.'admin/addskill.php', $this->curlObj, $this->baseProdURL, 
+                $this->testEmployer->userId, $this->testEmployerEmail, $this->baseURL, true, "admin", $this->userTypes);
+        $this->assertTrue($currentTokenRes[0], $currentTokenRes[1]);
+    }
+
+    public function testAddSkillPOSTVarsProvided() {
+        $noPOSTVarsRes = $this->checkCurrentToken($this->baseURL.'admin/addskill.php', $this->curlObj, $this->baseProdURL, 
+                $this->testAdminStaff->userId, $this->testAdminEmail, $this->baseURL, true, "admin", $this->userTypes,
+                true, "incorrect", array(), "Must provide both categoryId and skillName via POST");
+        $this->assertTrue($noPOSTVarsRes[0], $noPOSTVarsRes[1]);
+    }
+
+    public function testAddSkillInvalidCategoryId() {
+        $noPOSTVarsRes = $this->checkCurrentToken($this->baseURL.'admin/addskill.php', $this->curlObj, $this->baseProdURL, 
+                $this->testAdminStaff->userId, $this->testAdminEmail, $this->baseURL, true, "admin", $this->userTypes,
+                true, "incorrect", array("categoryId" => -1, "skillName" => "aSkill"), "categoryId does not match a category in our system");
+        $this->assertTrue($noPOSTVarsRes[0], $noPOSTVarsRes[1]);
+    }
+
+    public function testAddSkillExistingName() {
+
+    }
+
+    public function testAddSkillSuccess() {
+
+        //cleanup
+    }
+
 
     /**
      * Rename skill
@@ -571,11 +638,92 @@ final class APITest extends TestCase {
      * categoryId is legitimate, skillId is legitimate, skillId is in categoryId, skillName doesn't match already existing skill, success
      */
 
+    public function testRenameSkillNoToken() {
+        $noTokenRes = $this->checkNoToken($this->baseURL. 'admin/renameskill.php', $this->curlObj, $this->baseProdURL);
+        $this->assertTrue($noTokenRes[0], $noTokenRes[1]);
+    }
+
+    public function testRenameSkillIncorrectToken() {
+        $wrongTokenRes = $this->checkIncorrectToken($this->baseURL. 'admin/renameskill.php', $this->curlObj, $this->baseProdURL);
+        $this->assertTrue($wrongTokenRes[0], $wrongTokenRes[1]);
+    }
+    
+    public function testRenameSkillWrongUserType() {
+        $currentTokenRes = $this->checkCurrentToken($this->baseURL.'admin/renameskill.php', $this->curlObj, $this->baseProdURL, 
+                $this->testEmployer->userId, $this->testEmployerEmail, $this->baseURL, true, "admin", $this->userTypes);
+        $this->assertTrue($currentTokenRes[0], $currentTokenRes[1]);
+    }
+
+    public function testRenameSkillPOSTVarsProvided() {
+
+    }
+
+    public function testRenameSkillInvalidCategoryId() {
+
+    }
+
+    public function testRenameSkillInvalidSkillId() {
+
+    }
+
+    public function testRenameSkillNotInSpecifiedCategory() {
+
+        //cleanup
+    }
+
+    public function testRenameSkillExistingName() {
+
+        //cleanup
+    }
+
+    public function testRenameSkillSuccess() {
+        
+        //cleanup
+    }
+
     /**
      * Delete skill
      * Need to test token provided, token for user, token for adminUser, categoryId and skillId provided,
      * category Id is legitimate, skillId is legitimate, skillId is in categoryId, success
      */
+
+    public function testDeleteSkillNoToken() {
+        $noTokenRes = $this->checkNoToken($this->baseURL. 'admin/deleteskill.php', $this->curlObj, $this->baseProdURL);
+        $this->assertTrue($noTokenRes[0], $noTokenRes[1]);
+    }
+
+    public function testDeleteSkillIncorrectToken() {
+        $wrongTokenRes = $this->checkIncorrectToken($this->baseURL. 'admin/deleteskill.php', $this->curlObj, $this->baseProdURL);
+        $this->assertTrue($wrongTokenRes[0], $wrongTokenRes[1]);
+    }
+    
+    public function testDeleteSkillWrongUserType() {
+        $currentTokenRes = $this->checkCurrentToken($this->baseURL.'admin/deleteskill.php', $this->curlObj, $this->baseProdURL, 
+                $this->testEmployer->userId, $this->testEmployerEmail, $this->baseURL, true, "admin", $this->userTypes);
+        $this->assertTrue($currentTokenRes[0], $currentTokenRes[1]);
+    }
+
+    public function testDeleteSkillPOSTVarsProvided() {
+
+    }
+
+    public function testDeleteSkillInvalidCategoryId() {
+
+    }
+
+    public function testDeleteSkillInvalidSkillId() {
+
+    }
+
+    public function testDeleteSkillNotInSpecifiedCategory() {
+        
+        //cleanup
+    }
+
+    public function testDeleteSkillSuccess() {
+
+    }
+
 
     protected function setUp(): void {
         parent::setUp();
@@ -590,6 +738,9 @@ final class APITest extends TestCase {
         $jsRes = JobSeekerTest::createUserAndJobSeeker($this->testJobSeekerEmail);
         $this->testJobSeeker = new \Classes\JobSeeker($jsRes['jid']);
         $this->testAdminStaff = new \Classes\User(UserTest::saveNewUser($this->testAdminEmail,3));
+        //The above does not actually create a record in the adminuser table, which is fine for
+        //testing the Skill class, but not ok for testing the admin API functions
+
     }
 
     protected function tearDown(): void {
