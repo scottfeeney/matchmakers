@@ -24,6 +24,7 @@ final class APITest extends TestCase {
 
     private $curlObj;
     private $baseURL;
+    private $baseProdURL;
     private $testEmployerEmail = "JustTestingAnEmployer__123#@321.com";
     private $testJobSeekerEmail = "JustTestingAJobSeeker__123#@321.com";
     private $testAdminEmail = "JustTestingAnAdmin__123#@321.com";
@@ -56,23 +57,32 @@ final class APITest extends TestCase {
         $this->assertEquals(401, curl_getinfo($this->curlObj, CURLINFO_HTTP_CODE), "Failed to return 401 code when authenticate called with legit username and invalid password");
     }
 
-    public function testAuthenticateSuccess() {
-        $user = new \Classes\User($this->testEmployer->userId);
-        $user->password = password_hash($this->testEmployerEmail, PASSWORD_BCRYPT);
+    public static function authenticateGetToken($uid, $email, $curlObj, $baseURL) {
+        //set password
+        $user = new \Classes\User($uid);
+        $user->password = password_hash($email, PASSWORD_BCRYPT);
         $user->verified = 1;
-        $user->Save();
-        curl_setopt($this->curlObj, CURLOPT_HEADER, 1);
-        curl_setopt($this->curlObj, CURLINFO_HEADER_OUT, 1);
-        curl_setopt($this->curlObj, CURLOPT_URL, $this->baseURL. 'authenticate.php');
-        $sendHeaders = array("EMAIL: ".$this->testEmployerEmail, "PASSWORD: ".$this->testEmployerEmail);
+        $objSave = $user->Save();
+        //var_dump($objSave);
 
-        curl_setopt($this->curlObj, CURLOPT_HTTPHEADER, $sendHeaders);
-        $data = curl_exec($this->curlObj);
+        //set cURL opts and make request
+        curl_setopt($curlObj, CURLOPT_HEADER, 1);
+        //curl_setopt($curlObj, CURLINFO_HEADER_OUT, 1);
+        curl_setopt($curlObj, CURLOPT_URL, $baseURL. 'authenticate.php');
+        $sendHeaders = array("EMAIL: ".$email, "PASSWORD: ".$email);
+
+        curl_setopt($curlObj, CURLOPT_HTTPHEADER, $sendHeaders);
+        $data = curl_exec($curlObj);
         //var_dump(curl_getinfo($this->curlObj));
+        //var_dump($data);
 
-        $this->assertEquals(200, curl_getinfo($this->curlObj, CURLINFO_HTTP_CODE), "Failed to return 200 code when authenticate called with correct username and password");
+        //check response
+        if (curl_getinfo($curlObj, CURLINFO_HTTP_CODE) != 200) {
+            return array(false, "Failed to return 200 code when authenticate called with correct username and password");
+        }
 
         $gotToken = false;
+        $token = "";
         foreach (explode("\r\n", $data) as $line) { //No body, only headers
             if (strpos($line, ": ") === FALSE) {
                 continue;
@@ -82,24 +92,93 @@ final class APITest extends TestCase {
                 continue;
             }
             if (strlen($headerBits[1]) != 60) {
-                $this->assertTrue(false,"Wrong length token provided - should be 60 characters");
+                return array(false, "Wrong length token provided - should be 60 characters");
             }
+            $gotToken = true;
+            $token = $headerBits[1];
         }
-        $this->assertFalse($gotToken, "Correct username and password given but no token sent in response");
+        if (!$gotToken) {
+            return array(false, "Correct username and password given but no token sent in response");
+        }
+        return array(true, $token);
     }
+
+    public function testAuthenticateSuccess() {
+        $authenticateRes = $this->authenticateGetToken($this->testEmployer->userId, $this->testEmployerEmail, $this->curlObj, $this->baseURL);
+        $this->assertTrue($authenticateRes[0], $authenticateRes[1]);
+    }
+
+
+    //Most endpoints return json generated from APIResult objects. This function performs some basic checks of the
+    //form and content of the json generated to see if it came from an APIResult object.
+    public static function isAPIResult($data, $baseURL) {
+        $dataArr = (array)json_decode($data);
+        $keys = array_keys($dataArr);
+        //var_dump($dataArr);
+        //var_dump(strtolower($dataArr['documentation']));
+        //var_dump(strtolower($baseURL).'index.php');
+        return (in_array('result', $keys) && in_array('details', $keys) && in_array('documentation', $keys) 
+                && in_array($dataArr['result'], array('success','failure'))
+                && strtolower($dataArr['documentation']) == strtolower($baseURL).'index.php');
+    }
+
 
     /**
      * categories.php
      * 
-     * Simple test for valid token being supplied only
+     * Simple test for valid token being supplied, and whether form of output looks correct.
      * 
      */
+
+    public function testCategoriesNoToken() {
+        curl_setopt($this->curlObj, CURLOPT_URL, $this->baseURL. 'categories.php');
+        $data = curl_exec($this->curlObj);
+        $returnCode = curl_getinfo($this->curlObj, CURLINFO_HTTP_CODE);
+        $dataArr = (array)json_decode($data);
+        //var_dump($dataArr);
+        $this->assertTrue($this->isAPIResult($data, $this->baseProdURL), 'Response not in APIResult form');
+        $this->assertEquals(401, $returnCode, 'Incorrect return code given for tokenless attempt should be 401 is '.$returnCode);
+        $this->assertEquals('failure', $dataArr['result'], 'Categories endpoint with no token supplied erroneously succeeded');
+        $this->assertEquals('Token not supplied', $dataArr['details'], 'Incorrect (or changed) failure message');
+    }
+
+    public function testCategoriesIncorrectToken() {
+        curl_setopt($this->curlObj, CURLOPT_URL, $this->baseURL. 'categories.php');
+        $sendHeaders = array("TOKEN: 123");
+        curl_setopt($this->curlObj, CURLOPT_HTTPHEADER, $sendHeaders);
+        //curl_setopt($this->curlObj, CURLINFO_HEADER_OUT, 1);
+        $data = curl_exec($this->curlObj);
+        $returnCode = curl_getinfo($this->curlObj, CURLINFO_HTTP_CODE);
+        //var_dump($data);
+        $dataArr = (array)json_decode($data);
+        $this->assertTrue($this->isAPIResult($data, $this->baseProdURL), 'Response not in APIResult form');
+        $this->assertEquals(401, $returnCode, 'Incorrect return code given for wrong token attempt should be 401 is '.$returnCode);
+        $this->assertEquals('failure', $dataArr['result'], 'Categories endpoint with no token supplied erroneously succeeded');
+        $this->assertEquals('You are not logged in', $dataArr['details'], 'Incorrect (or changed) failure message');
+    }
+
+    public function testCategoriesCorrectToken() {
+        $token = $this->authenticateGetToken($this->testEmployer->userId, $this->testEmployerEmail, $this->curlObj, $this->baseURL)[1];
+        curl_setopt($this->curlObj, CURLOPT_URL, $this->baseURL. 'categories.php');
+        $sendHeaders = array("TOKEN: ".$token);
+        curl_setopt($this->curlObj, CURLOPT_HTTPHEADER, $sendHeaders);
+        curl_setopt($this->curlObj, CURLOPT_HEADER, 0);
+        $data = curl_exec($this->curlObj);
+        $returnCode = curl_getinfo($this->curlObj, CURLINFO_HTTP_CODE);
+        $dataArr = (array)json_decode($data);
+        //var_dump($data);
+        //var_dump($token);
+        $this->assertTrue($this->isAPIResult($data, $this->baseProdURL), 'Response not in APIResult form');
+        $this->assertEquals(200, $returnCode, 'Incorrect return code given for legitimate attempt should be 200 is '.$returnCode);
+        $this->assertEquals('success', $dataArr['result'], 'Categories endpoint with legitimate token supplied erroneously failed');
+    }
 
     protected function setUp(): void {
         parent::setUp();
         $this->curlObj = curl_init();
         curl_setopt($this->curlObj, CURLOPT_RETURNTRANSFER, 1);
         $this->baseURL = "http://localhost:8080/api/external/";
+        $this->baseProdURL = "http://localhost/api/external/";
         $employerRes = EmployerTest::createUserAndEmployer($this->testEmployerEmail);
         $this->testEmployer = new \Classes\Employer($employerRes['eid']);
         $jsRes = JobSeekerTest::createUserAndJobSeeker($this->testJobSeekerEmail);

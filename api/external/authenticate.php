@@ -22,6 +22,7 @@
 	if (!$emailFound || !$passwordFound) {
 		//exit early to prevent HTML error messages being returned
 		header("HTTP/1.1 401 Unauthorized");
+		//var_dump($_SERVER);
 		exit;
 	}
 
@@ -32,6 +33,7 @@
 	
 	if ($user == null) {
 		header("HTTP/1.1 401 Unauthorized");
+		//var_dump($_SERVER);
 		exit;
 	}
 	else {
