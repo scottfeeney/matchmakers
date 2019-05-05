@@ -26,12 +26,15 @@ final class APITest extends TestCase {
     private $baseURL;
     private $baseProdURL;
     private $testEmployerEmail = "JustTestingAnEmployer__123#@321.com";
+    private $testEmployer2Email = "JustTestingAnEmployr2__123#@321.com";
     private $testJobSeekerEmail = "JustTestingAJobSeeker__123#@321.com";
     private $testAdminEmail = "JustTestingAnAdmin__123#@321.com";
     private $testEmployer;
+    private $testEmployer2;
     private $testJobSeeker;
     private $testAdminStaff;
     private $userTypes = array(1 => "employer", 2 => "jobseeker", 3 => "admin");
+    
     /**
      * authenticate.php
      */
@@ -169,13 +172,30 @@ final class APITest extends TestCase {
 
     //
     public static function checkCurrentToken($endpointURL, $curlObj, $baseProdURL, $uid, $email, $baseURL, 
-                                                $checkType = false, $typeExpected = "", $userTypes = array()) {
+                                                $checkType = false, $typeExpected = "", $userTypes = array(),
+                                                $checkPOSTVars = false, $POSTVarsTypeGiven = "", $POSTVars = array(), $POSTErrorMsgExpected = "") {
 
         $token = APITest::authenticateGetToken($uid, $email, $curlObj, $baseURL)[1];
+        
         curl_setopt($curlObj, CURLOPT_URL, $endpointURL);
         $sendHeaders = array("TOKEN: ".$token);
         curl_setopt($curlObj, CURLOPT_HTTPHEADER, $sendHeaders);
         curl_setopt($curlObj, CURLOPT_HEADER, 0);
+        //For endpoints that require POST vars be passed
+        if ($checkPOSTVars) {
+            $POSTVarString = "";
+            /**
+            foreach ($POSTVars as $key => $value) {
+                if ($POSTVarString == "") {
+                    $POSTVarString = $key."=".$value;
+                } else {
+                    $POSTVarString .= "&".$key."=".$value;
+                }
+            } */
+            curl_setopt($curlObj, CURLOPT_POST,1);
+            curl_setopt($curlObj, CURLOPT_POSTFIELDS, http_build_query($POSTVars));
+        }
+
         $data = curl_exec($curlObj);
         $returnCode = curl_getinfo($curlObj, CURLINFO_HTTP_CODE);
         $dataArr = (array)json_decode($data);
@@ -184,6 +204,11 @@ final class APITest extends TestCase {
         if (!APITest::isAPIResult($data, $baseProdURL)) {
             return array(false, 'Response not in APIResult form');
         }
+
+        //For endpoints that require user be logged in as a certain type
+        //(As is probably obvious current structure will not handle cases where
+        //user need not be logged in as a specific type, but post var related stuff
+        //is done. There are no cases of that in the current set of API endpoints)
         if ($checkType) {
             $user = new \Classes\User($uid);
             $userType = $userTypes[$user->userType];
@@ -197,8 +222,24 @@ final class APITest extends TestCase {
                 if ($dataArr['details'] != 'You are not logged in as an '.$typeExpected) {
                     return array(false, 'Incorrect (or changed) failure message for wrong user type');
                 }
-                return array(true,"");
+                //For endpoints that require POST vars be passed
+                if ($checkPOSTVars) {
+                    if ($POSTVarsTypeGiven != "correct") {
+                        if ($dataArr['result'] == 'success') {
+                            return array(false, "Incorrect POST vars given but success still returned");
+                        }
+                        if ($dataArr['details'] != $POSTErrorMsgExpected) {
+                            return array(false, "Incorrect POST vars given and incorrect (or changed) error message returned: '"
+                                        .$dataArr['details']."' given, '".$POSTErrorMsgExpected."' expected");
+                        }
+                    } else {
+                        if ($dataArr['result'] != 'success') {
+                            return array(false, "Correct POST vars given but failure still returned");
+                        }
+                    }
+                }
             }
+            return array(true,"");
         }
         if ($returnCode != 200) {
             return array(false, 'Incorrect return code given for legitimate attempt should be 200 is '.$returnCode);
@@ -235,7 +276,7 @@ final class APITest extends TestCase {
     /**
      * Employer endpoint
      * 
-     * Test if token given, if token legit, if token for employer
+     * Test if token given, if token legit, if token for correct user type
      * 
      */
 
@@ -259,6 +300,118 @@ final class APITest extends TestCase {
         $currentTokenRes = $this->checkCurrentToken($this->baseURL.'employer.php', $this->curlObj, $this->baseProdURL, 
                 $this->testEmployer->userId, $this->testEmployerEmail, $this->baseURL);
         $this->assertTrue($currentTokenRes[0], $currentTokenRes[1]);
+    }
+
+    /** 
+     * EmployerJobs endpoint
+     * 
+     * As per employer endpoint
+     */
+
+    public function testEmployerJobsNoToken() {
+        $noTokenRes = $this->checkNoToken($this->baseURL. 'employerJobs.php', $this->curlObj, $this->baseProdURL);
+        $this->assertTrue($noTokenRes[0], $noTokenRes[1]);
+    }
+
+    public function testEmployerJobsIncorrectToken() {
+        $wrongTokenRes = $this->checkIncorrectToken($this->baseURL. 'employerJobs.php', $this->curlObj, $this->baseProdURL);
+        $this->assertTrue($wrongTokenRes[0], $wrongTokenRes[1]);
+    }
+
+    public function testEmployerJobsWrongUserType() {
+        $currentTokenRes = $this->checkCurrentToken($this->baseURL.'employerJobs.php', $this->curlObj, $this->baseProdURL, 
+                $this->testJobSeeker->userId, $this->testJobSeekerEmail, $this->baseURL, true, "employer", $this->userTypes);
+        $this->assertTrue($currentTokenRes[0], $currentTokenRes[1]);
+    }
+
+    public function testEmployerJobsCorrectToken() {
+        $currentTokenRes = $this->checkCurrentToken($this->baseURL.'employerJobs.php', $this->curlObj, $this->baseProdURL, 
+                $this->testEmployer->userId, $this->testEmployerEmail, $this->baseURL);
+        $this->assertTrue($currentTokenRes[0], $currentTokenRes[1]);
+    }
+
+    /**
+     * EmployerMatches endpoint
+     * 
+     * As per employer endpoint, but needs different CorrectToken check (or existing one needs to be expanded to also check
+     * for presence of legitimate jobid when indicated to do so, and whether jobid given is for employerid)
+     */
+
+    public function testEmployerMatchesNoToken() {
+        $noTokenRes = $this->checkNoToken($this->baseURL. 'employerMatches.php', $this->curlObj, $this->baseProdURL);
+        $this->assertTrue($noTokenRes[0], $noTokenRes[1]);
+    }
+
+    public function testEmployerMatchesIncorrectToken() {
+        $wrongTokenRes = $this->checkIncorrectToken($this->baseURL. 'employerMatches.php', $this->curlObj, $this->baseProdURL);
+        $this->assertTrue($wrongTokenRes[0], $wrongTokenRes[1]);
+    }
+
+    public function testEmployerMatchesWrongUserType() {
+        $currentTokenRes = $this->checkCurrentToken($this->baseURL.'employerMatches.php', $this->curlObj, $this->baseProdURL, 
+                $this->testJobSeeker->userId, $this->testJobSeekerEmail, $this->baseURL, true, "employer", $this->userTypes);
+        $this->assertTrue($currentTokenRes[0], $currentTokenRes[1]);
+    }
+
+    //$checkPOSTVars = false, $POSTVarsTypeGiven = "", $POSTVars = array(), $POSTErrorMsgExpected = "") {
+    public function testEmployerMatchesNoJobId() {
+        $currentTokenRes = $this->checkCurrentToken($this->baseURL.'employerMatches.php', $this->curlObj, $this->baseProdURL, 
+                $this->testEmployer->userId, $this->testEmployerEmail, $this->baseURL, true, "employer", $this->userTypes,
+                true, "incorrect", array(), "Must provide jobId via POST");
+        $this->assertTrue($currentTokenRes[0], $currentTokenRes[1]);
+    }
+
+    public function testEmployerMatchesInvalidJobId() {
+        $invalidJobIdRes = $this->checkCurrentToken($this->baseURL.'employerMatches.php', $this->curlObj, $this->baseProdURL, 
+                $this->testEmployer->userId, $this->testEmployerEmail, $this->baseURL, true, "employer", $this->userTypes,
+                true, "incorrect", array("jobId" => -1), "Provided jobId does not match a job in the system.");
+        $this->assertTrue($invalidJobIdRes[0], $invalidJobIdRes[1]);
+    }
+
+    public function testEmployerMatchesOtherEmployerJobId() {
+        //create job using employer2
+        //assuming 1 is a valid skill categoryId
+        extract(JobTest::createJob($this->testEmployer2->employerId, 1, "SomeJob"));
+        //gives jid, objSave
+        if ($objSave->hasError) {
+            $this->assertTrue(false, "Failed to create test job");
+        }
+
+        $diffEmployerRes = $this->checkCurrentToken($this->baseURL.'employerMatches.php', $this->curlObj, $this->baseProdURL, 
+            $this->testEmployer->userId, $this->testEmployerEmail, $this->baseURL, true, "employer", $this->userTypes,
+            true, "incorrect", array("jobId" => $jid), "Job with provided jobId was posted by another employer. You can only view matches for jobs you have posted.");
+
+        //cleanup
+        $jobDelRes = JobTest::deleteJobTestTempRecords($this->testEmployer2Email);
+        if ($jobDelRes[0] == false) {
+            $this->assertTrue(false, $jobCreateRes[1]);
+        }
+
+        //check result when employer tried to look at it
+        $this->assertTrue($diffEmployerRes[0], $diffEmployerRes[1]);
+    }
+
+    public function testEmployerMatchesCorrectInput() {
+        //create job using employer
+        //assuming 1 is a valid skill categoryId
+        extract(JobTest::createJob($this->testEmployer->employerId, 1, "SomeJob"));
+        //gives jid, objSave
+        if ($objSave->hasError) {
+            $this->assertTrue(false, "Failed to create test job");
+        }
+
+        $diffEmployerRes = $this->checkCurrentToken($this->baseURL.'employerMatches.php', $this->curlObj, $this->baseProdURL, 
+            $this->testEmployer->userId, $this->testEmployerEmail, $this->baseURL, true, "employer", $this->userTypes,
+            true, "correct", array("jobId" => $jid), "");
+
+        //cleanup
+        $jobDelRes = JobTest::deleteJobTestTempRecords($this->testEmployerEmail);
+        if ($jobDelRes[0] == false) {
+            $this->assertTrue(false, $jobCreateRes[1]);
+        }
+
+        //check result when employer tried to look at it
+        $this->assertTrue($diffEmployerRes[0], $diffEmployerRes[1]);
     }
 
     /**
@@ -298,6 +451,8 @@ final class APITest extends TestCase {
         $this->baseProdURL = "http://localhost/api/external/";
         $employerRes = EmployerTest::createUserAndEmployer($this->testEmployerEmail);
         $this->testEmployer = new \Classes\Employer($employerRes['eid']);
+        $employerRes2 = EmployerTest::createUserAndEmployer($this->testEmployer2Email);
+        $this->testEmployer2 = new \Classes\Employer($employerRes2['eid']);
         $jsRes = JobSeekerTest::createUserAndJobSeeker($this->testJobSeekerEmail);
         $this->testJobSeeker = new \Classes\JobSeeker($jsRes['jid']);
         $this->testAdminStaff = new \Classes\User(UserTest::saveNewUser($this->testAdminEmail,3));
@@ -306,6 +461,7 @@ final class APITest extends TestCase {
     protected function tearDown(): void {
         curl_close($this->curlObj);
         EmployerTest::tearDownByEmail($this->testEmployerEmail);
+        EmployerTest::tearDownByEmail($this->testEmployer2Email);
         JobSeekerTest::tearDownByEmail($this->testJobSeekerEmail);
         SkillTest::tearDownAdminByEmail($this->testAdminEmail);
         parent::tearDown();
