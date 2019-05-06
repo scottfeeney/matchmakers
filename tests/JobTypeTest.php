@@ -1,5 +1,13 @@
 <?php
 
+/**
+ * (Ludicrously) Trivial test class for the jobType class
+ * Given the simplicity of this class, a good argument could probably be made
+ * for not creating a test class for it at all.
+ * 
+ * Author(s): Blair
+ */
+
 use PHPUnit\Framework\TestCase;
 
 

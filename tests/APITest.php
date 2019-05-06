@@ -318,6 +318,7 @@ final class APITest extends TestCase {
                 $conn->close();
                 return array('false', "Could not verify creation of record in adminstaff table for userId ".$uid.":".PHP_EOL.$errMsg);
             }
+            $insertedId = $stmt->insert_id;
         } 
         else {
             $errMsg = $conn->errno.': '.$conn->error;
@@ -327,10 +328,10 @@ final class APITest extends TestCase {
         }
         $conn->close();
         //var_dump("Looks to have successfully set up adminStaff record for ".$uid);
-        return array(true,'');
+        return array(true, array('adminStaff' => new \Classes\AdminStaff($insertedId)));
     }
 
-    public static function tearDownAdminStaffrecord($uid) {
+    public static function tearDownAdminStaffRecord($uid) {
         $conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);
 
         $sql =  "delete from admin_staff where userId = ?";
@@ -349,7 +350,7 @@ final class APITest extends TestCase {
             return array('false', "Could not delete record in adminStaff table for userId ".$uid);
         }
         $conn->close();
-        return array(true,'');
+        return array(true, '');
     }
 
 

@@ -1,9 +1,11 @@
 <?php
 
- /*
+ /**
   * Class to test SkillCategory class
   * Rather trivial, but so is the class it is testing
   * Relies on static data, obviously this test will start failing if the categories change
+  * 
+  * Author(s): Blair
   */
 
 use PHPUnit\Framework\TestCase;

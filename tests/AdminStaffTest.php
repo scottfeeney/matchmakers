@@ -12,11 +12,26 @@ use PHPUnit\Framework\TestCase;
 
 final class AdminStaffTest extends TestCase {
 
-    private $uidsToDelete;
+
+    private $adminStaffUserRecord;
+    private $adminStaffAdminStaffRecord;
+    private $testEmail = "anAdminPersonBeingTested@email321.com";
+
+
 
     public function testConstructor() {
         $adminStaff = new \Classes\AdminStaff(0);
         $this->assertSame(0, $adminStaff->adminStaffId);
+    }
+
+    public function testConstructorNegative() {
+        $adminStaff = new \Classes\AdminStaff(-1);
+        $this->assertSame(0, $adminStaff->adminStaffId);
+    }
+
+    public function testConstructorSuccess() {
+        $this->assertTrue((new \Classes\AdminStaff($this->adminStaffAdminStaffRecord->adminStaffId))->adminStaffId != 0);
+        $this->assertTrue((new \Classes\AdminStaff($this->adminStaffAdminStaffRecord->adminStaffId))->userId != null);
     }
 
     /** save method is commented out in adminstaff class, as we currently have no facility for 
@@ -60,35 +75,24 @@ final class AdminStaffTest extends TestCase {
         $this->assertSame(null, \Classes\AdminStaff::GetAdminStaffByUserId(0));
     }
 
-    public function testGetAdminStaff() { //ByUserId() {
-        //Cannot use the below line as the adminstaff->save method it relies on is currently
-        //commented out - instead assume that there is a staff record created with adminstaffid 1
-        //extract($this->createUserAndAdminStaff());
-        //$this->assertEquals(\Classes\AdminStaff::GetAdminStaffByUserId($oid), $adminStaff);
-        $this->assertTrue((new \Classes\AdminStaff(1))->userId > 0, "Test failed OR there is no adminStaff record in DB with adminStaffId = 1");
+    public function testGetAdminStaffByUserIdSuccess() {
+        $this->assertTrue(\Classes\AdminStaff::GetAdminStaffByUserId($this->adminStaff->userId) != null);
     }
 
     protected function setUp(): void {
         parent::setUp();
-        $this->uidsToDelete = array();
+        //create record in user table
+        $this->adminStaffUserRecord = SkillTest::staticSetupAdminUser($this->testEmail)[1]['adminUser'];
+        //create record in adminStaff table
+        $adminStaffSetupRes = APITest::setupAdminStaffRecord($this->adminStaffUserRecord->userId);
+        if ($adminStaffSetupRes[0] != false) {
+            $this->adminStaffAdminStaffRecord = $adminStaffSetupRes[1]['adminStaff'];
+        }
     }
 
     protected function tearDown(): void {
-        $conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);
-        foreach ($this->uidsToDelete as $idd) {
-            foreach (array('delete from admin_staff where userid = ?', 'delete from user where UserId = ?') as $sql) {
-                if ($stmt = $conn->prepare($sql)) {
-                    $stmt->bind_param("i", $idd);
-                    $stmt->execute();
-                    $result = mysqli_stmt_get_result($stmt);
-                    $stmt->close();
-                } else {
-                    var_dump($errorMessage = $conn->errno . ' ' . $conn->error);
-                    $this->assertTrue(false, "Error in database query in tearDown function");
-                }
-            }
-        }
-        $conn->close();
+        APITest::tearDownAdminStaffRecord($this->adminStaffUserRecord->userId);
+        SkillTest::tearDownAdminByEmail($this->adminStaffUserRecord->email);
         parent::tearDown();
     }
 

@@ -252,13 +252,7 @@ final class SkillTest extends TestCase {
         return array(true, array('skillCatId' => $skillCatId));
     }
 
-    public static function staticSetup($skillCatName, $testEmail) {
-        $skillCatRes = SkillTest::staticSetupSkillCat($skillCatName);
-        if ($skillCatRes[0] == false) {
-            return $skillCatRes;
-        }
-        $skillCatId = $skillCatRes[1]['skillCatId'];
-
+    public static function staticSetupAdminUser($testEmail) {
         //set up test admin user
         $user = new \Classes\User(UserTest::saveNewUser($testEmail));
         $user->userType = 3;
@@ -268,6 +262,21 @@ final class SkillTest extends TestCase {
             return array(false, $adminUserSaveRes->errorMessage);
         }
         $adminUser = new \Classes\User($adminUserSaveRes->objectId);
+        return array(true, array('adminUser' => $adminUser));
+    }
+
+    public static function staticSetup($skillCatName, $testEmail) {
+        $skillCatRes = SkillTest::staticSetupSkillCat($skillCatName);
+        if ($skillCatRes[0] == false) {
+            return $skillCatRes;
+        }
+        $skillCatId = $skillCatRes[1]['skillCatId'];
+
+        $adminSetupRes = SkillTest::staticSetupAdminUser($testEmail);
+        if ($adminSetupRes[0] == false) {
+            return $adminSetupRes;
+        }
+        $adminUser = $adminSetupRes[1]['adminUser'];
         return array(true, array('adminUser' => $adminUser, 'skillCatId' => $skillCatId));
     }
 
