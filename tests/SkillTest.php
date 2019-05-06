@@ -226,7 +226,7 @@ final class SkillTest extends TestCase {
     }
 
     //refactored to allow external use
-    public static function staticSetup($skillCatName, $testEmail) {
+    public static function staticSetupSkillCat($skillCatName) {
         $conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);
         $sql = 'insert into skill_category(SkillCategoryName) values (?)';
         if ($stmt = $conn->prepare($sql)) {
@@ -249,6 +249,15 @@ final class SkillTest extends TestCase {
             return array(false, "Error in database query in setUp function:".PHP_EOL.$errMsg);
         }
         $conn->close();
+        return array(true, array('skillCatId' => $skillCatId));
+    }
+
+    public static function staticSetup($skillCatName, $testEmail) {
+        $skillCatRes = SkillTest::staticSetupSkillCat($skillCatName);
+        if ($skillCatRes[0] == false) {
+            return $skillCatRes;
+        }
+        $skillCatId = $skillCatRes[1]['skillCatId'];
 
         //set up test admin user
         $user = new \Classes\User(UserTest::saveNewUser($testEmail));
@@ -279,9 +288,7 @@ final class SkillTest extends TestCase {
         $this->skillCatId = $setupResult[1]['skillCatId'];
     }
 
-    
     //Refactored to static to allow use from another test class
-
     public static function tearDownAdminByEmail($email) {
         $conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);
         $sql = "delete from user where email = ?";
@@ -309,8 +316,7 @@ final class SkillTest extends TestCase {
         return array(true, "");
     }
 
-    public static function staticTearDown($skillCategoryName, $adminUser) {
-        //var_dump("Attempting to teardown skillcategory ".$skillCategoryName);
+    public static function staticTearDownSkillCat($skillCategoryName) {
         $conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);
 
         //Delete all skills in test skill category, and category itself
@@ -340,6 +346,15 @@ final class SkillTest extends TestCase {
         }
 
         $conn->close();
+        return array(true, "");
+    }
+
+    public static function staticTearDown($skillCategoryName, $adminUser) {
+        //var_dump("Attempting to teardown skillcategory ".$skillCategoryName);
+        $skillCatRes = SkillTest::staticTearDownSkillCat($skillCategoryName);
+        if ($skillCatRes[0] == false) {
+            return $skillCatRes;
+        }
 
         //delete the adminUser created to create the skills
 

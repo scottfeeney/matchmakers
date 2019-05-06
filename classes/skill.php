@@ -67,6 +67,10 @@
 				$errorMessage = "A skill with the same name already exists in this category";
 			}
 			
+			if ($user->userType != 3) {
+				$errorMessage = "Only admin users may add skills";
+			}
+
 			if ($errorMessage == "") {
 		
 				if ($this->skillId == 0) {

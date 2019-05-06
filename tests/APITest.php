@@ -22,18 +22,31 @@ use PHPUnit\Framework\TestCase;
 
 final class APITest extends TestCase {
 
+    //Basic config data and curl object
     private $curlObj;
     private $baseURL;
     private $baseProdURL;
+
+    //Emails to be used to create test user records
     private $testEmployerEmail = "JustTestingAnEmployer__123#@321.com";
     private $testEmployer2Email = "JustTestingAnEmployr2__123#@321.com";
     private $testJobSeekerEmail = "JustTestingAJobSeeker__123#@321.com";
     private $testAdminEmail = "JustTestingAnAdmin__123#@321.com";
+
+    //Test user records
     private $testEmployer;
     private $testEmployer2;
     private $testJobSeeker;
     private $testAdminStaff;
+
+    //easy access for ids for dummy skill categories and skills
     private $testSkillCatId;
+    private $testSkillCat2Id;
+    private $skill1cat1Id;
+    private $skill2cat1Id;
+    private $skill1cat2Id;
+
+    //lookup for userTypes
     private $userTypes = array(1 => "employer", 2 => "jobseeker", 3 => "admin");
     
     /**
@@ -660,25 +673,25 @@ final class APITest extends TestCase {
     }
 
     public function testAddSkillInvalidCategoryId() {
-        $noPOSTVarsRes = $this->checkCurrentToken($this->baseURL.'admin/addskill.php', $this->curlObj, $this->baseProdURL, 
+        $invalidCatRes = $this->checkCurrentToken($this->baseURL.'admin/addskill.php', $this->curlObj, $this->baseProdURL, 
                 $this->testAdminStaff->userId, $this->testAdminEmail, $this->baseURL, true, "admin", $this->userTypes,
                 true, "incorrect", array("categoryId" => -1, "skillName" => "aSkill"), "categoryId does not match a category in our system");
-        $this->assertTrue($noPOSTVarsRes[0], $noPOSTVarsRes[1]);
+        $this->assertTrue($invalidCatRes[0], $invalidCatRes[1]);
     }
 
     public function testAddSkillExistingName() {
-        $noPOSTVarsRes = $this->checkCurrentToken($this->baseURL.'admin/addskill.php', $this->curlObj, $this->baseProdURL, 
+        $existingNameRes = $this->checkCurrentToken($this->baseURL.'admin/addskill.php', $this->curlObj, $this->baseProdURL, 
                 $this->testAdminStaff->userId, $this->testAdminEmail, $this->baseURL, true, "admin", $this->userTypes,
                 true, "incorrect", array("categoryId" => $this->testSkillCatId, "skillName" => "Skill To Conflict With"),
                 "Error attempting to save skill: Skill with same name already exists in specified category");
-        $this->assertTrue($noPOSTVarsRes[0], $noPOSTVarsRes[1]);
+        $this->assertTrue($existingNameRes[0], $existingNameRes[1]);
     }
 
     public function testAddSkillSuccess() {
-        $noPOSTVarsRes = $this->checkCurrentToken($this->baseURL.'admin/addskill.php', $this->curlObj, $this->baseProdURL, 
+        $successRes = $this->checkCurrentToken($this->baseURL.'admin/addskill.php', $this->curlObj, $this->baseProdURL, 
                 $this->testAdminStaff->userId, $this->testAdminEmail, $this->baseURL, true, "admin", $this->userTypes,
                 true, "correct", array("categoryId" => $this->testSkillCatId, "skillName" => "Previously Unused Skill Name"), "");
-        $this->assertTrue($noPOSTVarsRes[0], $noPOSTVarsRes[1]);
+        $this->assertTrue($successRes[0], $successRes[1]);
     }
 
 
@@ -705,27 +718,49 @@ final class APITest extends TestCase {
     }
 
     public function testRenameSkillPOSTVarsProvided() {
-
+        $noPOSTVarsRes = $this->checkCurrentToken($this->baseURL.'admin/renameskill.php', $this->curlObj, $this->baseProdURL, 
+                $this->testAdminStaff->userId, $this->testAdminEmail, $this->baseURL, true, "admin", $this->userTypes,
+                true, "incorrect", array(), "Must provide categoryId, skillId and newName via POST");
+        $this->assertTrue($noPOSTVarsRes[0], $noPOSTVarsRes[1]);
     }
 
     public function testRenameSkillInvalidCategoryId() {
-
+        $invalidCatRes = $this->checkCurrentToken($this->baseURL.'admin/renameskill.php', $this->curlObj, $this->baseProdURL, 
+                $this->testAdminStaff->userId, $this->testAdminEmail, $this->baseURL, true, "admin", $this->userTypes,
+                true, "incorrect", array("categoryId" => -1, "skillId" => -1, "newName" => "aSkill"), "categoryId does not match a category in our system");
+        $this->assertTrue($invalidCatRes[0], $invalidCatRes[1]);
     }
 
     public function testRenameSkillInvalidSkillId() {
-
+        $invalidSkillIdRes = $this->checkCurrentToken($this->baseURL.'admin/renameskill.php', $this->curlObj, $this->baseProdURL, 
+                $this->testAdminStaff->userId, $this->testAdminEmail, $this->baseURL, true, "admin", $this->userTypes,
+                true, "incorrect", array("categoryId" => $this->testSkillCatId, "skillId" => -1, "newName" => "SomeSkill"),
+                "skillId does not match a skill in our system");
+        $this->assertTrue($invalidSkillIdRes[0], $invalidSkillIdRes[1]);
     }
 
     public function testRenameSkillNotInSpecifiedCategory() {
-
+        $notInCategoryRes = $this->checkCurrentToken($this->baseURL.'admin/renameskill.php', $this->curlObj, $this->baseProdURL, 
+                $this->testAdminStaff->userId, $this->testAdminEmail, $this->baseURL, true, "admin", $this->userTypes,
+                true, "incorrect", array("categoryId" => $this->testSkillCatId, "skillId" => $this->skill1cat2Id, "newName" => "SomeSkill"),
+                "skillId does not represent a skill in the category represented by categoryId");
+        $this->assertTrue($notInCategoryRes[0], $notInCategoryRes[1]);
     }
 
     public function testRenameSkillExistingName() {
-
+        $existingNameRes = $this->checkCurrentToken($this->baseURL.'admin/renameskill.php', $this->curlObj, $this->baseProdURL, 
+                $this->testAdminStaff->userId, $this->testAdminEmail, $this->baseURL, true, "admin", $this->userTypes,
+                true, "incorrect", array("categoryId" => $this->testSkillCatId, "skillId" => $this->skill2cat1Id, "newName" => "Skill To Conflict With"),
+                "Skill already exists with new name in specified category");
+        $this->assertTrue($existingNameRes[0], $existingNameRes[1]);
     }
 
     public function testRenameSkillSuccess() {
-        
+        $successRes = $this->checkCurrentToken($this->baseURL.'admin/renameskill.php', $this->curlObj, $this->baseProdURL, 
+            $this->testAdminStaff->userId, $this->testAdminEmail, $this->baseURL, true, "admin", $this->userTypes,
+            true, "correct", array("categoryId" => $this->testSkillCatId, "skillId" => $this->skill2cat1Id, "newName" => "NewSkillName No Conflict"),
+            "Skill successfully renamed");
+        $this->assertTrue($successRes[0], $successRes[1]);
     }
 
     /**
@@ -751,23 +786,38 @@ final class APITest extends TestCase {
     }
 
     public function testDeleteSkillPOSTVarsProvided() {
-
+        $noPOSTVarsRes = $this->checkCurrentToken($this->baseURL.'admin/deleteskill.php', $this->curlObj, $this->baseProdURL, 
+                $this->testAdminStaff->userId, $this->testAdminEmail, $this->baseURL, true, "admin", $this->userTypes,
+                true, "incorrect", array(), "Must provide categoryId and skillId via POST");
+        $this->assertTrue($noPOSTVarsRes[0], $noPOSTVarsRes[1]);
     }
 
     public function testDeleteSkillInvalidCategoryId() {
-
+        $invalidCatRes = $this->checkCurrentToken($this->baseURL.'admin/deleteskill.php', $this->curlObj, $this->baseProdURL, 
+                $this->testAdminStaff->userId, $this->testAdminEmail, $this->baseURL, true, "admin", $this->userTypes,
+                true, "incorrect", array("categoryId" => -1, "skillId" => -1), "categoryId does not match a category in our system");
+        $this->assertTrue($invalidCatRes[0], $invalidCatRes[1]);
     }
 
     public function testDeleteSkillInvalidSkillId() {
-
+        $invalidSkillRes = $this->checkCurrentToken($this->baseURL.'admin/deleteskill.php', $this->curlObj, $this->baseProdURL, 
+                $this->testAdminStaff->userId, $this->testAdminEmail, $this->baseURL, true, "admin", $this->userTypes,
+                true, "incorrect", array("categoryId" => $this->testSkillCatId, "skillId" => -1), "skillId does not match a skill in our system");
+        $this->assertTrue($invalidSkillRes[0], $invalidSkillRes[1]);
     }
 
     public function testDeleteSkillNotInSpecifiedCategory() {
-        
+        $notInCategoryRes = $this->checkCurrentToken($this->baseURL.'admin/deleteskill.php', $this->curlObj, $this->baseProdURL, 
+                $this->testAdminStaff->userId, $this->testAdminEmail, $this->baseURL, true, "admin", $this->userTypes,
+                true, "incorrect", array("categoryId" => $this->testSkillCatId, "skillId" => $this->skill1cat2Id), "skillId does not represent a skill in the category represented by categoryId");
+        $this->assertTrue($notInCategoryRes[0], $notInCategoryRes[1]);
     }
 
     public function testDeleteSkillSuccess() {
-
+        $successRes = $this->checkCurrentToken($this->baseURL.'admin/deleteskill.php', $this->curlObj, $this->baseProdURL, 
+            $this->testAdminStaff->userId, $this->testAdminEmail, $this->baseURL, true, "admin", $this->userTypes,
+            true, "correct", array("categoryId" => $this->testSkillCatId, "skillId" => $this->skill1cat1Id), "");
+        $this->assertTrue($successRes[0], $successRes[1]);
     }
 
 
@@ -784,6 +834,7 @@ final class APITest extends TestCase {
         $jsRes = JobSeekerTest::createUserAndJobSeeker($this->testJobSeekerEmail);
         $this->testJobSeeker = new \Classes\JobSeeker($jsRes['jid']);
         $skillCatRes = SkillTest::staticSetup('SomeRandomTestSkillCategory', $this->testAdminEmail);
+        $skillCat2Res = SkillTest::staticSetupSkillCat('SomeOtherTestSkillCategory');
         //var_dump($skillCatRes);
         //$adminUser, $skillCatId
         $adminUser = $skillCatRes[1]['adminUser'];
@@ -793,11 +844,15 @@ final class APITest extends TestCase {
         //$objSave = $adminUser->Save();
         //var_dump($objSave);
         $this->testSkillCatId = $skillCatRes[1]['skillCatId'];
+        $this->testSkillCat2Id = $skillCat2Res[1]['skillCatId'];
         $this->testAdminStaff = $adminUser;
+
         //The above does not actually create a record in the admin_staff table, which is fine for
         //testing the Skill class, but not ok for testing the admin API functions
         $this->setupAdminStaffRecord($this->testAdminStaff->userId);
-        SkillTest::createSkill("Skill To Conflict With", $this->testSkillCatId, $this->testAdminStaff);
+        $this->skill1cat1Id = (SkillTest::createSkill("Skill To Conflict With", $this->testSkillCatId, $this->testAdminStaff))->objectId;
+        $this->skill2cat1Id = (SkillTest::createSkill("Skill To Rename", $this->testSkillCatId, $this->testAdminStaff))->objectId;
+        $this->skill1cat2Id = (SkillTest::createSkill("Skill In Other Category", $this->testSkillCat2Id, $this->testAdminStaff))->objectId;
         //var_dump($this->testAdminStaff);
 
     }
@@ -809,6 +864,7 @@ final class APITest extends TestCase {
         JobSeekerTest::tearDownByEmail($this->testJobSeekerEmail);
         $this->tearDownAdminStaffRecord($this->testAdminStaff->userId);
         SkillTest::staticTearDown('SomeRandomTestSkillCategory', $this->testAdminStaff);
+        SkillTest::staticTearDownSkillCat('SomeOtherTestSkillCategory');
         parent::tearDown();
     }
 

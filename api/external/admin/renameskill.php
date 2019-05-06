@@ -46,14 +46,14 @@ if ($user != null) {
         $skillId = \Utilities\Common::GetRequest("skillId");
         $skillName = \Utilities\Common::GetRequest("newName");
         if ($categoryId == "" or $skillName == "" or $skillId == "") {
-            echo (new \api\APIResult("failure","Must provide categoryId, skillId and new skillName via POST"))->getJSON();
+            echo (new \api\APIResult("failure","Must provide categoryId, skillId and newName via POST"))->getJSON();
             exit();
         }
 
         $category = new \Classes\SkillCategory($categoryId);
-        if ($category != null) {
+        if ($category->skillCategoryId != null) {
             $skill = new \Classes\Skill($skillId);
-            if ($skill != null) {
+            if ($skill->skillId != null) {
                 if ($skill->skillCategoryId == $category->skillCategoryId) {
                     $skill->skillName = $skillName;
                     if (\Classes\Skill::GetSkillExists($skill)) {

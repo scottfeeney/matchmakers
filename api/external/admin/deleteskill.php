@@ -50,9 +50,9 @@ if ($user != null) {
         }
 
         $category = new \Classes\SkillCategory($categoryId);
-        if ($category != null) {
+        if ($category->skillCategoryId != null) {
             $skill = new \Classes\Skill($skillId);
-            if ($skill != null) {
+            if ($skill->skillId != null) {
                 if ($skill->skillCategoryId == $category->skillCategoryId) {
                     $objSave = \Classes\Skill::DeleteSkill($skillId);
                     if ($objSave->hasError) {
