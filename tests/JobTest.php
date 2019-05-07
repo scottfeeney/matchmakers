@@ -182,6 +182,56 @@ final class JobTest extends TestCase {
         return $allSkills;
     }
 
+    private function matchingFormula($job, $jobSeeker) {
+        return JobSeekerTest::matchingFormula($job, $jobSeeker);
+    }
+
+    //Test Matching
+    //Tests required:
+    
+    //Only location matches - not listed, 25%
+    
+    //only jobtype matches - not listed, 25%
+    
+    //Both jobtype and location match, no skills match, seeker has no skills selected (yes, currently impossible through UI, even so)
+    //listed, 50%
+
+    //Both jobtype and location match, no skills match, seeker has 3 skills selected, job has 2 skills
+    //listed, 50%
+
+    //Both jobtype and location match, seeker has 5 skills, 4 of them match, job has 4 skills
+    //listed, 97.72 repeating %
+
+    //Both jobtype and location match, seeker has 5 skills, 4 of them match, job has 8 skills
+    //listed 74.43 18 repeating %
+
+    //Both jobtype and location match, seeker has 5 skills, 5 of them match, job has 5 skills
+    //listed 100%
+
+    //both jobtype and location match, seeker has 5 skills, 5 of them match, job has 12 skills
+    //listed 70.8 3 repeating
+
+    //jobtype doesn't match location does, seeker has 5 skills, 4 match, job has 8 skills
+    //not listed 49.43 18 repeating %
+
+    //location doesn't match jobtype does seeker has 5 skills 4 match job has 8 skills
+    //not listed 49 43 18 repeating %
+
+    //jobtype doesn't match location does, seeker has 5 skills, 4 match, job has 6 skills
+    //listed 57.57 repeating
+
+    //location doesn't match jobtype does, seeker has 5 skills, 4 match, job has 6 skills
+    //listed 57.57 repeating
+
+    //neither location or jobtype match, seeker has 5 skills 5 match job has 5 skills
+    //listed 50
+
+    //neither location or jobtype match, seeker has 5 skills 4 match job has 4 skills
+    //not listed 47 72 repeating
+    
+    //neither location or jobtype match, seeker has 5 skills 5 match job has 6 skills
+    //not listed 41.6 repeating
+
     public function testGetJobSeekerMatchesByJob() {
         //$this->assertFalse(true, print_r(\Classes\Job::GetJobMatchesByJobSeeker(1040)));
         $this->markTestIncomplete();

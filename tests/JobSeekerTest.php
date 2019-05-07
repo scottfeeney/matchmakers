@@ -161,6 +161,87 @@ final class JobSeekerTest extends TestCase {
         }
     }
 
+
+    //Helper function to emulate the job matching algorithm. With tests using this function, any later adjustments to the 
+    //algorithm will require only adjusting this function to bring testing in line, rather than adjusting each test function
+    public static function matchingFormula($job, $jobSeeker) {
+        $matchPercent = 0;
+        $cutoffPercent = 50; //Minimum value that will register as a match
+        
+        //get job type from both - if a match add 25
+        $matchPercent += $job->jobTypeId == $jobSeeker->jobTypeId ? 25 : 0;
+
+        //get location from both - if a match add 25
+        $matchPercent += $job->locationId == $jobSeeker->locationId ? 25 : 0;
+
+        //get number of skills that match = $matched
+        //get number of skills that job has total = $jobTotal
+        //get number of skills that seeker has job doesn't = $seekerNoMatch
+        $jobSkills = explode(',', Job::GetSkillsByJobString($job->jobId));
+        $seekerSkills = explode(",", JobSeeker::GetSkillsByJobSeekerString($jobSeeker->jobSeekerId));
+
+        $matched = count(array_intersect($jobSkills, $seekerSkills));
+        $seekerNoMatch = count($seekerSkills - $matched);
+        $jobTotal = count($jobSkills);
+
+        //Add score for weighted skills with 'jack of all trades' penalty if applicable
+        $pros = $matched / $jobTotal * 50 * 11;
+        $cons = $seekerNoMatch / $jobTotal * 50;
+        $skillsScore = ($pros - $cons) / 11;
+
+        //SkillsScore ignored if negative
+        $matchPercent += $skillsScore ? $skillsScore > 0 : 0;
+        
+        return array($matchPercent >= $cutoffPercent, $matchPercent);
+    }
+
+    //Test Matching
+    //Tests required:
+    
+    //Only location matches - not listed, 25%
+    
+    //only jobtype matches - not listed, 25%
+    
+    //Both jobtype and location match, no skills match, seeker has no skills selected (yes, currently impossible through UI, even so)
+    //listed, 50%
+
+    //Both jobtype and location match, no skills match, seeker has 3 skills selected, job has 2 skills
+    //listed, 50%
+
+    //Both jobtype and location match, seeker has 5 skills, 4 of them match, job has 4 skills
+    //listed, 97.72 repeating %
+
+    //Both jobtype and location match, seeker has 5 skills, 4 of them match, job has 8 skills
+    //listed 74.43 18 repeating %
+
+    //Both jobtype and location match, seeker has 5 skills, 5 of them match, job has 5 skills
+    //listed 100%
+
+    //both jobtype and location match, seeker has 5 skills, 5 of them match, job has 12 skills
+    //listed 70.8 3 repeating
+
+    //jobtype doesn't match location does, seeker has 5 skills, 4 match, job has 8 skills
+    //not listed 49.43 18 repeating %
+
+    //location doesn't match jobtype does seeker has 5 skills 4 match job has 8 skills
+    //not listed 49 43 18 repeating %
+
+    //jobtype doesn't match location does, seeker has 5 skills, 4 match, job has 6 skills
+    //listed 57.57 repeating
+
+    //location doesn't match jobtype does, seeker has 5 skills, 4 match, job has 6 skills
+    //listed 57.57 repeating
+
+    //neither location or jobtype match, seeker has 5 skills 5 match job has 5 skills
+    //listed 50
+
+    //neither location or jobtype match, seeker has 5 skills 4 match job has 4 skills
+    //not listed 47 72 repeating
+    
+    //neither location or jobtype match, seeker has 5 skills 5 match job has 6 skills
+    //not listed 41.6 repeating
+    
+
     public function testGetJobMatchesByJobSeeker() {
         //$this->assertFalse(true, print_r(\Classes\Job::GetJobMatchesByJobSeeker(1040)));
         $this->markTestIncomplete();
