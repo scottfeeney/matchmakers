@@ -487,6 +487,12 @@ footer a:hover{
 	padding: 5px 5px 7px 5px;
 }
 
+.job-inactive {
+	font-size: 1rem;
+	margin-left: 20px;	
+	padding: 5px 5px 7px 5px;
+}
+
 @media (max-width: 767px)
 {
 	.job-positions {

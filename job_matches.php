@@ -43,7 +43,7 @@
 	$header->isSignedIn = true;
 	echo $header->Bind();
 
-	$jobSeekerMatches = \Classes\JobSeeker::GetJobSeekerMatchesByJob($job->jobId);
+	
 ?>	
         <section>		
 			<div class="row">
@@ -63,8 +63,20 @@
 				//Loop through top matches
 				
 				
-				foreach ($jobSeekerMatches as $jobSeekerMatch) {
-					echo GetJobSeekerMatchCard($jobSeekerMatch, $jobId);
+				if ($job->active) {
+				
+	
+					$jobSeekerMatches = \Classes\JobSeeker::GetJobSeekerMatchesByJob($job->jobId);
+
+		
+					foreach ($jobSeekerMatches as $jobSeekerMatch) {
+						echo GetJobSeekerMatchCard($jobSeekerMatch, $jobId);
+					}
+				
+				}
+				else {
+					
+					echo '<div class="alert alert-warning mt-3" role="alert">This job is currently inactive. <a class="alert-link" href="create_job.php?j='  . $job->jobId . '">Edit Job</a> to reactivate it.</div>';
 				}
 				
 				

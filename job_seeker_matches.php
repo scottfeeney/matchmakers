@@ -29,7 +29,7 @@
 	$header->isSignedIn = true;
 	echo $header->Bind();
 	
-	$jobMatches = \Classes\Job::GetJobMatchesByJobSeeker($jobSeeker->jobSeekerId);
+	
 ?>	
 
 
@@ -49,8 +49,18 @@
 			
 				echo GetCardDetail("<strong>Job Seeker: </strong>" . htmlspecialchars($jobSeeker->firstName . " " . $jobSeeker->lastName));
 			
-				foreach ($jobMatches as $jobMatch) {
-					echo GetJobMatchCard($jobMatch);
+				if ($jobSeeker->active) {
+			
+					$jobMatches = \Classes\Job::GetJobMatchesByJobSeeker($jobSeeker->jobSeekerId);
+					
+				
+					foreach ($jobMatches as $jobMatch) {
+						echo GetJobMatchCard($jobMatch);
+					}
+					
+				}
+				else {
+					echo '<div class="alert alert-warning mt-3" role="alert">Your profile is currently inactive (Employer\'s won\'t see it). <a class="alert-link" href="job_seeker_details.php">Update your details</a> to reactivate it.</div>';					
 				}
 				
 				

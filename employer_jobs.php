@@ -62,14 +62,14 @@
 		$active = "";
 		
 		if($job->active == 0){
-			$active = "(Inactive)";
+			$active = '<span class="badge badge-danger job-inactive">Inactive</span>';
 		}
 		
 		$html = '<div class="card listing-card">
 			<div class="card-body">
 			
 				<div class="row">	
-					<div class="col-sm-12 list-title">' . htmlspecialchars($job->jobName) . ' '. htmlspecialchars($active) .'</div>
+					<div class="col-sm-12 list-title">' . htmlspecialchars($job->jobName) . $active .'</div>
 				</div>
 				
 				<div class="row">	
