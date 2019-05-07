@@ -79,12 +79,12 @@
 		
 			<div class="row">
 				<!-- Page heading-->
-				<div class="col-6 col-xs-12">
+				<div class="col-9">
 					<h2>Match Profile</h2>
 				</div>
 				<!-- Back Button -->
-				<div class="col-6">
-					<a class="float-right btn btn-primary mb-3 backButton" href="job_matches.php?j=<?php echo $jobId; ?>" role="button"><i class="fas fa-arrow-left"></i> Back to Matches</a>
+				<div class="col-3">
+					<a class="float-right btn btn-primary mb-3 backButton" href="job_matches.php?j=<?php echo $jobId; ?>" role="button"><i class="fas fa-arrow-left"></i><span class="back-button-text"> Back to Matches</span></a>
 				</div>
 			</div>
 			
