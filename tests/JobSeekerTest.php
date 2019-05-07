@@ -12,7 +12,7 @@ use PHPUnit\Framework\TestCase;
 
 final class JobSeekerTest extends TestCase {
 
-    private $uidsToDelete;
+    //private $uidsToDelete;
     private $testEmail = "someJobSeekerEmail@somewhere.com";
 
     public function testConstructor() {
@@ -21,10 +21,12 @@ final class JobSeekerTest extends TestCase {
     }
 
     public function testSaveUser() {
-        if ($this->createUserAndJobSeeker($this->testEmail) == null) {
+        $createUserJSRes = $this->createUserAndJobSeeker($this->testEmail);
+        if ($createUserJSRes == null) {
             $this->assertTrue(false);
         }
-        extract($this->createUserAndJobSeeker($this->testEmail));
+        extract($createUserJSRes);
+        //yields oid, jid and jobSeeker
         $this->assertEquals($jobSeeker, new \Classes\JobSeeker($jid));
     }
 
@@ -43,10 +45,11 @@ final class JobSeekerTest extends TestCase {
     }
 
     public function testEditUser() {
-        if ($this->createUserAndJobSeeker($this->testEmail) == null) {
+        $createUserJSRes = $this->createUserAndJobSeeker($this->testEmail);
+        if ($createUserJSRes == null) {
             $this->assertTrue(false);
         }
-        extract($this->createUserAndJobSeeker($this->testEmail));
+        extract($createUserJSRes);
         $jobSeeker->firstName = "Bob";
         $oSave2 = $jobSeeker->save();
         $jid = $oSave2->objectId;
@@ -140,6 +143,13 @@ final class JobSeekerTest extends TestCase {
             $this->assertTrue(false, $tearDownJSSRes[1]);
         }
 
+        //UPDATE: also need to remove the jobseeker record early (before the teardown function) OR change it's skillCategoryId
+        //that of another valid category to allow the test category to be deleted (now that foreign key constraints have been added)
+
+        //Deleting the jobseeker record early would seem the simplest option.
+
+        $tearDownByEmailRes = $this->tearDownByEmail($this->testEmail);
+
         $this->assertEquals(join(",", array($skill1Id, $skill2Id)), $post2String);
         $this->assertEquals($skill1Id, $post1String);
         $this->assertSame($preString, "");
@@ -158,7 +168,7 @@ final class JobSeekerTest extends TestCase {
 
     protected function setUp(): void {
         parent::setUp();
-        $this->uidsToDelete = array();
+        //$this->uidsToDelete = array();
     }
 
     private function tearDownJobSeekerSkill($skillIds) {
@@ -168,10 +178,10 @@ final class JobSeekerTest extends TestCase {
             if ($stmt = $conn->prepare($sql)) {
                 $stmt->bind_param("i", $skillId);
                 $stmt->execute();
-                $result = mysqli_stmt_get_result($stmt);
                 $stmt->close();
             } else {
                 var_dump($errorMessage = $conn->errno . ' ' . $conn->error);
+                $conn->close();
                 return array(false, "Error in database query in jobSeeker tearDownJobSeekerSkill function & skillID: ".PHP_EOL.$sql.PHP_EOL.$skillId.PHP_EOL);
             }
         }
@@ -184,7 +194,7 @@ final class JobSeekerTest extends TestCase {
 
         $sqls = array(  "delete from job_seeker_skill where jobseekerId in 
                             (select jobseekerId from job_seeker where userId in
-                                (select userId from user where email = ? ) )",
+                                (select userId from user where email = ? ))",
                         "delete from job_seeker where userId in
                             (select userId from user where email = ? )",
                         "delete from user where email = ?");
@@ -192,11 +202,11 @@ final class JobSeekerTest extends TestCase {
             if ($stmt = $conn->prepare($sql)) {
                 $stmt->bind_param("s", $email);
                 $stmt->execute();
-                $result = mysqli_stmt_get_result($stmt);
                 $stmt->close();
             } else {
                 var_dump($errorMessage = $conn->errno . ' ' . $conn->error);
-                return array(false, "Error in database query in jobSeeker tearDownByEmail function: ".PHP_EOL.$sql);
+                $conn->close();
+                return array(false, "Error in database query in jobSeeker tearDownByEmail function: ".PHP_EOL.$sql.PHP_EOL.$errorMessage);
             }
         }
         $conn->close();
@@ -209,14 +219,13 @@ final class JobSeekerTest extends TestCase {
             $this->assertTrue(false, $byEmailResult[1]);
         }
 
-        //Legacy teardown code, left in place as not doing any harm (I believe)
+        /**
         $conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);
         foreach ($this->uidsToDelete as $idd) {
             foreach (array('delete from job_seeker where userid = ?', 'delete from user where UserId = ?') as $sql) {
                 if ($stmt = $conn->prepare($sql)) {
                     $stmt->bind_param("i", $idd);
                     $stmt->execute();
-                    $result = mysqli_stmt_get_result($stmt);
                     $stmt->close();
                 } else {
                     var_dump($errorMessage = $conn->errno . ' ' . $conn->error);
@@ -227,7 +236,6 @@ final class JobSeekerTest extends TestCase {
             if ($stmt = $conn->prepare($sql)) {
                 $stmt->bind_param("s", $this->testEmail);
                 $stmt->execute();
-                $result = mysqli_stmt_get_result($stmt);
                 $stmt->close();
             } else {
                 var_dump($errorMessage = $conn->errno . ' ' . $conn->error);
@@ -236,7 +244,6 @@ final class JobSeekerTest extends TestCase {
             $sql = 'delete from job_seeker where userid is null';
             if ($stmt = $conn->prepare($sql)) {
                 $stmt->execute();
-                $result = mysqli_stmt_get_result($stmt);
                 $stmt->close();
             } else {
                 var_dump($errorMessage = $conn->errno . ' ' . $conn->error);
@@ -244,6 +251,8 @@ final class JobSeekerTest extends TestCase {
             }
         }
         $conn->close();
+        */
+
         parent::tearDown();
     }
 

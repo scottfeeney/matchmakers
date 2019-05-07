@@ -208,18 +208,21 @@ final class JobTest extends TestCase {
             $stmt->bind_param("s", $testEmail);
             //var_dump("Cleaning up - deleting user with id ".$oid);
             $stmt->execute();
-            $result = mysqli_stmt_get_result($stmt);
             if ($checkAffected > 0) {
-                if (mysqli_stmt_affected_rows($stmt) != $checkAffected) {
+                $affected = $stmt->affected_rows;
+                if ($affected != $checkAffected) {
+                    $errorMessage = $conn->errno . ' ' . $conn->error;
                     $conn->close();
-                    return array(false, $failStr);
+                    return array(false, $failStr.":".PHP_EOL.$affected." rows affected instead of 1".PHP_EOL.$errorMessage);
                 }
             }
             $stmt->close();
         } else {
-            var_dump($errorMessage = $conn->errno . ' ' . $conn->error);
+            $errorMessage = $conn->errno . ' ' . $conn->error;
+            var_dump($errorMessage);
             $conn->close();
-            return array(false, "Error in database query in deleteJobTestTempRecords function");
+            return array(false, "Error in database query in deleteJobTestTempRecords function:".PHP_EOL.$errorMessage
+                                .PHP_EOL."Query was ".$sql);
         }
         $conn->close();
         return array(true,"");
@@ -236,6 +239,7 @@ final class JobTest extends TestCase {
                 "Could not delete test Job from database based on email ".$testEmail, $checkJobDeleted),
             array("delete from employer where userId in (select userId from user where email = ?)",
                 "Could not delete test Employer from database based on email ".$testEmail, $checkEmployerDeleted),
+            array("delete from api_token where userId in (Select userId from user where email = ?)", "", 0),
             array("delete from user where email = ?",
                 "Could not delete test user from database based on email ".$testEmail, $checkUserDeleted)
             

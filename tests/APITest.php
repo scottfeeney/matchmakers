@@ -511,9 +511,14 @@ final class APITest extends TestCase {
             true, "correct", array("jobId" => $jid), "");
 
         //cleanup
+        $tearDownAPIRes = $this->tearDownAPITokens();
+        if ($tearDownAPIRes[0] == false) {
+            $this->assertTrue(false, "Error in tearDown: ".$tearDownAPIRes[1]);
+        }
+        
         $jobDelRes = JobTest::deleteJobTestTempRecords($this->testEmployerEmail);
         if ($jobDelRes[0] == false) {
-            $this->assertTrue(false, $jobCreateRes[1]);
+            $this->assertTrue(false, $jobDelRes[1]);
         }
 
         //check result when employer tried to look at it
@@ -858,14 +863,67 @@ final class APITest extends TestCase {
 
     }
 
+    private function tearDownAPITokens() {
+        $conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);
+        $sql = "delete from api_token where userid in (Select userid from user where email = ?)";
+        foreach (array($this->testEmployerEmail, $this->testEmployer2Email, $this->testJobSeekerEmail, $this->testAdminEmail) as $email) {
+            if($stmt = $conn->prepare($sql)) {
+                $stmt->bind_param("s", $email);
+                $stmt->execute();
+                //var_dump("In tearDownAPITokens, ".$stmt->affected_rows." rows deleted");
+            } 
+            else {
+                $errMsg = $conn->errno . ' ' . $conn->error;
+                var_dump("Error tearing down records in api_token for test users: ".PHP_EOL.$errMsg);
+                $conn->close();
+                return array(false, $errMsg);
+            }
+            $stmt->close();
+        }
+        return array(true, "");
+        $conn->close();
+    }
+
     protected function tearDown(): void {
         curl_close($this->curlObj);
-        EmployerTest::tearDownByEmail($this->testEmployerEmail);
-        EmployerTest::tearDownByEmail($this->testEmployer2Email);
-        JobSeekerTest::tearDownByEmail($this->testJobSeekerEmail);
-        $this->tearDownAdminStaffRecord($this->testAdminStaff->userId);
-        SkillTest::staticTearDown('SomeRandomTestSkillCategory', $this->testAdminStaff);
-        SkillTest::staticTearDownSkillCat('SomeOtherTestSkillCategory');
+
+        //Call relevant teardown methods and check their results, causing an assertion failure if
+        //any indicated errors
+        $tearDownAPIRes = $this->tearDownAPITokens();
+        if ($tearDownAPIRes[0] == false) {
+            $this->assertTrue(false, "Error in tearDown: ".$tearDownAPIRes[1]);
+        }
+
+        $tearDownEmpRes = EmployerTest::tearDownByEmail($this->testEmployerEmail);
+        if ($tearDownEmpRes[0] == false) {
+            $this->assertTrue(false, "Error in tearDown: ".$tearDownEmpRes[1]);
+        }
+        
+        $tearDownEmpRes2 = EmployerTest::tearDownByEmail($this->testEmployer2Email);
+        if ($tearDownEmpRes2[0] == false) {
+            $this->assertTrue(false, "Error in tearDown: ".$tearDownEmpRes2[1]);
+        }
+
+        $tearDownJobSeekerRes = JobSeekerTest::tearDownByEmail($this->testJobSeekerEmail);
+        if ($tearDownJobSeekerRes[0] == false) {
+            $this->assertTrue(false, "Error in tearDown: ".$tearDownJobSeekerRes[1]);
+        }
+
+        $tearsDownAdminRes = $this->tearDownAdminStaffRecord($this->testAdminStaff->userId);
+        if ($tearsDownAdminRes[0] == false) {
+            $this->assertTrue(false, "Error in tearDown: ".$tearsDownAdminRes[1]);
+        }
+
+        $tearDownCatAndAdminRes = SkillTest::staticTearDown('SomeRandomTestSkillCategory', $this->testAdminStaff);
+        if ($tearDownCatAndAdminRes[0] == false) {
+            $this->assertTrue(false, "Error in tearDown: ".$tearDownCatAndAdminRes[1]);
+        }
+        
+        $tearDownCatRes = SkillTest::staticTearDownSkillCat('SomeOtherTestSkillCategory');
+        if ($tearDownCatRes[0] == false) {
+            $this->assertTrue(false, "Error in tearDown: ".$tearDownCatRes[1]);
+        }
+        
         parent::tearDown();
     }
 
