@@ -615,3 +615,9 @@ footer a:hover{
 
 	
 }
+
+
+.jobSkillDisplay.unmatched {
+	background-color: #f1f1f1;
+	color: #aaa;
+}

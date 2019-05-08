@@ -237,6 +237,7 @@
 						<?php
 							// If the user is an employer and the job skills have been loaded display skills in different colours
 							if ($user->userType == 1 && sizeof($jobRequiredSkills) > 0) {
+								echo "<p>Displayed below are the job seekers skills. Skills displayed in green match skills required for this position.</p>";
 								// Loop through array of skills to display skill name
 								foreach($selectedSkills as $skill){
 									if (in_array($skill, $jobRequiredSkills)){
@@ -245,10 +246,10 @@
 									}
 									else {
 										// Show skill as blue if it's not
-										echo "<span class='badge badge-info jobSkillDisplay'>$skill->skillName</span>";
+										echo "<span class='badge badge-info jobSkillDisplay unmatched'>$skill->skillName</span>";
 									}
 								}
-								echo "<p class='skillsInfo'><span style='color:#28a745'>Green</span> skills are your required skills for this position. <span style='color:#17a2b8'>Blue</span> skills are this job seekers additional skills</p>";
+								
 							}
 							else {
 								// Display skills as one colour

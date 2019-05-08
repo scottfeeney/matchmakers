@@ -150,6 +150,9 @@
 						<h3>Required Skills</h3>
 						<div class="col-sm-12 jobSkillsList">
 							<?php
+							
+							echo "<p>Displayed below are the jobs required skills. Skills displayed in green are the job seekers matched skills.</p>";
+							
 							// If the user is an employer and the job skills have been loaded display skills in different colours
 							if ($user->userType == 2 && sizeof($jobSeekerSkills) > 0) {
 								// Loop through array of skills to display skill name
@@ -160,10 +163,10 @@
 									}
 									else {
 										// Show skill as blue if it's not
-										echo "<span class='badge badge-info jobSkillDisplay'>$skill->skillName</span>";
+										echo "<span class='badge badge-info jobSkillDisplay unmatched'>$skill->skillName</span>";
 									}
 								}
-								echo "<p class='skillsInfo'><span style='color:#28a745'>Green</span> skills are your skills that match this jobs requirements.</p>";
+								
 							}
 							else {
 								// Display skills as one colour
@@ -199,7 +202,7 @@
 			<div class="card mt-2">
 				<div class="card-body">
 					<div id="jobRequiredSkills">
-						<div class="row mt-4">
+						<div class="row">
 							<div class="col-sm-12">
 								<h4>Missing Skills</h4>
 							</div>
