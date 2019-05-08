@@ -616,8 +616,25 @@ footer a:hover{
 	
 }
 
-
 .jobSkillDisplay.unmatched {
 	background-color: #f1f1f1;
 	color: #aaa;
+}
+
+.job-match-figure-outer {
+	text-align: right;
+}
+.job-match-figure {
+	text-align: center;
+	display: inline-block;
+}
+
+@media (max-width: 767px)
+{
+	.job-match-figure {
+		text-align: left;
+	}
+	.job-match-figure-outer {
+		text-align: left;
+	}
 }

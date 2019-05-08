@@ -349,7 +349,7 @@
 			
 			$jobMatches = Array();
 			
-			$sql = "call Job_JobSeekerMatches(?)";
+			$sql = "call Job_JobSeekerMatches(?, null)";
 
 				
 			$conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);
@@ -378,6 +378,30 @@
 			
 		}
 		
+		
+		// Get Job Seeker Matche By Job
+		public function GetJobMatch($jobId) {
+			
+			$sql = "call Job_JobSeekerMatches(?, ?)";
+
+			$conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);
+			
+			$stmt = $conn->prepare($sql);
+			$stmt->bind_param("ii", $jobId, $this->jobSeekerId);
+			$stmt->execute();
+			$result = mysqli_stmt_get_result($stmt);
+			$stmt->close();
+			$conn->close();
+			
+			if ($result->num_rows == 1) {
+				$row = mysqli_fetch_array($result);
+				return round($row['Score']);
+			}
+			
+			
+			return null;
+			
+		}
 		
 	
 	}

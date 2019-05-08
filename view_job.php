@@ -26,11 +26,12 @@
 	// Get job id from get reqeuest and load job details
 	$jobId = \Utilities\Common::GetRequest("j");
 	$job = new \Classes\Job($jobId);
+	$employer = new \Classes\Employer($job->employerId);
 	
 	// Create variables of job details for more reusable code.
 	$positionName = $job->jobName;
 	$numberAvailable = $job->numberAvailable;
-	$companyName = (new \Classes\Employer($job->employerId))->companyName;
+	$companyName = $employer->companyName;
 	$jobTypeName = (new \Classes\JobType($job->jobTypeId))->jobTypeName;
 	$positionAvailability = $job->positionAvailability;
 	$referenceNumber = $job->referenceNumber;
@@ -39,10 +40,12 @@
 	$locationName = (new \Classes\Location($job->locationId))->name;
 	$active = $job->active;
 	
+	$matchScore = null;
 
 	// Load job seeker information (for Job Seeker view only)
 	if ($user->userType == 2) {
-		$jobseekerId = (\Classes\JobSeeker::GetJobSeekerByUserId($user->userId))->jobSeekerId;		
+		$jobseeker = \Classes\JobSeeker::GetJobSeekerByUserId($user->userId);
+		$jobseekerId = $jobseeker->jobSeekerId;		
 		$jobSeekerSkills = \Classes\Skill::GetSkillsByJobSeeker($jobseekerId);
 		$missingSkills = array();
 		
@@ -52,6 +55,9 @@
 				array_push($missingSkills, $skill);
 			}
 		}
+		
+		$matchScore = $jobseeker->GetJobMatch($job->jobId);
+		
 	}
 	
 	
@@ -105,22 +111,37 @@
 				<div class="card-body">
 					<!-- Position name -->
 					<div class="row">
-						<div class="col-sm-12">
-							<h2 class="job-view-title"><?php echo htmlspecialchars($positionName); ?></h2>					
-							<?php 	
-								if($numberAvailable > 1){
-									echo '<span class="badge badge-success job-positions">' . $numberAvailable . ' positions</span>';
-								}
-							?>
+						<div class="<?php echo ($matchScore == null ? "col-sm-12" : "col-sm-9") ?>">
+						
+							<div class="row mt-2">
+								<div class="col-sm-12">
+						
+									<h2 class="job-view-title"><?php echo htmlspecialchars($positionName); ?></h2>					
+									<?php 	
+										if($numberAvailable > 1){
+											echo '<span class="badge badge-success job-positions">' . $numberAvailable . ' positions</span>';
+										}
+									?>
+							
+								</div>
+							</div>
+							
+							<!-- Company name -->
+							<div class="row mt-2">
+								<div class="col-sm-12">
+									<p><strong>Employer: </strong><?php echo $companyName; ?></p>
+								</div>
+							</div>
+							
 						</div>
+						<?php 
+							if ($matchScore != null) {
+								echo '<div class="col-sm-3"><div class="job-match-figure-outer"><div class="job-match-figure"><span>Match</span><br /><span style="font-size: 3em;">' . $matchScore . '%</span></div></div></div>';
+							}
+						?>
 					</div>
 					
-					<!-- Company name -->
-					<div class="row mt-2">
-						<div class="col-sm-12">
-							<p><strong>Employer: </strong><?php echo $companyName; ?></p>
-						</div>
-					</div>
+					
 					
 					<!-- Job Type, Start period, and Reference No.-->
 					<div class="row mt-2">
@@ -140,18 +161,18 @@
 					<!-- Description -->
 					<div class="row mt-2">
 						<div class="col-sm-12">
-							<h2>Job Description</h2>
+							<h3>Job Description</h3>
 							<p><?php echo htmlspecialchars($positionDescription); ?></p>
 						</div>
 					</div>
 					
 					<!-- Skills -->
 					<div id="skillsSection">
-						<h3>Required Skills</h3>
+						<h3 class="mt-3">Required Skills</h3>
 						<div class="col-sm-12 jobSkillsList">
 							<?php
 							
-							echo "<p>Displayed below are the jobs required skills. Skills displayed in green are the job seekers matched skills.</p>";
+							echo "<p>Displayed below are the jobs required skills. Skills displayed in green are your matched skills.</p>";
 							
 							// If the user is an employer and the job skills have been loaded display skills in different colours
 							if ($user->userType == 2 && sizeof($jobSeekerSkills) > 0) {
@@ -183,7 +204,7 @@
 					<!-- Location-->
 					<div id="locationSection">
 						<div>
-							<h2>Location: <?php echo $locationName; ?></h2>
+							<h3 class="mt-3">Location: <?php echo $locationName; ?></h3>
 							
 							<div class="map-container">
 								<iframe width="485" 
@@ -195,6 +216,25 @@
 							</div>
 						</div>
 					</div>
+					
+					
+					<?php if ($user->userType == 2 ) { ?>
+						<h3 class="mt-4">Contact</h3>
+						<p class="mb-0"><?php 
+							$mainContact = $employer->title . " " . $employer->firstName . " " . $employer->lastName . ": "  . $employer->phoneAreaCode . " " . $employer->phoneNumber;
+							echo htmlspecialchars($mainContact);
+						?></p>
+						<?php 
+						
+							if ($employer->otherLastName != "" && $employer->otherPhoneNumber != "") {
+								$otherContact = trim($employer->otherTitle . " " . $employer->otherFirstName . " " . $employer->otherLastName) . ": "  . trim($employer->otherPhoneAreaCode . " " . $employer->otherPhoneNumber);
+								echo '<p class="mb-0">' . htmlspecialchars($otherContact) . '</p>';
+							}
+						?>
+					
+					<?php } ?>
+					
+					
 				</div>
 			</div>
 			
