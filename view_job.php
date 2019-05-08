@@ -162,7 +162,7 @@
 					<div class="row mt-2">
 						<div class="col-sm-12">
 							<h3>Job Description</h3>
-							<p><?php echo htmlspecialchars($positionDescription); ?></p>
+							<div class="card"><div class="card-body"><?php echo str_replace("\n", "<br />", htmlspecialchars($positionDescription)); ?></div></div>
 						</div>
 					</div>
 					
@@ -172,10 +172,11 @@
 						<div class="col-sm-12 jobSkillsList">
 							<?php
 							
-							echo "<p>Displayed below are the jobs required skills. Skills displayed in green are your matched skills.</p>";
-							
 							// If the user is an employer and the job skills have been loaded display skills in different colours
 							if ($user->userType == 2 && sizeof($jobSeekerSkills) > 0) {
+								
+								echo "<p>Displayed below are the required skills for this position. Skills displayed in green are your matched skills.</p>";
+								
 								// Loop through array of skills to display skill name
 								foreach($selectedSkills as $skill){
 									if (in_array($skill, $jobSeekerSkills)){
@@ -244,12 +245,12 @@
 					<div id="jobRequiredSkills">
 						<div class="row">
 							<div class="col-sm-12">
-								<h4>Missing Skills</h4>
+								<h4>Unmatched Skills</h4>
 							</div>
 						</div>
 						<div class="row">
 							<div class="col-sm-12">
-								<p>You do <strong>not</strong> have the following skill(s) required this position:</p>
+								<p>You do <strong>not</strong> have the following skills required this position:</p>
 							</div>
 						</div>
 						<div class="col-sm-12 jobSkillsList">
