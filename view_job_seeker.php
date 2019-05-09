@@ -292,7 +292,7 @@
 					<div id="jobRequiredSkills">
 						<div class="row mt-4">
 							<div class="col-sm-12">
-								<h4>Missing Skills</h4>
+								<h4>Unmatched Skills</h4>
 							</div>
 						</div>
 						<div class="row">
