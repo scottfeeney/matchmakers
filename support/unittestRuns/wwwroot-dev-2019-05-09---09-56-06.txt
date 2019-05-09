@@ -1,0 +1,999 @@
+PHPUnit 8.1.3 by Sebastian Bergmann and contributors.
+
+Test 'APITest::testAuthenticateNoHeadersFailure' started
+Test 'APITest::testAuthenticateNoHeadersFailure' ended
+Test 'APITest::testAuthenticateIncorrectValues' started
+Test 'APITest::testAuthenticateIncorrectValues' ended
+Test 'APITest::testAuthenticateIncorrectPassword' started
+Test 'APITest::testAuthenticateIncorrectPassword' ended
+Test 'APITest::testAuthenticateSuccess' started
+Test 'APITest::testAuthenticateSuccess' ended
+Test 'APITest::testCategoriesNoToken' started
+Test 'APITest::testCategoriesNoToken' ended
+Test 'APITest::testCategoriesIncorrectToken' started
+Test 'APITest::testCategoriesIncorrectToken' ended
+Test 'APITest::testCategoriesCorrectToken' started
+Test 'APITest::testCategoriesCorrectToken' ended
+Test 'APITest::testEmployerNoToken' started
+Test 'APITest::testEmployerNoToken' ended
+Test 'APITest::testEmployerIncorrectToken' started
+Test 'APITest::testEmployerIncorrectToken' ended
+Test 'APITest::testEmployerWrongUserType' started
+Test 'APITest::testEmployerWrongUserType' ended
+Test 'APITest::testEmployerCorrectToken' started
+Test 'APITest::testEmployerCorrectToken' ended
+Test 'APITest::testEmployerJobsNoToken' started
+Test 'APITest::testEmployerJobsNoToken' ended
+Test 'APITest::testEmployerJobsIncorrectToken' started
+Test 'APITest::testEmployerJobsIncorrectToken' ended
+Test 'APITest::testEmployerJobsWrongUserType' started
+Test 'APITest::testEmployerJobsWrongUserType' ended
+Test 'APITest::testEmployerJobsCorrectToken' started
+Test 'APITest::testEmployerJobsCorrectToken' ended
+Test 'APITest::testEmployerMatchesNoToken' started
+Test 'APITest::testEmployerMatchesNoToken' ended
+Test 'APITest::testEmployerMatchesIncorrectToken' started
+Test 'APITest::testEmployerMatchesIncorrectToken' ended
+Test 'APITest::testEmployerMatchesWrongUserType' started
+Test 'APITest::testEmployerMatchesWrongUserType' ended
+Test 'APITest::testEmployerMatchesNoJobId' started
+Test 'APITest::testEmployerMatchesNoJobId' ended
+Test 'APITest::testEmployerMatchesInvalidJobId' started
+Test 'APITest::testEmployerMatchesInvalidJobId' ended
+Test 'APITest::testEmployerMatchesOtherEmployerJobId' started
+Test 'APITest::testEmployerMatchesOtherEmployerJobId' ended
+Test 'APITest::testEmployerMatchesCorrectInput' started
+Test 'APITest::testEmployerMatchesCorrectInput' ended
+Test 'APITest::testJobSeekerNoToken' started
+Test 'APITest::testJobSeekerNoToken' ended
+Test 'APITest::testJobSeekerIncorrectToken' started
+Test 'APITest::testJobSeekerIncorrectToken' ended
+Test 'APITest::testJobSeekerWrongUserType' started
+Test 'APITest::testJobSeekerWrongUserType' ended
+Test 'APITest::testJobSeekerCorrectToken' started
+Test 'APITest::testJobSeekerCorrectToken' ended
+Test 'APITest::testJobSeekerMatchesNoToken' started
+Test 'APITest::testJobSeekerMatchesNoToken' ended
+Test 'APITest::testJobSeekerMatchesIncorrectToken' started
+Test 'APITest::testJobSeekerMatchesIncorrectToken' ended
+Test 'APITest::testJobSeekerMatchesWrongUserType' started
+Test 'APITest::testJobSeekerMatchesWrongUserType' ended
+Test 'APITest::testJobSeekerMatchesCorrectToken' started
+Test 'APITest::testJobSeekerMatchesCorrectToken' ended
+Test 'APITest::testJobTypesNoToken' started
+Test 'APITest::testJobTypesNoToken' ended
+Test 'APITest::testJobTypesIncorrectToken' started
+Test 'APITest::testJobTypesIncorrectToken' ended
+Test 'APITest::testJobTypesCorrectToken' started
+Test 'APITest::testJobTypesCorrectToken' ended
+Test 'APITest::testSkillsNoToken' started
+Test 'APITest::testSkillsNoToken' ended
+Test 'APITest::testSkillsIncorrectToken' started
+Test 'APITest::testSkillsIncorrectToken' ended
+Test 'APITest::testSkillsNoSkillCatId' started
+Test 'APITest::testSkillsNoSkillCatId' ended
+Test 'APITest::testSkillsInvalidSkillCatId' started
+Test 'APITest::testSkillsInvalidSkillCatId' ended
+Test 'APITest::testSkillsCorrectInput' started
+Test 'APITest::testSkillsCorrectInput' ended
+Test 'APITest::testAddSkillNoToken' started
+Test 'APITest::testAddSkillNoToken' ended
+Test 'APITest::testAddSkillIncorrectToken' started
+Test 'APITest::testAddSkillIncorrectToken' ended
+Test 'APITest::testAddSkillWrongUserType' started
+Test 'APITest::testAddSkillWrongUserType' ended
+Test 'APITest::testAddSkillPOSTVarsProvided' started
+Test 'APITest::testAddSkillPOSTVarsProvided' ended
+Test 'APITest::testAddSkillInvalidCategoryId' started
+Test 'APITest::testAddSkillInvalidCategoryId' ended
+Test 'APITest::testAddSkillExistingName' started
+Test 'APITest::testAddSkillExistingName' ended
+Test 'APITest::testAddSkillSuccess' started
+Test 'APITest::testAddSkillSuccess' ended
+Test 'APITest::testRenameSkillNoToken' started
+Test 'APITest::testRenameSkillNoToken' ended
+Test 'APITest::testRenameSkillIncorrectToken' started
+Test 'APITest::testRenameSkillIncorrectToken' ended
+Test 'APITest::testRenameSkillWrongUserType' started
+Test 'APITest::testRenameSkillWrongUserType' ended
+Test 'APITest::testRenameSkillPOSTVarsProvided' started
+Test 'APITest::testRenameSkillPOSTVarsProvided' ended
+Test 'APITest::testRenameSkillInvalidCategoryId' started
+Test 'APITest::testRenameSkillInvalidCategoryId' ended
+Test 'APITest::testRenameSkillInvalidSkillId' started
+Test 'APITest::testRenameSkillInvalidSkillId' ended
+Test 'APITest::testRenameSkillNotInSpecifiedCategory' started
+Test 'APITest::testRenameSkillNotInSpecifiedCategory' ended
+Test 'APITest::testRenameSkillExistingName' started
+Test 'APITest::testRenameSkillExistingName' ended
+Test 'APITest::testRenameSkillSuccess' started
+Test 'APITest::testRenameSkillSuccess' ended
+Test 'APITest::testDeleteSkillNoToken' started
+Test 'APITest::testDeleteSkillNoToken' ended
+Test 'APITest::testDeleteSkillIncorrectToken' started
+Test 'APITest::testDeleteSkillIncorrectToken' ended
+Test 'APITest::testDeleteSkillWrongUserType' started
+Test 'APITest::testDeleteSkillWrongUserType' ended
+Test 'APITest::testDeleteSkillPOSTVarsProvided' started
+Test 'APITest::testDeleteSkillPOSTVarsProvided' ended
+Test 'APITest::testDeleteSkillInvalidCategoryId' started
+Test 'APITest::testDeleteSkillInvalidCategoryId' ended
+Test 'APITest::testDeleteSkillInvalidSkillId' started
+Test 'APITest::testDeleteSkillInvalidSkillId' ended
+Test 'APITest::testDeleteSkillNotInSpecifiedCategory' started
+Test 'APITest::testDeleteSkillNotInSpecifiedCategory' ended
+Test 'APITest::testDeleteSkillSuccess' started
+Test 'APITest::testDeleteSkillSuccess' ended
+Test 'AdminStaffTest::testConstructor' started
+Test 'AdminStaffTest::testConstructor' ended
+Test 'AdminStaffTest::testGetAdminStaffByUserIdFailure' started
+Test 'AdminStaffTest::testGetAdminStaffByUserIdFailure' ended
+Test 'AdminStaffTest::testGetAdminStaff' started
+Test 'AdminStaffTest::testGetAdminStaff' ended
+Test 'EmployerTest::testConstructor' started
+Test 'EmployerTest::testConstructor' ended
+Test 'EmployerTest::testSaveUser' started
+Test 'EmployerTest::testSaveUser' ended
+Test 'EmployerTest::testEditEmployer' started
+Test 'EmployerTest::testEditEmployer' ended
+Test 'EmployerTest::testGetEmployerByUserIdFailure' started
+Test 'EmployerTest::testGetEmployerByUserIdFailure' ended
+Test 'EmployerTest::testGetEmployerByUserId' started
+Test 'EmployerTest::testGetEmployerByUserId' ended
+Test 'JobSeekerTest::testConstructor' started
+Test 'JobSeekerTest::testConstructor' ended
+Test 'JobSeekerTest::testSaveUser' started
+Test 'JobSeekerTest::testSaveUser' ended
+Test 'JobSeekerTest::testEditUser' started
+Test 'JobSeekerTest::testEditUser' ended
+Test 'JobSeekerTest::testGetJobSeekerByUserIdFailure' started
+Test 'JobSeekerTest::testGetJobSeekerByUserIdFailure' ended
+Test 'JobSeekerTest::testGetJobSeekerByUserId' started
+Test 'JobSeekerTest::testGetJobSeekerByUserId' ended
+Test 'JobSeekerTest::testJobSeekerSkillsString' started
+Test 'JobSeekerTest::testJobSeekerSkillsString' ended
+Test 'JobSeekerTest::testGetJobMatchesByJobSeeker' started
+Test 'JobSeekerTest::testGetJobMatchesByJobSeeker' ended
+Test 'JobTest::testConstructorNoInput' started
+Test 'JobTest::testConstructorNoInput' ended
+Test 'JobTest::testNewJob' started
+Test 'JobTest::testNewJob' ended
+Test 'JobTest::testSaveGetJobSkills' started
+Test 'JobTest::testSaveGetJobSkills' ended
+Test 'JobTest::testGetJobSeekerMatchesByJob' started
+Test 'JobTest::testGetJobSeekerMatchesByJob' ended
+Test 'JobTypeTest::testConstructorZero' started
+Test 'JobTypeTest::testConstructorZero' ended
+Test 'JobTypeTest::testConstructorValues' started
+Test 'JobTypeTest::testConstructorValues' ended
+Test 'JobTypeTest::testGetJobTypes' started
+Test 'JobTypeTest::testGetJobTypes' ended
+Test 'LocationTest::testConstructorZero' started
+Test 'LocationTest::testConstructorZero' ended
+Test 'LocationTest::testConstructorValues' started
+Test 'LocationTest::testConstructorValues' ended
+Test 'LocationTest::testGetLocations' started
+Test 'LocationTest::testGetLocations' ended
+Test 'SkillCategoryTest::testConstructorNoInput' started
+Test 'SkillCategoryTest::testConstructorNoInput' ended
+Test 'SkillCategoryTest::testExpectedCategoriesIndividually' started
+Test 'SkillCategoryTest::testExpectedCategoriesIndividually' ended
+Test 'SkillCategoryTest::testGetSkillCategories' started
+Test 'SkillCategoryTest::testGetSkillCategories' ended
+Test 'SkillTest::testConstructorZero' started
+Test 'SkillTest::testConstructorZero' ended
+Test 'SkillTest::testSaveInvalidCategory' started
+Test 'SkillTest::testSaveInvalidCategory' ended
+Test 'SkillTest::testSaveRenameChangeCat' started
+Test 'SkillTest::testSaveRenameChangeCat' ended
+Test 'SkillTest::testDeleteSkillFailure' started
+Test 'SkillTest::testDeleteSkillFailure' ended
+Test 'SkillTest::testDeleteSkillSuccess' started
+Test 'SkillTest::testDeleteSkillSuccess' ended
+Test 'SkillTest::testDeleteUsedSkill' started
+Test 'SkillTest::testDeleteUsedSkill' ended
+Test 'SkillTest::testGetSkillsBySkillCategoryFailure' started
+Test 'SkillTest::testGetSkillsBySkillCategoryFailure' ended
+Test 'SkillTest::testGetSkillsBySkillCategorySuccess' started
+Test 'SkillTest::testGetSkillsBySkillCategorySuccess' ended
+Test 'SkillTest::testGetSkillsByJob' started
+Test 'SkillTest::testGetSkillsByJob' ended
+Test 'SkillTest::testGetSkillsByJobSeeker' started
+Test 'SkillTest::testGetSkillsByJobSeeker' ended
+Test 'SkillTest::testGetSkillExists' started
+Test 'SkillTest::testGetSkillExists' ended
+Test 'UserTest::testConstructorUserIdZeroGivenZero' started
+Test 'UserTest::testConstructorUserIdZeroGivenZero' ended
+Test 'UserTest::testConstructorUserIdZeroGivenNegative' started
+Test 'UserTest::testConstructorUserIdZeroGivenNegative' ended
+Test 'UserTest::testSaveEmailExists' started
+Test 'UserTest::testSaveEmailExists' ended
+Test 'UserTest::testUpdateUser' started
+Test 'UserTest::testUpdateUser' ended
+Test 'UserTest::testSaveGetUser' started
+Test 'UserTest::testSaveGetUser' ended
+Test 'UserTest::testGetEmailExists' started
+Test 'UserTest::testGetEmailExists' ended
+Test 'UserTest::testGetEmailExistsFailure' started
+Test 'UserTest::testGetEmailExistsFailure' ended
+Test 'UserTest::testGetUserByVerifyCode' started
+Test 'UserTest::testGetUserByVerifyCode' ended
+Test 'UserTest::testGetUserByVerifyCodeFailure' started
+Test 'UserTest::testGetUserByVerifyCodeFailure' ended
+Test 'UserTest::testGetUserByEmailAddress' started
+Test 'UserTest::testGetUserByEmailAddress' ended
+Test 'UserTest::testGetUserByEmailAddressFailure' started
+Test 'UserTest::testGetUserByEmailAddressFailure' ended
+Test 'UserTest::testGetUserByResetCode' started
+Test 'UserTest::testGetUserByResetCode' ended
+Test 'UserTest::testGetUserByResetCodeFailureNoMatch' started
+Test 'UserTest::testGetUserByResetCodeFailureNoMatch' ended
+Test 'UserTest::testGetUserByResetCodeFailurecodeLength' started
+Test 'UserTest::testGetUserByResetCodeFailurecodeLength' ended
+Test 'UserTest::testGetUserLogin' started
+Test 'UserTest::testGetUserLogin' ended
+Test 'UserTest::testGetUserLoginFailInvalidPassword' started
+Test 'UserTest::testGetUserLoginFailInvalidPassword' ended
+
+
+Time: 312 ms, Memory: 12.00 MB
+
+There were 115 errors:
+
+1) APITest::testAuthenticateNoHeadersFailure
+Error: Class 'Classes\User' not found
+
+C:\inetpub\wwwroot-dev\tests\UserTest.php:81
+C:\inetpub\wwwroot-dev\tests\EmployerTest.php:38
+C:\inetpub\wwwroot-dev\tests\APITest.php:831
+
+2) APITest::testAuthenticateIncorrectValues
+Error: Class 'Classes\User' not found
+
+C:\inetpub\wwwroot-dev\tests\UserTest.php:81
+C:\inetpub\wwwroot-dev\tests\EmployerTest.php:38
+C:\inetpub\wwwroot-dev\tests\APITest.php:831
+
+3) APITest::testAuthenticateIncorrectPassword
+Error: Class 'Classes\User' not found
+
+C:\inetpub\wwwroot-dev\tests\UserTest.php:81
+C:\inetpub\wwwroot-dev\tests\EmployerTest.php:38
+C:\inetpub\wwwroot-dev\tests\APITest.php:831
+
+4) APITest::testAuthenticateSuccess
+Error: Class 'Classes\User' not found
+
+C:\inetpub\wwwroot-dev\tests\UserTest.php:81
+C:\inetpub\wwwroot-dev\tests\EmployerTest.php:38
+C:\inetpub\wwwroot-dev\tests\APITest.php:831
+
+5) APITest::testCategoriesNoToken
+Error: Class 'Classes\User' not found
+
+C:\inetpub\wwwroot-dev\tests\UserTest.php:81
+C:\inetpub\wwwroot-dev\tests\EmployerTest.php:38
+C:\inetpub\wwwroot-dev\tests\APITest.php:831
+
+6) APITest::testCategoriesIncorrectToken
+Error: Class 'Classes\User' not found
+
+C:\inetpub\wwwroot-dev\tests\UserTest.php:81
+C:\inetpub\wwwroot-dev\tests\EmployerTest.php:38
+C:\inetpub\wwwroot-dev\tests\APITest.php:831
+
+7) APITest::testCategoriesCorrectToken
+Error: Class 'Classes\User' not found
+
+C:\inetpub\wwwroot-dev\tests\UserTest.php:81
+C:\inetpub\wwwroot-dev\tests\EmployerTest.php:38
+C:\inetpub\wwwroot-dev\tests\APITest.php:831
+
+8) APITest::testEmployerNoToken
+Error: Class 'Classes\User' not found
+
+C:\inetpub\wwwroot-dev\tests\UserTest.php:81
+C:\inetpub\wwwroot-dev\tests\EmployerTest.php:38
+C:\inetpub\wwwroot-dev\tests\APITest.php:831
+
+9) APITest::testEmployerIncorrectToken
+Error: Class 'Classes\User' not found
+
+C:\inetpub\wwwroot-dev\tests\UserTest.php:81
+C:\inetpub\wwwroot-dev\tests\EmployerTest.php:38
+C:\inetpub\wwwroot-dev\tests\APITest.php:831
+
+10) APITest::testEmployerWrongUserType
+Error: Class 'Classes\User' not found
+
+C:\inetpub\wwwroot-dev\tests\UserTest.php:81
+C:\inetpub\wwwroot-dev\tests\EmployerTest.php:38
+C:\inetpub\wwwroot-dev\tests\APITest.php:831
+
+11) APITest::testEmployerCorrectToken
+Error: Class 'Classes\User' not found
+
+C:\inetpub\wwwroot-dev\tests\UserTest.php:81
+C:\inetpub\wwwroot-dev\tests\EmployerTest.php:38
+C:\inetpub\wwwroot-dev\tests\APITest.php:831
+
+12) APITest::testEmployerJobsNoToken
+Error: Class 'Classes\User' not found
+
+C:\inetpub\wwwroot-dev\tests\UserTest.php:81
+C:\inetpub\wwwroot-dev\tests\EmployerTest.php:38
+C:\inetpub\wwwroot-dev\tests\APITest.php:831
+
+13) APITest::testEmployerJobsIncorrectToken
+Error: Class 'Classes\User' not found
+
+C:\inetpub\wwwroot-dev\tests\UserTest.php:81
+C:\inetpub\wwwroot-dev\tests\EmployerTest.php:38
+C:\inetpub\wwwroot-dev\tests\APITest.php:831
+
+14) APITest::testEmployerJobsWrongUserType
+Error: Class 'Classes\User' not found
+
+C:\inetpub\wwwroot-dev\tests\UserTest.php:81
+C:\inetpub\wwwroot-dev\tests\EmployerTest.php:38
+C:\inetpub\wwwroot-dev\tests\APITest.php:831
+
+15) APITest::testEmployerJobsCorrectToken
+Error: Class 'Classes\User' not found
+
+C:\inetpub\wwwroot-dev\tests\UserTest.php:81
+C:\inetpub\wwwroot-dev\tests\EmployerTest.php:38
+C:\inetpub\wwwroot-dev\tests\APITest.php:831
+
+16) APITest::testEmployerMatchesNoToken
+Error: Class 'Classes\User' not found
+
+C:\inetpub\wwwroot-dev\tests\UserTest.php:81
+C:\inetpub\wwwroot-dev\tests\EmployerTest.php:38
+C:\inetpub\wwwroot-dev\tests\APITest.php:831
+
+17) APITest::testEmployerMatchesIncorrectToken
+Error: Class 'Classes\User' not found
+
+C:\inetpub\wwwroot-dev\tests\UserTest.php:81
+C:\inetpub\wwwroot-dev\tests\EmployerTest.php:38
+C:\inetpub\wwwroot-dev\tests\APITest.php:831
+
+18) APITest::testEmployerMatchesWrongUserType
+Error: Class 'Classes\User' not found
+
+C:\inetpub\wwwroot-dev\tests\UserTest.php:81
+C:\inetpub\wwwroot-dev\tests\EmployerTest.php:38
+C:\inetpub\wwwroot-dev\tests\APITest.php:831
+
+19) APITest::testEmployerMatchesNoJobId
+Error: Class 'Classes\User' not found
+
+C:\inetpub\wwwroot-dev\tests\UserTest.php:81
+C:\inetpub\wwwroot-dev\tests\EmployerTest.php:38
+C:\inetpub\wwwroot-dev\tests\APITest.php:831
+
+20) APITest::testEmployerMatchesInvalidJobId
+Error: Class 'Classes\User' not found
+
+C:\inetpub\wwwroot-dev\tests\UserTest.php:81
+C:\inetpub\wwwroot-dev\tests\EmployerTest.php:38
+C:\inetpub\wwwroot-dev\tests\APITest.php:831
+
+21) APITest::testEmployerMatchesOtherEmployerJobId
+Error: Class 'Classes\User' not found
+
+C:\inetpub\wwwroot-dev\tests\UserTest.php:81
+C:\inetpub\wwwroot-dev\tests\EmployerTest.php:38
+C:\inetpub\wwwroot-dev\tests\APITest.php:831
+
+22) APITest::testEmployerMatchesCorrectInput
+Error: Class 'Classes\User' not found
+
+C:\inetpub\wwwroot-dev\tests\UserTest.php:81
+C:\inetpub\wwwroot-dev\tests\EmployerTest.php:38
+C:\inetpub\wwwroot-dev\tests\APITest.php:831
+
+23) APITest::testJobSeekerNoToken
+Error: Class 'Classes\User' not found
+
+C:\inetpub\wwwroot-dev\tests\UserTest.php:81
+C:\inetpub\wwwroot-dev\tests\EmployerTest.php:38
+C:\inetpub\wwwroot-dev\tests\APITest.php:831
+
+24) APITest::testJobSeekerIncorrectToken
+Error: Class 'Classes\User' not found
+
+C:\inetpub\wwwroot-dev\tests\UserTest.php:81
+C:\inetpub\wwwroot-dev\tests\EmployerTest.php:38
+C:\inetpub\wwwroot-dev\tests\APITest.php:831
+
+25) APITest::testJobSeekerWrongUserType
+Error: Class 'Classes\User' not found
+
+C:\inetpub\wwwroot-dev\tests\UserTest.php:81
+C:\inetpub\wwwroot-dev\tests\EmployerTest.php:38
+C:\inetpub\wwwroot-dev\tests\APITest.php:831
+
+26) APITest::testJobSeekerCorrectToken
+Error: Class 'Classes\User' not found
+
+C:\inetpub\wwwroot-dev\tests\UserTest.php:81
+C:\inetpub\wwwroot-dev\tests\EmployerTest.php:38
+C:\inetpub\wwwroot-dev\tests\APITest.php:831
+
+27) APITest::testJobSeekerMatchesNoToken
+Error: Class 'Classes\User' not found
+
+C:\inetpub\wwwroot-dev\tests\UserTest.php:81
+C:\inetpub\wwwroot-dev\tests\EmployerTest.php:38
+C:\inetpub\wwwroot-dev\tests\APITest.php:831
+
+28) APITest::testJobSeekerMatchesIncorrectToken
+Error: Class 'Classes\User' not found
+
+C:\inetpub\wwwroot-dev\tests\UserTest.php:81
+C:\inetpub\wwwroot-dev\tests\EmployerTest.php:38
+C:\inetpub\wwwroot-dev\tests\APITest.php:831
+
+29) APITest::testJobSeekerMatchesWrongUserType
+Error: Class 'Classes\User' not found
+
+C:\inetpub\wwwroot-dev\tests\UserTest.php:81
+C:\inetpub\wwwroot-dev\tests\EmployerTest.php:38
+C:\inetpub\wwwroot-dev\tests\APITest.php:831
+
+30) APITest::testJobSeekerMatchesCorrectToken
+Error: Class 'Classes\User' not found
+
+C:\inetpub\wwwroot-dev\tests\UserTest.php:81
+C:\inetpub\wwwroot-dev\tests\EmployerTest.php:38
+C:\inetpub\wwwroot-dev\tests\APITest.php:831
+
+31) APITest::testJobTypesNoToken
+Error: Class 'Classes\User' not found
+
+C:\inetpub\wwwroot-dev\tests\UserTest.php:81
+C:\inetpub\wwwroot-dev\tests\EmployerTest.php:38
+C:\inetpub\wwwroot-dev\tests\APITest.php:831
+
+32) APITest::testJobTypesIncorrectToken
+Error: Class 'Classes\User' not found
+
+C:\inetpub\wwwroot-dev\tests\UserTest.php:81
+C:\inetpub\wwwroot-dev\tests\EmployerTest.php:38
+C:\inetpub\wwwroot-dev\tests\APITest.php:831
+
+33) APITest::testJobTypesCorrectToken
+Error: Class 'Classes\User' not found
+
+C:\inetpub\wwwroot-dev\tests\UserTest.php:81
+C:\inetpub\wwwroot-dev\tests\EmployerTest.php:38
+C:\inetpub\wwwroot-dev\tests\APITest.php:831
+
+34) APITest::testSkillsNoToken
+Error: Class 'Classes\User' not found
+
+C:\inetpub\wwwroot-dev\tests\UserTest.php:81
+C:\inetpub\wwwroot-dev\tests\EmployerTest.php:38
+C:\inetpub\wwwroot-dev\tests\APITest.php:831
+
+35) APITest::testSkillsIncorrectToken
+Error: Class 'Classes\User' not found
+
+C:\inetpub\wwwroot-dev\tests\UserTest.php:81
+C:\inetpub\wwwroot-dev\tests\EmployerTest.php:38
+C:\inetpub\wwwroot-dev\tests\APITest.php:831
+
+36) APITest::testSkillsNoSkillCatId
+Error: Class 'Classes\User' not found
+
+C:\inetpub\wwwroot-dev\tests\UserTest.php:81
+C:\inetpub\wwwroot-dev\tests\EmployerTest.php:38
+C:\inetpub\wwwroot-dev\tests\APITest.php:831
+
+37) APITest::testSkillsInvalidSkillCatId
+Error: Class 'Classes\User' not found
+
+C:\inetpub\wwwroot-dev\tests\UserTest.php:81
+C:\inetpub\wwwroot-dev\tests\EmployerTest.php:38
+C:\inetpub\wwwroot-dev\tests\APITest.php:831
+
+38) APITest::testSkillsCorrectInput
+Error: Class 'Classes\User' not found
+
+C:\inetpub\wwwroot-dev\tests\UserTest.php:81
+C:\inetpub\wwwroot-dev\tests\EmployerTest.php:38
+C:\inetpub\wwwroot-dev\tests\APITest.php:831
+
+39) APITest::testAddSkillNoToken
+Error: Class 'Classes\User' not found
+
+C:\inetpub\wwwroot-dev\tests\UserTest.php:81
+C:\inetpub\wwwroot-dev\tests\EmployerTest.php:38
+C:\inetpub\wwwroot-dev\tests\APITest.php:831
+
+40) APITest::testAddSkillIncorrectToken
+Error: Class 'Classes\User' not found
+
+C:\inetpub\wwwroot-dev\tests\UserTest.php:81
+C:\inetpub\wwwroot-dev\tests\EmployerTest.php:38
+C:\inetpub\wwwroot-dev\tests\APITest.php:831
+
+41) APITest::testAddSkillWrongUserType
+Error: Class 'Classes\User' not found
+
+C:\inetpub\wwwroot-dev\tests\UserTest.php:81
+C:\inetpub\wwwroot-dev\tests\EmployerTest.php:38
+C:\inetpub\wwwroot-dev\tests\APITest.php:831
+
+42) APITest::testAddSkillPOSTVarsProvided
+Error: Class 'Classes\User' not found
+
+C:\inetpub\wwwroot-dev\tests\UserTest.php:81
+C:\inetpub\wwwroot-dev\tests\EmployerTest.php:38
+C:\inetpub\wwwroot-dev\tests\APITest.php:831
+
+43) APITest::testAddSkillInvalidCategoryId
+Error: Class 'Classes\User' not found
+
+C:\inetpub\wwwroot-dev\tests\UserTest.php:81
+C:\inetpub\wwwroot-dev\tests\EmployerTest.php:38
+C:\inetpub\wwwroot-dev\tests\APITest.php:831
+
+44) APITest::testAddSkillExistingName
+Error: Class 'Classes\User' not found
+
+C:\inetpub\wwwroot-dev\tests\UserTest.php:81
+C:\inetpub\wwwroot-dev\tests\EmployerTest.php:38
+C:\inetpub\wwwroot-dev\tests\APITest.php:831
+
+45) APITest::testAddSkillSuccess
+Error: Class 'Classes\User' not found
+
+C:\inetpub\wwwroot-dev\tests\UserTest.php:81
+C:\inetpub\wwwroot-dev\tests\EmployerTest.php:38
+C:\inetpub\wwwroot-dev\tests\APITest.php:831
+
+46) APITest::testRenameSkillNoToken
+Error: Class 'Classes\User' not found
+
+C:\inetpub\wwwroot-dev\tests\UserTest.php:81
+C:\inetpub\wwwroot-dev\tests\EmployerTest.php:38
+C:\inetpub\wwwroot-dev\tests\APITest.php:831
+
+47) APITest::testRenameSkillIncorrectToken
+Error: Class 'Classes\User' not found
+
+C:\inetpub\wwwroot-dev\tests\UserTest.php:81
+C:\inetpub\wwwroot-dev\tests\EmployerTest.php:38
+C:\inetpub\wwwroot-dev\tests\APITest.php:831
+
+48) APITest::testRenameSkillWrongUserType
+Error: Class 'Classes\User' not found
+
+C:\inetpub\wwwroot-dev\tests\UserTest.php:81
+C:\inetpub\wwwroot-dev\tests\EmployerTest.php:38
+C:\inetpub\wwwroot-dev\tests\APITest.php:831
+
+49) APITest::testRenameSkillPOSTVarsProvided
+Error: Class 'Classes\User' not found
+
+C:\inetpub\wwwroot-dev\tests\UserTest.php:81
+C:\inetpub\wwwroot-dev\tests\EmployerTest.php:38
+C:\inetpub\wwwroot-dev\tests\APITest.php:831
+
+50) APITest::testRenameSkillInvalidCategoryId
+Error: Class 'Classes\User' not found
+
+C:\inetpub\wwwroot-dev\tests\UserTest.php:81
+C:\inetpub\wwwroot-dev\tests\EmployerTest.php:38
+C:\inetpub\wwwroot-dev\tests\APITest.php:831
+
+51) APITest::testRenameSkillInvalidSkillId
+Error: Class 'Classes\User' not found
+
+C:\inetpub\wwwroot-dev\tests\UserTest.php:81
+C:\inetpub\wwwroot-dev\tests\EmployerTest.php:38
+C:\inetpub\wwwroot-dev\tests\APITest.php:831
+
+52) APITest::testRenameSkillNotInSpecifiedCategory
+Error: Class 'Classes\User' not found
+
+C:\inetpub\wwwroot-dev\tests\UserTest.php:81
+C:\inetpub\wwwroot-dev\tests\EmployerTest.php:38
+C:\inetpub\wwwroot-dev\tests\APITest.php:831
+
+53) APITest::testRenameSkillExistingName
+Error: Class 'Classes\User' not found
+
+C:\inetpub\wwwroot-dev\tests\UserTest.php:81
+C:\inetpub\wwwroot-dev\tests\EmployerTest.php:38
+C:\inetpub\wwwroot-dev\tests\APITest.php:831
+
+54) APITest::testRenameSkillSuccess
+Error: Class 'Classes\User' not found
+
+C:\inetpub\wwwroot-dev\tests\UserTest.php:81
+C:\inetpub\wwwroot-dev\tests\EmployerTest.php:38
+C:\inetpub\wwwroot-dev\tests\APITest.php:831
+
+55) APITest::testDeleteSkillNoToken
+Error: Class 'Classes\User' not found
+
+C:\inetpub\wwwroot-dev\tests\UserTest.php:81
+C:\inetpub\wwwroot-dev\tests\EmployerTest.php:38
+C:\inetpub\wwwroot-dev\tests\APITest.php:831
+
+56) APITest::testDeleteSkillIncorrectToken
+Error: Class 'Classes\User' not found
+
+C:\inetpub\wwwroot-dev\tests\UserTest.php:81
+C:\inetpub\wwwroot-dev\tests\EmployerTest.php:38
+C:\inetpub\wwwroot-dev\tests\APITest.php:831
+
+57) APITest::testDeleteSkillWrongUserType
+Error: Class 'Classes\User' not found
+
+C:\inetpub\wwwroot-dev\tests\UserTest.php:81
+C:\inetpub\wwwroot-dev\tests\EmployerTest.php:38
+C:\inetpub\wwwroot-dev\tests\APITest.php:831
+
+58) APITest::testDeleteSkillPOSTVarsProvided
+Error: Class 'Classes\User' not found
+
+C:\inetpub\wwwroot-dev\tests\UserTest.php:81
+C:\inetpub\wwwroot-dev\tests\EmployerTest.php:38
+C:\inetpub\wwwroot-dev\tests\APITest.php:831
+
+59) APITest::testDeleteSkillInvalidCategoryId
+Error: Class 'Classes\User' not found
+
+C:\inetpub\wwwroot-dev\tests\UserTest.php:81
+C:\inetpub\wwwroot-dev\tests\EmployerTest.php:38
+C:\inetpub\wwwroot-dev\tests\APITest.php:831
+
+60) APITest::testDeleteSkillInvalidSkillId
+Error: Class 'Classes\User' not found
+
+C:\inetpub\wwwroot-dev\tests\UserTest.php:81
+C:\inetpub\wwwroot-dev\tests\EmployerTest.php:38
+C:\inetpub\wwwroot-dev\tests\APITest.php:831
+
+61) APITest::testDeleteSkillNotInSpecifiedCategory
+Error: Class 'Classes\User' not found
+
+C:\inetpub\wwwroot-dev\tests\UserTest.php:81
+C:\inetpub\wwwroot-dev\tests\EmployerTest.php:38
+C:\inetpub\wwwroot-dev\tests\APITest.php:831
+
+62) APITest::testDeleteSkillSuccess
+Error: Class 'Classes\User' not found
+
+C:\inetpub\wwwroot-dev\tests\UserTest.php:81
+C:\inetpub\wwwroot-dev\tests\EmployerTest.php:38
+C:\inetpub\wwwroot-dev\tests\APITest.php:831
+
+63) AdminStaffTest::testConstructor
+Error: Class 'Classes\AdminStaff' not found
+
+C:\inetpub\wwwroot-dev\tests\AdminStaffTest.php:18
+
+64) AdminStaffTest::testGetAdminStaffByUserIdFailure
+Error: Class 'Classes\AdminStaff' not found
+
+C:\inetpub\wwwroot-dev\tests\AdminStaffTest.php:60
+
+65) AdminStaffTest::testGetAdminStaff
+Error: Class 'Classes\AdminStaff' not found
+
+C:\inetpub\wwwroot-dev\tests\AdminStaffTest.php:68
+
+66) EmployerTest::testConstructor
+Error: Class 'Classes\Employer' not found
+
+C:\inetpub\wwwroot-dev\tests\EmployerTest.php:21
+
+67) EmployerTest::testSaveUser
+Error: Class 'Classes\User' not found
+
+C:\inetpub\wwwroot-dev\tests\UserTest.php:81
+C:\inetpub\wwwroot-dev\tests\EmployerTest.php:38
+C:\inetpub\wwwroot-dev\tests\EmployerTest.php:26
+
+68) EmployerTest::testEditEmployer
+Error: Class 'Classes\User' not found
+
+C:\inetpub\wwwroot-dev\tests\UserTest.php:81
+C:\inetpub\wwwroot-dev\tests\EmployerTest.php:38
+C:\inetpub\wwwroot-dev\tests\EmployerTest.php:54
+
+69) EmployerTest::testGetEmployerByUserIdFailure
+Error: Class 'Classes\Employer' not found
+
+C:\inetpub\wwwroot-dev\tests\EmployerTest.php:67
+
+70) EmployerTest::testGetEmployerByUserId
+Error: Class 'Classes\User' not found
+
+C:\inetpub\wwwroot-dev\tests\UserTest.php:81
+C:\inetpub\wwwroot-dev\tests\EmployerTest.php:38
+C:\inetpub\wwwroot-dev\tests\EmployerTest.php:71
+
+71) JobSeekerTest::testConstructor
+Error: Class 'Classes\JobSeeker' not found
+
+C:\inetpub\wwwroot-dev\tests\JobSeekerTest.php:19
+
+72) JobSeekerTest::testSaveUser
+Error: Class 'Classes\User' not found
+
+C:\inetpub\wwwroot-dev\tests\UserTest.php:81
+C:\inetpub\wwwroot-dev\tests\JobSeekerTest.php:38
+C:\inetpub\wwwroot-dev\tests\JobSeekerTest.php:24
+
+73) JobSeekerTest::testEditUser
+Error: Class 'Classes\User' not found
+
+C:\inetpub\wwwroot-dev\tests\UserTest.php:81
+C:\inetpub\wwwroot-dev\tests\JobSeekerTest.php:38
+C:\inetpub\wwwroot-dev\tests\JobSeekerTest.php:48
+
+74) JobSeekerTest::testGetJobSeekerByUserIdFailure
+Error: Class 'Classes\JobSeeker' not found
+
+C:\inetpub\wwwroot-dev\tests\JobSeekerTest.php:60
+
+75) JobSeekerTest::testGetJobSeekerByUserId
+Error: Class 'Classes\User' not found
+
+C:\inetpub\wwwroot-dev\tests\UserTest.php:81
+C:\inetpub\wwwroot-dev\tests\JobSeekerTest.php:38
+C:\inetpub\wwwroot-dev\tests\JobSeekerTest.php:64
+
+76) JobSeekerTest::testJobSeekerSkillsString
+Error: Class 'Classes\User' not found
+
+C:\inetpub\wwwroot-dev\tests\UserTest.php:81
+C:\inetpub\wwwroot-dev\tests\JobSeekerTest.php:38
+C:\inetpub\wwwroot-dev\tests\JobSeekerTest.php:80
+
+77) JobTest::testConstructorNoInput
+Error: Class 'Classes\Job' not found
+
+C:\inetpub\wwwroot-dev\tests\JobTest.php:24
+
+78) JobTest::testNewJob
+Error: Class 'Classes\User' not found
+
+C:\inetpub\wwwroot-dev\tests\UserTest.php:81
+C:\inetpub\wwwroot-dev\tests\EmployerTest.php:38
+C:\inetpub\wwwroot-dev\tests\JobTest.php:32
+C:\inetpub\wwwroot-dev\tests\JobTest.php:50
+
+79) JobTest::testSaveGetJobSkills
+Error: Class 'Classes\User' not found
+
+C:\inetpub\wwwroot-dev\tests\UserTest.php:81
+C:\inetpub\wwwroot-dev\tests\EmployerTest.php:38
+C:\inetpub\wwwroot-dev\tests\JobTest.php:32
+C:\inetpub\wwwroot-dev\tests\JobTest.php:88
+
+80) JobTypeTest::testConstructorZero
+Error: Class 'Classes\JobType' not found
+
+C:\inetpub\wwwroot-dev\tests\JobTypeTest.php:13
+
+81) JobTypeTest::testConstructorValues
+Error: Class 'Classes\JobType' not found
+
+C:\inetpub\wwwroot-dev\tests\JobTypeTest.php:19
+
+82) JobTypeTest::testGetJobTypes
+Error: Class 'Classes\JobType' not found
+
+C:\inetpub\wwwroot-dev\tests\JobTypeTest.php:27
+
+83) LocationTest::testConstructorZero
+Error: Class 'Classes\Location' not found
+
+C:\inetpub\wwwroot-dev\tests\LocationTest.php:20
+
+84) LocationTest::testConstructorValues
+Error: Class 'Classes\Location' not found
+
+C:\inetpub\wwwroot-dev\tests\LocationTest.php:26
+
+85) LocationTest::testGetLocations
+Error: Class 'Classes\Location' not found
+
+C:\inetpub\wwwroot-dev\tests\LocationTest.php:33
+
+86) SkillCategoryTest::testConstructorNoInput
+Error: Class 'Classes\SkillCategory' not found
+
+C:\inetpub\wwwroot-dev\tests\SkillCategoryTest.php:19
+
+87) SkillCategoryTest::testExpectedCategoriesIndividually
+Error: Class 'Classes\SkillCategory' not found
+
+C:\inetpub\wwwroot-dev\tests\SkillCategoryTest.php:26
+
+88) SkillCategoryTest::testGetSkillCategories
+Error: Class 'Classes\SkillCategory' not found
+
+C:\inetpub\wwwroot-dev\tests\SkillCategoryTest.php:34
+
+89) SkillTest::testConstructorZero
+Use of undefined constant DB_HOST - assumed 'DB_HOST' (this will throw an Error in a future version of PHP)
+
+C:\inetpub\wwwroot-dev\tests\SkillTest.php:230
+C:\inetpub\wwwroot-dev\tests\SkillTest.php:256
+C:\inetpub\wwwroot-dev\tests\SkillTest.php:283
+
+90) SkillTest::testSaveInvalidCategory
+Use of undefined constant DB_HOST - assumed 'DB_HOST' (this will throw an Error in a future version of PHP)
+
+C:\inetpub\wwwroot-dev\tests\SkillTest.php:230
+C:\inetpub\wwwroot-dev\tests\SkillTest.php:256
+C:\inetpub\wwwroot-dev\tests\SkillTest.php:283
+
+91) SkillTest::testSaveRenameChangeCat
+Use of undefined constant DB_HOST - assumed 'DB_HOST' (this will throw an Error in a future version of PHP)
+
+C:\inetpub\wwwroot-dev\tests\SkillTest.php:230
+C:\inetpub\wwwroot-dev\tests\SkillTest.php:256
+C:\inetpub\wwwroot-dev\tests\SkillTest.php:283
+
+92) SkillTest::testDeleteSkillFailure
+Use of undefined constant DB_HOST - assumed 'DB_HOST' (this will throw an Error in a future version of PHP)
+
+C:\inetpub\wwwroot-dev\tests\SkillTest.php:230
+C:\inetpub\wwwroot-dev\tests\SkillTest.php:256
+C:\inetpub\wwwroot-dev\tests\SkillTest.php:283
+
+93) SkillTest::testDeleteSkillSuccess
+Use of undefined constant DB_HOST - assumed 'DB_HOST' (this will throw an Error in a future version of PHP)
+
+C:\inetpub\wwwroot-dev\tests\SkillTest.php:230
+C:\inetpub\wwwroot-dev\tests\SkillTest.php:256
+C:\inetpub\wwwroot-dev\tests\SkillTest.php:283
+
+94) SkillTest::testDeleteUsedSkill
+Use of undefined constant DB_HOST - assumed 'DB_HOST' (this will throw an Error in a future version of PHP)
+
+C:\inetpub\wwwroot-dev\tests\SkillTest.php:230
+C:\inetpub\wwwroot-dev\tests\SkillTest.php:256
+C:\inetpub\wwwroot-dev\tests\SkillTest.php:283
+
+95) SkillTest::testGetSkillsBySkillCategoryFailure
+Use of undefined constant DB_HOST - assumed 'DB_HOST' (this will throw an Error in a future version of PHP)
+
+C:\inetpub\wwwroot-dev\tests\SkillTest.php:230
+C:\inetpub\wwwroot-dev\tests\SkillTest.php:256
+C:\inetpub\wwwroot-dev\tests\SkillTest.php:283
+
+96) SkillTest::testGetSkillsBySkillCategorySuccess
+Use of undefined constant DB_HOST - assumed 'DB_HOST' (this will throw an Error in a future version of PHP)
+
+C:\inetpub\wwwroot-dev\tests\SkillTest.php:230
+C:\inetpub\wwwroot-dev\tests\SkillTest.php:256
+C:\inetpub\wwwroot-dev\tests\SkillTest.php:283
+
+97) SkillTest::testGetSkillsByJob
+Use of undefined constant DB_HOST - assumed 'DB_HOST' (this will throw an Error in a future version of PHP)
+
+C:\inetpub\wwwroot-dev\tests\SkillTest.php:230
+C:\inetpub\wwwroot-dev\tests\SkillTest.php:256
+C:\inetpub\wwwroot-dev\tests\SkillTest.php:283
+
+98) SkillTest::testGetSkillsByJobSeeker
+Use of undefined constant DB_HOST - assumed 'DB_HOST' (this will throw an Error in a future version of PHP)
+
+C:\inetpub\wwwroot-dev\tests\SkillTest.php:230
+C:\inetpub\wwwroot-dev\tests\SkillTest.php:256
+C:\inetpub\wwwroot-dev\tests\SkillTest.php:283
+
+99) SkillTest::testGetSkillExists
+Use of undefined constant DB_HOST - assumed 'DB_HOST' (this will throw an Error in a future version of PHP)
+
+C:\inetpub\wwwroot-dev\tests\SkillTest.php:230
+C:\inetpub\wwwroot-dev\tests\SkillTest.php:256
+C:\inetpub\wwwroot-dev\tests\SkillTest.php:283
+
+100) UserTest::testConstructorUserIdZeroGivenZero
+Error: Class 'Classes\User' not found
+
+C:\inetpub\wwwroot-dev\tests\UserTest.php:62
+
+101) UserTest::testConstructorUserIdZeroGivenNegative
+Error: Class 'Classes\User' not found
+
+C:\inetpub\wwwroot-dev\tests\UserTest.php:66
+
+102) UserTest::testSaveEmailExists
+Error: Class 'Classes\User' not found
+
+C:\inetpub\wwwroot-dev\tests\UserTest.php:81
+C:\inetpub\wwwroot-dev\tests\UserTest.php:70
+
+103) UserTest::testUpdateUser
+Error: Class 'Classes\User' not found
+
+C:\inetpub\wwwroot-dev\tests\UserTest.php:81
+C:\inetpub\wwwroot-dev\tests\UserTest.php:100
+
+104) UserTest::testSaveGetUser
+Error: Class 'Classes\User' not found
+
+C:\inetpub\wwwroot-dev\tests\UserTest.php:81
+C:\inetpub\wwwroot-dev\tests\UserTest.php:114
+
+105) UserTest::testGetEmailExists
+Error: Class 'Classes\User' not found
+
+C:\inetpub\wwwroot-dev\tests\UserTest.php:81
+C:\inetpub\wwwroot-dev\tests\UserTest.php:128
+
+106) UserTest::testGetEmailExistsFailure
+Error: Class 'Classes\User' not found
+
+C:\inetpub\wwwroot-dev\tests\UserTest.php:81
+C:\inetpub\wwwroot-dev\tests\UserTest.php:135
+
+107) UserTest::testGetUserByVerifyCode
+Error: Class 'Classes\User' not found
+
+C:\inetpub\wwwroot-dev\tests\UserTest.php:81
+C:\inetpub\wwwroot-dev\tests\UserTest.php:142
+
+108) UserTest::testGetUserByVerifyCodeFailure
+Error: Class 'Classes\User' not found
+
+C:\inetpub\wwwroot-dev\tests\UserTest.php:81
+C:\inetpub\wwwroot-dev\tests\UserTest.php:152
+
+109) UserTest::testGetUserByEmailAddress
+Error: Class 'Classes\User' not found
+
+C:\inetpub\wwwroot-dev\tests\UserTest.php:81
+C:\inetpub\wwwroot-dev\tests\UserTest.php:161
+
+110) UserTest::testGetUserByEmailAddressFailure
+Error: Class 'Classes\User' not found
+
+C:\inetpub\wwwroot-dev\tests\UserTest.php:81
+C:\inetpub\wwwroot-dev\tests\UserTest.php:171
+
+111) UserTest::testGetUserByResetCode
+Error: Class 'Classes\User' not found
+
+C:\inetpub\wwwroot-dev\tests\UserTest.php:81
+C:\inetpub\wwwroot-dev\tests\UserTest.php:178
+
+112) UserTest::testGetUserByResetCodeFailureNoMatch
+Error: Class 'Classes\User' not found
+
+C:\inetpub\wwwroot-dev\tests\UserTest.php:81
+C:\inetpub\wwwroot-dev\tests\UserTest.php:189
+
+113) UserTest::testGetUserByResetCodeFailurecodeLength
+Error: Class 'Classes\User' not found
+
+C:\inetpub\wwwroot-dev\tests\UserTest.php:81
+C:\inetpub\wwwroot-dev\tests\UserTest.php:196
+
+114) UserTest::testGetUserLogin
+Error: Class 'Classes\User' not found
+
+C:\inetpub\wwwroot-dev\tests\UserTest.php:81
+C:\inetpub\wwwroot-dev\tests\UserTest.php:206
+
+115) UserTest::testGetUserLoginFailInvalidPassword
+Error: Class 'Classes\User' not found
+
+C:\inetpub\wwwroot-dev\tests\UserTest.php:81
+C:\inetpub\wwwroot-dev\tests\UserTest.php:217
+
+ERRORS!
+Tests: 117, Assertions: 0, Errors: 115, Incomplete: 2.
