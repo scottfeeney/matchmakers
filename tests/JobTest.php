@@ -13,12 +13,27 @@ use PHPUnit\Framework\TestCase;
 final class JobTest extends TestCase {
 
     private $testJobName = "Widget Wrangler";
-    private $jidsToDelete;
-    private $uidsToDelete;
     private $testEmail = "jobposter@jobpostingplace.com";
     private $checkJobDeleted;
     private $checkEmployerDeleted;
     private $checkUserDeleted;
+
+    //For matching algorithm testing
+    private $testEmployerEmail = "algoTestingEmployerPerson@unitTests.com";
+    private $testJSEmail = "algoTestingJSPerson@unitTests.com";
+    private $jobName = "Statue Impersonator";
+    private $skillCategoryName = "algoTestSkillCat";
+    private $skillNames = array("Standing Upright", "Walking a straight line" , "Mixing Cocktails", "Sleeping through construction noise",
+                                "Faking interest in foreign films", "Keeping it real", "Believing in yourself", "Mouthing mindless platitudes",
+                                "Getting through a Tolstoy novel", "Growing a beard like Tolstoy", "Drinking craft beer", "Cooking charcoal");
+    private $testAdminEmail = "algoTestingAdminPerson@unitTests.com";
+    
+    private $testJobSeeker;
+    private $testSkillCategory;
+    private $testEmployer;
+    private $testJob;
+    private $testSkills;
+    private $testAdmin;
 
     public function testConstructorNoInput() {
         $job = new \Classes\Job();
@@ -46,6 +61,21 @@ final class JobTest extends TestCase {
                      'categoryId' => $categoryId, 'eid' => $eid);
     }
 
+    public static function createEmployerAndJobChooseCategory($testEmail, $testJobName, $categoryId) {
+        $result = EmployerTest::createUserAndEmployer($testEmail);
+        if ($result == null) {
+            return null;
+        }
+        extract($result); //$oid, $eid, $employer (employer obj)
+
+        $job = new \Classes\Job();
+        
+        //$jid, $objSave
+        extract(JobTest::createJob($eid, $categoryId, $testJobName));
+        
+        return array('job' => new \Classes\Job($jid), 'employer' => new \Classes\Employer($eid));
+    }
+
     public function testNewJob() {
         $result = ($this->createEmployerAndJob($this->testEmail, $this->testJobName));
         if ($result == null) {
@@ -53,8 +83,6 @@ final class JobTest extends TestCase {
         }
         //var_dump($result);
         extract($result); //$oid, $jib, $objSave, $categoryId, $eid
-        $this->uidsToDelete[] = $oid;
-        $this->jidsToDelete[] = $jid;
         $this->assertFalse($objSave->hasError);
         $this->assertNotEquals(0, $jid);
     }
@@ -90,8 +118,6 @@ final class JobTest extends TestCase {
             $this->assertTrue(false, "createEmployerAndJob failed (returned null)");
         }
         extract($result); //$oid, $jid, $objSave, $categoryId, $eid
-        $this->uidsToDelete[] = $oid;
-        $this->jidsToDelete[] = $jid;
         $allSkills = $this->GetAllSkills();
 
         //Pick some random skills, save, get, make sure they match
@@ -197,57 +223,87 @@ final class JobTest extends TestCase {
     //listed, 50%
 
     //Both jobtype and location match, no skills match, seeker has 3 skills selected, job has 2 skills
+    //seeker - skills 1-3
+    //job - skills 4-5
     //listed, 50%
 
     //Both jobtype and location match, seeker has 5 skills, 4 of them match, job has 4 skills
+    //seeker - skills 1-5
+    //job - skills 1-4
     //listed, 97.72 repeating %
 
     //Both jobtype and location match, seeker has 5 skills, 4 of them match, job has 8 skills
+    //seeker - skills 1-5
+    //job - skills 2-9
     //listed 74.43 18 repeating %
 
     //Both jobtype and location match, seeker has 5 skills, 5 of them match, job has 5 skills
+    //seeker - skills 1-5
+    //job - skills 1-5
     //listed 100%
 
     //both jobtype and location match, seeker has 5 skills, 5 of them match, job has 12 skills
+    //seeker - skills 1-5
+    //job - skills 1-12
     //listed 70.8 3 repeating
 
     //jobtype doesn't match location does, seeker has 5 skills, 4 match, job has 8 skills
+    //seeker - skills 1-5
+    //job - skills 2-9
     //not listed 49.43 18 repeating %
 
     //location doesn't match jobtype does seeker has 5 skills 4 match job has 8 skills
+    //seeker - skills 1-5
+    //job - skills 2-9
     //not listed 49 43 18 repeating %
 
     //jobtype doesn't match location does, seeker has 5 skills, 4 match, job has 6 skills
+    //seeker - skills 1-5
+    //job - skills 2-7
     //listed 57.57 repeating
 
     //location doesn't match jobtype does, seeker has 5 skills, 4 match, job has 6 skills
+    //seeker - skills 1-5
+    //job - skills 2-7
     //listed 57.57 repeating
 
     //neither location or jobtype match, seeker has 5 skills 5 match job has 5 skills
+    //seeker - skills 1-5
+    //job - skills 1-5
     //listed 50
 
     //neither location or jobtype match, seeker has 5 skills 4 match job has 4 skills
+    //seeker - skills 1-5
+    //job - skills 1-4
     //not listed 47 72 repeating
     
     //neither location or jobtype match, seeker has 5 skills 5 match job has 6 skills
+    //seeker - skills 1-5
+    //job - skills 1-6
     //not listed 41.6 repeating
 
+    /**
     public function testGetJobSeekerMatchesByJob() {
         //$this->assertFalse(true, print_r(\Classes\Job::GetJobMatchesByJobSeeker(1040)));
-        $this->markTestIncomplete();
-    }
+        $this->assertFalse(true);
+    } */
 
 
     protected function setUp(): void {
         parent::setUp();
-        $this->uidsToDelete = array();
-        $this->jidsToDelete = array();
         $this->checkJobDeleted = 1;
         $this->checkEmployerDeleted = 1;
         $this->checkUserDeleted = 1;
-        //Quick cleanup
-        //$this->uidsToDelete[] = 2061;
-        //$this->jidsToDelete[] = 2146;
+
+        //For algorithm matching unit tests
+        $matchingAlgoSetupRes = JobSeekerTest::setUpForMatchingAlgoTest($this->testJSEmail, $this->testEmployerEmail, $this->jobName, 
+                                                                        $this->skillCategoryName, $this->skillNames, $this->testAdminEmail);
+        
+        if ($matchingAlgoSetupRes[0] == false) {
+            $this->assertTrue(false, $matchingAlgoSetupRes[1]);
+        }
+
+        list($this->testJobSeeker, $this->testEmployer, $this->testJob, $this->testSkillCategory, $this->testSkills, $this->testAdmin) = $matchingAlgoSetupRes;
     }
 
     private static function runDelete($query, $failStr, $checkAffected, $testEmail) {
@@ -314,6 +370,12 @@ final class JobTest extends TestCase {
         if ($result[0] == false) {
             $this->assertTrue(false, $result[1]);
         }
+
+        $algoTearDownRes = JobSeekerTest::tearDownAfterMatchingAlgoTest($this->testJSEmail, $this->testEmployerEmail, $this->skillCategoryName, $this->testAdminEmail);
+        if ($algoTearDownRes[0] == false) {
+            $this->assertTrue(false, $algoTearDownRes[1]);
+        }
+
         parent::tearDown();
     }
 }

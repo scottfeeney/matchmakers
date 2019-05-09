@@ -49,11 +49,11 @@ final class APITest extends TestCase {
     //lookup for userTypes
     private $userTypes = array(1 => "employer", 2 => "jobseeker", 3 => "admin");
     
+    
     /**
      * authenticate.php
      */
     
-
     public function testAuthenticateNoHeadersFailure() {
         curl_setopt($this->curlObj, CURLOPT_URL, $this->baseURL. 'authenticate.php');
         $data = curl_exec($this->curlObj);

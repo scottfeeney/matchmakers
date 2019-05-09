@@ -15,6 +15,26 @@ final class JobSeekerTest extends TestCase {
     //private $uidsToDelete;
     private $testEmail = "someJobSeekerEmail@somewhere.com";
 
+    //For matching algorithm testing
+    private $testEmployerEmail = "algoTestingEmployerPerson@unitTests.com";
+    private $testJSEmail = "algoTestingJSPerson@unitTests.com";
+    private $jobName = "Statue Impersonator";
+    private $skillCategoryName = "algoTestSkillCat";
+    private $skillNames = array("Standing Upright", "Walking a straight line" , "Mixing Cocktails", "Sleeping through construction noise",
+                                "Faking interest in foreign films", "Keeping it real", "Believing in yourself", "Mouthing mindless platitudes",
+                                "Getting through a Tolstoy novel", "Growing a beard like Tolstoy", "Drinking craft beer", "Cooking charcoal");
+    private $testAdminEmail = "algoTestingAdminPerson@unitTests.com";
+    
+    private $testJobSeeker;
+    private $testSkillCategory;
+    private $testEmployer;
+    private $testJob;
+    private $testSkills;
+    private $testAdmin;
+
+
+
+
     public function testConstructor() {
         $jobSeeker = new \Classes\JobSeeker(0);
         $this->assertSame(0, $jobSeeker->jobSeekerId);
@@ -240,16 +260,141 @@ final class JobSeekerTest extends TestCase {
     
     //neither location or jobtype match, seeker has 5 skills 5 match job has 6 skills
     //not listed 41.6 repeating
-    
 
-    public function testGetJobMatchesByJobSeeker() {
-        //$this->assertFalse(true, print_r(\Classes\Job::GetJobMatchesByJobSeeker(1040)));
-        $this->markTestIncomplete();
+
+    public static function setUpForMatchingAlgoTest($jsEmail, $empEmail, $jobName, $skillCatName, $skillNames, $adminEmail) {
+        
+        //probably some neat way to do the below using reflection classes, but probably not worth the effort to work out how
+        $thisMethod = "JobSeekerTest::setUpForMatchingAlgoTest";
+
+        //Create jobseeker
+        extract(JobSeekerTest::createUserAndJobSeeker($jsEmail));
+        //yields oid, jid and jobSeeker
+        if ($jobSeeker == null || $jobSeeker->jobSeekerId == 0) {
+            return array(false, "Failed to set up JobSeeker in ". $thisMethod);
+        }
+
+        //Create test skill category
+        $skillCatRes = SkillTest::staticSetupSkillCat($skillCatName);
+        if ($skillCatRes[0] == false) {
+            return array (false, "Failed to set up Skill Category in ". $thisMethod.PHP_EOL.$skillCatRes[1]);
+        }
+        $skillCat = new \Classes\SkillCategory($skillCatRes[1]['skillCatId']);
+
+        //Create employer and job
+        extract(JobTest::createEmployerAndJobChooseCategory($empEmail, $jobName, $skillCat->skillCategoryId));
+        //yields job, employer
+
+        //create test admin (need admin to add skills)
+        $adminUserRes = SkillTest::staticSetupAdminUser($adminEmail);
+        if ($adminUserRes[0] == false) {
+            return array (false, "Failed to set up Skill Category in ". $thisMethod.PHP_EOL.$adminUserRes[1]);
+        }
+        $adminUser = $adminUserRes[1]['adminUser'];
+
+        $skills = array();
+        //Create 12 skills
+        foreach ($skillNames as $skillName) {
+            $skillRes = SkillTest::createSkill($skillName, $skillCat->skillCategoryId, $adminUser);
+            if ($skillRes->hasError) {
+                return array(false, "Failed to set up Skill ".$skillName." in ". $thisMethod.PHP_EOL.$skillRes->errorMessage);
+            }
+            $skills[] = new \Classes\Skill($skillRes->objectId);
+        }
+        
+        //return array(jobseeker obj, employer obj, job obj, skillcategory obj, array of skill objs, $adminUser)
+        return array($jobSeeker, $employer, $job, $skillCat, $skills, $adminUser);
+    }
+
+    public static function tearDownAfterMatchingAlgoTest($jsEmail, $empEmail, $skillCatName, $adminEmail) {
+        $conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);	
+
+        $tearDown = array();
+        $tearDown['jobseeker'] = array('param' => $jsEmail, 'queries' => array());
+        //JobSeeker
+            //remove job_seeker_skill entries
+            $tearDown['jobseeker']['queries'][] = "delete from job_seeker_skill where jobSeekerId in 
+                    (select jobSeekerId from job_seeker where userId in
+                    (select userId from user where email = ?))";
+            //remove job_seeker
+            $tearDown['jobseeker']['queries'][] = "delete from job_seeker where userId in
+                    (select userId from user where email = ?)";
+            //remove user entry
+            $tearDown['jobseeker']['queries'][] = "delete from user where email = ?";
+
+
+        $tearDown['job or employer'] = array('param' => $empEmail, 'queries' => array());
+        //job
+            //remove job_skill entries
+            $tearDown['job or employer']['queries'][] = "delete from job_skill where jobId in
+                    (select jobId from job where employerId in
+                    (select employerId from employer where userId in
+                    (select userId from user where email = ?)))";
+            //remove job entry
+            $tearDown['job or employer']['queries'][] = "delete from job where employerId in
+                    (select employerId from employer where userId in
+                    (select userId from user where email = ?))";
+
+        //employer
+            //remove employer entry
+            $tearDown['job or employer']['queries'][] = "delete from employer where userId in
+                    (select userId from user where email = ?)";
+            //remove user entry
+            $tearDown['job or employer']['queries'][] = "delete from user where email = ?";
+
+
+        $tearDown['skills or skill category'] = array('param' => $skillCatName, 'queries' => array());
+        //skills
+            //remove all skills
+            $tearDown['skills or skill category']['queries'][] = "delete from skill where skillCategoryId in
+                    (select skillCategoryId from skill_category where skillCategoryName = ?)";
+        //remove skill category
+        $tearDown['skills or skill category']['queries'][] = "delete from skill_category where skillCategoryName = ?";
+
+        
+        $tearDown['admin user'] = array('param' => $adminEmail, 'queries' => array());
+        //remove admin (only in user table with userType 3, not in admin_staff table, as not necessary to add skills)
+            $tearDown['admin user']['queries'][] = "delete from user where email = ?";
+
+
+        //actual teardown
+        foreach ($tearDown as $tearDownCat => $paramAndQueries)
+            foreach ($paramAndQueries['queries'] as $sql) {
+                //var_dump($sql);
+                if($stmt = $conn->prepare($sql)) {
+                    //var_dump($paramAndQueries['param']);
+                    $stmt->bind_param("s", $paramAndQueries['param']);
+                    $stmt->execute();
+                    $affRows = $stmt->affected_rows;
+                    
+                    //var_dump("Attempting to tear down ".$tearDownCat." in JobSeekerTest::tearDownAfterMatchingAlgoTest:"
+                    //            .PHP_EOL.$affRows." rows affected by query".PHP_EOL.$sql.PHP_EOL."With param:".PHP_EOL.$paramAndQueries['param']);
+                    $stmt->close();
+                } else {
+                    $errMsg = "Error attempting to tear down ".$tearDownCat." in JobSeekerTest::tearDownAfterMatchingAlgoTest:"
+                                .PHP_EOL.$conn->errno.' '.$conn->error;
+                    $conn->close();
+                    var_dump($errMsg);
+                    return array(false, $errMsg);
+                }
+            }
+        $conn->close();
+        return array(true, "");
     }
 
     protected function setUp(): void {
         parent::setUp();
-        //$this->uidsToDelete = array();
+
+        //For algorithm matching unit tests
+        $matchingAlgoSetupRes = $this->setUpForMatchingAlgoTest($this->testJSEmail, $this->testEmployerEmail, $this->jobName, 
+                                                            $this->skillCategoryName, $this->skillNames, $this->testAdminEmail);
+        
+        if ($matchingAlgoSetupRes[0] == false) {
+            $this->assertTrue(false, $matchingAlgoSetupRes[1]);
+        }
+
+        //array($jobSeeker, $employer, $job, $skillCat, $skills, $adminUser)
+        list($this->testJobSeeker, $this->testEmployer, $this->testJob, $this->testSkillCategory, $this->testSkills, $this->testAdmin) = $matchingAlgoSetupRes;
     }
 
     private function tearDownJobSeekerSkill($skillIds) {
@@ -294,10 +439,17 @@ final class JobSeekerTest extends TestCase {
         return array(true, "");
     }
 
+
+    
     protected function tearDown(): void {
         $byEmailResult = JobSeekerTest::tearDownByEmail($this->testEmail);
         if ($byEmailResult[0] == false) {
             $this->assertTrue(false, $byEmailResult[1]);
+        }
+
+        $algoTearDownRes = $this->tearDownAfterMatchingAlgoTest($this->testJSEmail, $this->testEmployerEmail, $this->skillCategoryName, $this->testAdminEmail);
+        if ($algoTearDownRes[0] == false) {
+            $this->assertTrue(false, $algoTearDownRes[1]);
         }
 
         /**

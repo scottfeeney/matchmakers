@@ -13,7 +13,7 @@ spl_autoload_register(function ($class)
 	if ($class != 'Composer\Autoload\ClassLoader') {
 		try {
 			$includePath = getcwd() . '/' . strtolower(str_replace("\\","/",$class)) . '.php';
-			var_dump(PHP_EOL.$includePath.PHP_EOL);
+			//var_dump(PHP_EOL.$includePath.PHP_EOL);
 			include $includePath;
 		} catch (Exception $e) {
 			//in case of case sensitivity issues
