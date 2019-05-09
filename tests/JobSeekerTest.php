@@ -24,6 +24,10 @@ final class JobSeekerTest extends TestCase {
                                 "Faking interest in foreign films", "Keeping it real", "Believing in yourself", "Mouthing mindless platitudes",
                                 "Getting through a Tolstoy novel", "Growing a beard like Tolstoy", "Drinking craft beer", "Cooking charcoal");
     private $testAdminEmail = "algoTestingAdminPerson@unitTests.com";
+    private $location1Name = "Colombia";
+    private $location2Name = "Cuba";
+    private $jobType1Name = "Dodgy";
+    private $jobType2Name = "Legit";
     
     private $testJobSeeker;
     private $testSkillCategory;
@@ -31,6 +35,11 @@ final class JobSeekerTest extends TestCase {
     private $testJob;
     private $testSkills;
     private $testAdmin;
+    private $location1Id;
+    private $location2Id;
+    private $jobType1Id;
+    private $jobType2Id;
+
 
 
 
@@ -184,7 +193,7 @@ final class JobSeekerTest extends TestCase {
 
     //Helper function to emulate the job matching algorithm. With tests using this function, any later adjustments to the 
     //algorithm will require only adjusting this function to bring testing in line, rather than adjusting each test function
-    public static function matchingFormula($job, $jobSeeker) {
+    public static function matchingFormula($job, $jobSeeker, $returnType) {
         $matchPercent = 0;
         $cutoffPercent = 50; //Minimum value that will register as a match
         
@@ -197,11 +206,11 @@ final class JobSeekerTest extends TestCase {
         //get number of skills that match = $matched
         //get number of skills that job has total = $jobTotal
         //get number of skills that seeker has job doesn't = $seekerNoMatch
-        $jobSkills = explode(',', Job::GetSkillsByJobString($job->jobId));
-        $seekerSkills = explode(",", JobSeeker::GetSkillsByJobSeekerString($jobSeeker->jobSeekerId));
+        $jobSkills = explode(',', \Classes\Job::GetSkillsByJobString($job->jobId));
+        $seekerSkills = explode(",", \Classes\JobSeeker::GetSkillsByJobSeekerString($jobSeeker->jobSeekerId));
 
         $matched = count(array_intersect($jobSkills, $seekerSkills));
-        $seekerNoMatch = count($seekerSkills - $matched);
+        $seekerNoMatch = count($seekerSkills) - $matched;
         $jobTotal = count($jobSkills);
 
         //Add score for weighted skills with 'jack of all trades' penalty if applicable
@@ -212,18 +221,111 @@ final class JobSeekerTest extends TestCase {
         //SkillsScore ignored if negative
         $matchPercent += $skillsScore ? $skillsScore > 0 : 0;
         
-        return array($matchPercent >= $cutoffPercent, $matchPercent);
+        if ($matchPercent < $cutoffPercent) {
+            return array();
+        }
+        if ($returnType == "seekers") {
+            $obj = new \StdClass;
+            $obj->jobSeekerId = $jobSeeker->jobSeekerId;
+            $obj->score = $matchPercent;
+            return array($obj);
+        } else {
+            $obj = new \StdClass;
+            $obj->jobId = $job->jobId;
+            $obj->score = $matchPercent;
+            return array($obj);
+        }
     }
 
+    public static function checkMatchScore($jid, $matches) {
+        $score = null;
+        //Works for both job seekers and jobs
+        foreach ($matches as $matchObj) {
+            if (property_exists($matchObj, 'jobSeekerId')) {
+                if ($matchObj->jobSeekerId == $jid) {
+                    $score = $matchObj->score;
+                }
+            } else {
+                //var_dump($matchObj);
+                if ($matchObj->jobId == $jid) {
+                    $score = $matchObj->score;
+                }
+            }
+        }
+        return intval($score);
+    }
+
+    
+
     //Test Matching
-    //Tests required:
+    //For these tests we assume that there are already at least two locations and two jobTypes in the database,
+    //using IDs 1 and 2 in each table.
     
     //Only location matches - not listed, 25%
+    //add one skill to job and jobseeker to avoid divide by zero error
+    public function testLocOnly() {
+
+        $this->testJob->locationId = $this->location1Id;
+        $this->testJob->jobTypeId = $this->jobType1Id;
+        $this->testJob->Save();
+        \Classes\Job::SaveJobSkills($this->testJob->jobId, ($this->testSkills[0])->skillId);
+
+        $this->testJobSeeker->locationId = $this->location1Id;
+        $this->testJobSeeker->jobTypeId = $this->jobType2Id;
+        $this->testJobSeeker->Save();
+        \Classes\JobSeeker::SaveJobSeekerSkills($this->testJobSeeker->jobSeekerId, ($this->testSkills[1])->skillId);
+
+        $expectedMatches = $this->matchingFormula($this->testJob, $this->testJobSeeker, "seekers");
+        $actualMatches = \Classes\JobSeeker::GetJobSeekerMatchesByJob($this->testJob->jobId);
+
+        $this->assertEquals($this->checkMatchScore($this->testJobSeeker->jobSeekerId, $expectedMatches),
+                            $this->checkMatchScore($this->testJobSeeker->jobSeekerId, $actualMatches));
+    }
     
     //only jobtype matches - not listed, 25%
+    public function testJobTypeOnly() {
+
+        $this->testJob->locationId = $this->location1Id;
+        $this->testJob->jobTypeId = $this->jobType1Id;
+        $this->testJob->Save();
+        \Classes\Job::SaveJobSkills($this->testJob->jobId, ($this->testSkills[0])->skillId);
+
+        $this->testJobSeeker->locationId = $this->location2Id;
+        $this->testJobSeeker->jobTypeId = $this->jobType1Id;
+        $this->testJobSeeker->Save();
+        \Classes\JobSeeker::SaveJobSeekerSkills($this->testJobSeeker->jobSeekerId, ($this->testSkills[1])->skillId);
+
+        $expectedMatches = $this->matchingFormula($this->testJob, $this->testJobSeeker, "seekers");
+        $actualMatches = \Classes\JobSeeker::GetJobSeekerMatchesByJob($this->testJob->jobId);
+
+        $this->assertEquals($this->checkMatchScore($this->testJobSeeker->jobSeekerId, $expectedMatches),
+                            $this->checkMatchScore($this->testJobSeeker->jobSeekerId, $actualMatches));        
+    }
     
-    //Both jobtype and location match, no skills match, seeker has no skills selected (yes, currently impossible through UI, even so)
+    //Both jobtype and location match, no skills match
     //listed, 50%
+    public function testJobTypeLocOnly() {
+
+        $this->testJob->locationId = $this->location1Id;
+        $this->testJob->jobTypeId = $this->jobType1Id;
+        $this->testJob->skillCategoryId = $this->testSkillCategory->skillCategoryId;
+        $this->testJob->Save();
+        \Classes\Job::SaveJobSkills($this->testJob->jobId, ($this->testSkills[0])->skillId);
+
+        $this->testJobSeeker->locationId = $this->location1Id;
+        $this->testJobSeeker->jobTypeId = $this->jobType1Id;
+        $this->testJobSeeker->skillCategoryId = $this->testSkillCategory->skillCategoryId;
+        $this->testJobSeeker->Save();
+        \Classes\JobSeeker::SaveJobSeekerSkills($this->testJobSeeker->jobSeekerId, ($this->testSkills[1])->skillId);
+
+        $expectedMatches = $this->matchingFormula($this->testJob, $this->testJobSeeker, "seekers");
+        $actualMatches = \Classes\JobSeeker::GetJobSeekerMatchesByJob($this->testJob->jobId);
+        //var_dump($actualMatches);
+        //var_dump($expectedMatches);
+
+        $this->assertEquals($this->checkMatchScore($this->testJobSeeker->jobSeekerId, $expectedMatches),
+                            $this->checkMatchScore($this->testJobSeeker->jobSeekerId, $actualMatches));        
+    }
 
     //Both jobtype and location match, no skills match, seeker has 3 skills selected, job has 2 skills
     //listed, 50%
@@ -262,7 +364,9 @@ final class JobSeekerTest extends TestCase {
     //not listed 41.6 repeating
 
 
-    public static function setUpForMatchingAlgoTest($jsEmail, $empEmail, $jobName, $skillCatName, $skillNames, $adminEmail) {
+
+    public static function setUpForMatchingAlgoTest($jsEmail, $empEmail, $jobName, $skillCatName, $skillNames, $adminEmail, 
+                                                    $loc1Name, $jobType1Name, $loc2Name, $jobType2Name) {
         
         //probably some neat way to do the below using reflection classes, but probably not worth the effort to work out how
         $thisMethod = "JobSeekerTest::setUpForMatchingAlgoTest";
@@ -301,16 +405,55 @@ final class JobSeekerTest extends TestCase {
             }
             $skills[] = new \Classes\Skill($skillRes->objectId);
         }
+
+        $conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);
+
+        $locIds = array();
+        //Create location
+        $sql = "insert into location(name) values (?)";
+        foreach (array($loc1Name, $loc2Name) as $locName) {
+            if($stmt = $conn->prepare($sql)) {
+                $stmt->bind_param("s", $locName);
+                $stmt->execute();
+                $locIds[] = $stmt->insert_id;
+            } else {
+                $errorMessage = "Error attempting to insert location:".PHP_EOL.$sql.PHP_EOL."Using param:".PHP_EOL.$locName
+                                .PHP_EOL."Yielded:".PHP_EOL.$conn->errno . ' ' . $conn->error;
+                var_dump($errorMessage);
+                $conn->close();
+                return array(false, $errorMessage);
+            }
+        }
+
+        $jobTypeIds = array();
+        //Create jobType
+        $sql = "insert into job_type(JobTypeName) values (?)";
+        foreach (array($jobType1Name, $jobType2Name) as $jobTypeName) {
+            if($stmt = $conn->prepare($sql)) {
+                $stmt->bind_param("s", $jobTypeName);
+                $stmt->execute();
+                $jobTypeIds[] = $stmt->insert_id;
+            } else {
+                $errorMessage = "Error attempting to insert jobType:".PHP_EOL.$sql.PHP_EOL."Using param:".PHP_EOL.$jobTypeName
+                                .PHP_EOL."Yielded:".PHP_EOL.$conn->errno . ' ' . $conn->error;
+                var_dump($errorMessage);
+                $conn->close();
+                return array(false, $errorMessage);
+            }
+        }
+
+        $conn->close();
         
         //return array(jobseeker obj, employer obj, job obj, skillcategory obj, array of skill objs, $adminUser)
-        return array($jobSeeker, $employer, $job, $skillCat, $skills, $adminUser);
+        return array($jobSeeker, $employer, $job, $skillCat, $skills, $adminUser, $locIds, $jobTypeIds);
     }
 
-    public static function tearDownAfterMatchingAlgoTest($jsEmail, $empEmail, $skillCatName, $adminEmail) {
+    public static function tearDownAfterMatchingAlgoTest($jsEmail, $empEmail, $skillCatName, $adminEmail, $location1Id, $jobType1Id,
+                                                                $location2Id, $jobType2Id) {
         $conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);	
 
         $tearDown = array();
-        $tearDown['jobseeker'] = array('param' => $jsEmail, 'queries' => array());
+        $tearDown['jobseeker'] = array('param' => $jsEmail, 'paramType' => "s", 'queries' => array());
         //JobSeeker
             //remove job_seeker_skill entries
             $tearDown['jobseeker']['queries'][] = "delete from job_seeker_skill where jobSeekerId in 
@@ -323,7 +466,7 @@ final class JobSeekerTest extends TestCase {
             $tearDown['jobseeker']['queries'][] = "delete from user where email = ?";
 
 
-        $tearDown['job or employer'] = array('param' => $empEmail, 'queries' => array());
+        $tearDown['job or employer'] = array('param' => $empEmail, 'paramType' => "s", 'queries' => array());
         //job
             //remove job_skill entries
             $tearDown['job or employer']['queries'][] = "delete from job_skill where jobId in
@@ -343,7 +486,7 @@ final class JobSeekerTest extends TestCase {
             $tearDown['job or employer']['queries'][] = "delete from user where email = ?";
 
 
-        $tearDown['skills or skill category'] = array('param' => $skillCatName, 'queries' => array());
+        $tearDown['skills or skill category'] = array('param' => $skillCatName, 'paramType' => "s", 'queries' => array());
         //skills
             //remove all skills
             $tearDown['skills or skill category']['queries'][] = "delete from skill where skillCategoryId in
@@ -352,9 +495,23 @@ final class JobSeekerTest extends TestCase {
         $tearDown['skills or skill category']['queries'][] = "delete from skill_category where skillCategoryName = ?";
 
         
-        $tearDown['admin user'] = array('param' => $adminEmail, 'queries' => array());
+        $tearDown['admin user'] = array('param' => $adminEmail, 'paramType' => "s", 'queries' => array());
         //remove admin (only in user table with userType 3, not in admin_staff table, as not necessary to add skills)
             $tearDown['admin user']['queries'][] = "delete from user where email = ?";
+
+
+        //remove Locations        
+        $tearDown['location1'] = array('param' => $location1Id, 'paramType' => "i", 'queries' => array());
+        $tearDown['location1']['queries'][] = "delete from location where locationId = ?";
+        $tearDown['location2'] = array('param' => $location2Id, 'paramType' => "i", 'queries' => array());
+        $tearDown['location2']['queries'][] = "delete from location where locationId = ?";
+
+
+        //remove JobTypes
+        $tearDown['jobtype1'] = array('param' => $jobType1Id, 'paramType' => "i", 'queries' => array());
+        $tearDown['jobtype1']['queries'][] = "delete from job_type where jobtypeid = ?";
+        $tearDown['jobtype2'] = array('param' => $jobType2Id, 'paramType' => "i", 'queries' => array());
+        $tearDown['jobtype2']['queries'][] = "delete from job_type where jobtypeid = ?";
 
 
         //actual teardown
@@ -363,7 +520,7 @@ final class JobSeekerTest extends TestCase {
                 //var_dump($sql);
                 if($stmt = $conn->prepare($sql)) {
                     //var_dump($paramAndQueries['param']);
-                    $stmt->bind_param("s", $paramAndQueries['param']);
+                    $stmt->bind_param($paramAndQueries['paramType'], $paramAndQueries['param']);
                     $stmt->execute();
                     $affRows = $stmt->affected_rows;
                     
@@ -387,14 +544,21 @@ final class JobSeekerTest extends TestCase {
 
         //For algorithm matching unit tests
         $matchingAlgoSetupRes = $this->setUpForMatchingAlgoTest($this->testJSEmail, $this->testEmployerEmail, $this->jobName, 
-                                                            $this->skillCategoryName, $this->skillNames, $this->testAdminEmail);
+                                                            $this->skillCategoryName, $this->skillNames, $this->testAdminEmail,
+                                                            $this->location1Name, $this->location2Name, $this->jobType1Name, $this->jobType2Name);
         
         if ($matchingAlgoSetupRes[0] == false) {
             $this->assertTrue(false, $matchingAlgoSetupRes[1]);
         }
 
         //array($jobSeeker, $employer, $job, $skillCat, $skills, $adminUser)
-        list($this->testJobSeeker, $this->testEmployer, $this->testJob, $this->testSkillCategory, $this->testSkills, $this->testAdmin) = $matchingAlgoSetupRes;
+        list($this->testJobSeeker, $this->testEmployer, $this->testJob, $this->testSkillCategory, $this->testSkills,
+                $this->testAdmin, $locIds, $jobTypeIds) = $matchingAlgoSetupRes;
+        $this->location1Id = $locIds[0];
+        $this->location2Id = $locIds[1];
+
+        $this->jobType1Id = $jobTypeIds[0];
+        $this->jobType2Id = $jobTypeIds[1];
     }
 
     private function tearDownJobSeekerSkill($skillIds) {
@@ -447,7 +611,9 @@ final class JobSeekerTest extends TestCase {
             $this->assertTrue(false, $byEmailResult[1]);
         }
 
-        $algoTearDownRes = $this->tearDownAfterMatchingAlgoTest($this->testJSEmail, $this->testEmployerEmail, $this->skillCategoryName, $this->testAdminEmail);
+        $algoTearDownRes = $this->tearDownAfterMatchingAlgoTest($this->testJSEmail, $this->testEmployerEmail, $this->skillCategoryName, 
+                                                                $this->testAdminEmail, $this->location1Id, $this->jobType1Id,
+                                                                $this->location2Id, $this->jobType2Id);
         if ($algoTearDownRes[0] == false) {
             $this->assertTrue(false, $algoTearDownRes[1]);
         }

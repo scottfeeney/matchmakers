@@ -27,6 +27,10 @@ final class JobTest extends TestCase {
                                 "Faking interest in foreign films", "Keeping it real", "Believing in yourself", "Mouthing mindless platitudes",
                                 "Getting through a Tolstoy novel", "Growing a beard like Tolstoy", "Drinking craft beer", "Cooking charcoal");
     private $testAdminEmail = "algoTestingAdminPerson@unitTests.com";
+    private $location1Name = "Colombia";
+    private $location2Name = "Cuba";
+    private $jobType1Name = "Dodgy";
+    private $jobType2Name = "Legit";
     
     private $testJobSeeker;
     private $testSkillCategory;
@@ -34,6 +38,12 @@ final class JobTest extends TestCase {
     private $testJob;
     private $testSkills;
     private $testAdmin;
+    private $location1Id;
+    private $location2Id;
+    private $jobType1Id;
+    private $jobType2Id;
+
+
 
     public function testConstructorNoInput() {
         $job = new \Classes\Job();
@@ -297,13 +307,20 @@ final class JobTest extends TestCase {
 
         //For algorithm matching unit tests
         $matchingAlgoSetupRes = JobSeekerTest::setUpForMatchingAlgoTest($this->testJSEmail, $this->testEmployerEmail, $this->jobName, 
-                                                                        $this->skillCategoryName, $this->skillNames, $this->testAdminEmail);
+                                                                        $this->skillCategoryName, $this->skillNames, $this->testAdminEmail,
+                                                                        $this->location1Name, $this->location2Name, $this->jobType1Name, $this->jobType2Name);
         
         if ($matchingAlgoSetupRes[0] == false) {
             $this->assertTrue(false, $matchingAlgoSetupRes[1]);
         }
 
-        list($this->testJobSeeker, $this->testEmployer, $this->testJob, $this->testSkillCategory, $this->testSkills, $this->testAdmin) = $matchingAlgoSetupRes;
+        list($this->testJobSeeker, $this->testEmployer, $this->testJob, $this->testSkillCategory, $this->testSkills,
+                $this->testAdmin, $locIds, $jobTypeIds) = $matchingAlgoSetupRes;
+        $this->location1Id = $locIds[0];
+        $this->location2Id = $locIds[1];
+
+        $this->jobType1Id = $jobTypeIds[0];
+        $this->jobType2Id = $jobTypeIds[1];
     }
 
     private static function runDelete($query, $failStr, $checkAffected, $testEmail) {
@@ -371,7 +388,9 @@ final class JobTest extends TestCase {
             $this->assertTrue(false, $result[1]);
         }
 
-        $algoTearDownRes = JobSeekerTest::tearDownAfterMatchingAlgoTest($this->testJSEmail, $this->testEmployerEmail, $this->skillCategoryName, $this->testAdminEmail);
+        $algoTearDownRes = JobSeekerTest::tearDownAfterMatchingAlgoTest($this->testJSEmail, $this->testEmployerEmail, $this->skillCategoryName, 
+                                                                        $this->testAdminEmail, $this->location1Id, $this->jobType1Id,
+                                                                        $this->location2Id, $this->jobType2Id);
         if ($algoTearDownRes[0] == false) {
             $this->assertTrue(false, $algoTearDownRes[1]);
         }
