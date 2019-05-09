@@ -638,3 +638,11 @@ footer a:hover{
 		text-align: left;
 	}
 }
+
+
+@media (max-width: 767px)
+{
+	.skill-add-button {
+		padding-top: 10px;
+	}
+}

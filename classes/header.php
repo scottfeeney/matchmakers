@@ -56,11 +56,11 @@
 								
 									if ($this->isSignedIn)
 									{
-										$html .= '<div class="float-right"><a href="signout.php" class="btn btn-signup">Sign Out</a></div>';
+										$html .= '<div class="float-right"><a href="/signout.php" class="btn btn-signup">Sign Out</a></div>';
 									}
 									else
 									{
-										$html .= '<div class="float-right"><a href="signup.php" class="btn btn-signup">Sign Up</a></div>';
+										$html .= '<div class="float-right"><a href="/signup.php" class="btn btn-signup">Sign Up</a></div>';
 									}
 									
 								$html .= '</div>

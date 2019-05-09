@@ -41,7 +41,7 @@
 		<div id="manageSkillSelector" class="card">
 			<div class="card-body">
 				<div class="row">
-					<div class="col-10">
+					<div class="col-md-10">
 						<label for="Location">Category:</label>
 						<select name="SkillCategoryId" id="SkillCategoryId" class="form-control skill-manage">
 							<option value=""></option>
@@ -50,7 +50,7 @@
 							<?php } ?>
 						</select>
 					</div>
-					<div class="col-2 skill-add-button">
+					<div class="col-md-2 skill-add-button">
 						<button type="button" class="btn btn-primary skill-manage-button" data-toggle="modal" data-id="0" data-name="" data-target="#skillManageModel">
 							Add Skill
 						</button>
