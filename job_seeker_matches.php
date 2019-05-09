@@ -36,12 +36,12 @@
         <section>
 			<div class="row">
 				<!-- Page heading-->
-				<div class="col-6">
+				<div class="col-9">
 					<h2>Job Matches</h2>
 				</div>
 				<!-- Back Button -->
-				<div class="col-6">
-					<a class="float-right btn btn-primary mb-3 backButton" href="home.php" role="button"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
+				<div class="col-3">
+					<a class="float-right btn btn-primary mb-3 backButton" href="home.php" role="button"><i class="fas fa-arrow-left"></i><span class="back-button-text"> Back to Dashboard</span></a>
 				</div>
 			</div>
 		

@@ -8,6 +8,7 @@
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/employer.php';
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/jobseeker.php';
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/job.php';
+		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/location.php';
 	} else {
 		require_once './utilities/common.php';
 		require_once './classes/header.php';
@@ -17,6 +18,7 @@
 		require_once './classes/employer.php';
 		require_once './classes/jobseeker.php';
 		require_once './classes/job.php';
+		require_once './classes/location.php';
 	}
 	
 	$user = \Utilities\Common::GetSessionUser();
@@ -32,11 +34,6 @@
 	$phoneAreaCode = $jobseeker->phoneAreaCode;
 	$phoneNumber = $jobseeker->phoneNumber;
 	$mobileNumber = $jobseeker->mobileNumber;
-	$address1 = $jobseeker->address1;
-	$address2 = $jobseeker->address2;
-	$city = $jobseeker->city;
-	$state = $jobseeker->state;
-	$postcode = $jobseeker->postcode;
 	$skillCategoryId = $jobseeker->skillCategoryId;
 	$skillCategoryName = (new \Classes\skillcategory($jobseeker->skillCategoryId))->skillCategoryName;
 	$ageGroup = $jobseeker->ageGroup;
@@ -47,7 +44,16 @@
 	$jobChangeSpeed = $jobseeker->jobChangeSpeed;
 	$active = $jobseeker->active;
 	$selectedSkills = \Classes\Skill::GetSkillsByJobSeeker($jobseekerId);
+	$desiredJobLocation = (new \Classes\Location($jobseeker->locationId))->name;
 
+	$address = $jobseeker->address1;
+	if ($jobseeker->address2 != "") {
+		$address .= "\n" . $jobseeker->address2;
+	}
+	$address .= "\n" . $jobseeker->city . " " . $jobseeker->state . " " . $jobseeker->postcode;
+	
+	$matchScore = null;
+	$jobDetail = "";
 
 	// Load job information (for Employer view only)
 	if ($user->userType == 1) {
@@ -55,19 +61,39 @@
 		$jobRequiredSkills = array();
 		$missingSkills = array();
 		
+		$employer = \Classes\Employer::GetEmployerByUserId($user->userId);
+		
 		if ($jobId != 0) {
 			// Load job name and skills
-			$jobName = (new \Classes\Job($jobId))->jobName;
-			$jobRequiredSkills = \Classes\Skill::GetSkillsByJob($jobId);
 			
-			// Determine if job seeker is missing any required skills
-			foreach($jobRequiredSkills as $skill){
-				if (!in_array($skill, $selectedSkills)){
-					array_push($missingSkills, $skill);
+			$job = new \Classes\Job($jobId);
+			
+			if ($job->jobId != 0) {
+				//make sure job was found
+				
+				//check employer can view job
+				if ($job->employerId != $employer->employerId) {
+					header("Location: home.php");
+					die();		
 				}
-			}
 			
+				$jobRequiredSkills = \Classes\Skill::GetSkillsByJob($jobId);
+				
+				// Determine if job seeker is missing any required skills
+				foreach($jobRequiredSkills as $skill){
+					if (!in_array($skill, $selectedSkills)){
+						array_push($missingSkills, $skill);
+					}
+				}
+			
+				$matchScore = $job->GetJobSeekerMatch($jobseeker->jobSeekerId);
+				
+				$jobDetail = GetCardDetail("<strong>Employer: </strong>" . htmlspecialchars($employer->companyName) . "<br /><strong>Job: </strong>" . htmlspecialchars($job->jobName));
+			
+			}
+		
 		}
+		
 	}
 	
 	// Display header section	
@@ -79,33 +105,47 @@
 		
 			<div class="row">
 				<!-- Page heading-->
-				<div class="col-6 col-xs-12">
-					<h2>Match Profile</h2>
+				<div class="col-9">
+					<h2>Job Seeker Match</h2>
 				</div>
 				<!-- Back Button -->
-				<div class="col-6">
-					<a class="float-right btn btn-primary mb-3 backButton" href="job_matches.php?j=<?php echo $jobId; ?>" role="button"><i class="fas fa-arrow-left"></i> Back to Matches</a>
+				<div class="col-3">
+					<a class="float-right btn btn-primary mb-3 backButton" href="job_matches.php?j=<?php echo $jobId; ?>" role="button"><i class="fas fa-arrow-left"></i><span class="back-button-text"> Back to Matches</span></a>
 				</div>
 			</div>
 			
+			
+			<?php echo $jobDetail; ?>
+			
+			
 		<div class="card listing-card">
 			<div class="card-body">
-				<!-- Job Seeker name -->
+			
 				<div class="row">
-					<div class="col-sm-12">
-						<h1><?php echo htmlspecialchars($firstName) . " " . htmlspecialchars($lastName) ;?></h1>
-					</div>
-				</div>
-				
-				<!-- Location and field -->
-				<div class="row">
-					<div class="col-sm-6">
-						<p><strong>Location: </strong><?php echo htmlspecialchars($state); ;?></p>
+					<div class="<?php echo ($matchScore == null ? "col-sm-12" : "col-sm-9") ?>">
+			
+			
+						<!-- Job Seeker name -->
+						<div class="row">
+							<div class="col-sm-12">
+								<h1><?php echo htmlspecialchars($firstName) . " " . htmlspecialchars($lastName) ;?></h1>
+							</div>
+						</div>
+						
+						<!-- Location and field -->
+						<div class="row mt-2">
+							<div class="col-sm-12">
+								<p><strong>Desired Job Location: </strong><?php echo htmlspecialchars($desiredJobLocation); ?></p>
+							</div>
+						</div>
+						
 					</div>
 					
-					<div class="col-sm-6">
-						<p><strong>Primary Expertise: </strong><?php echo htmlspecialchars($skillCategoryName);?></p>
-					</div>
+					<?php 
+						if ($matchScore != null) {
+							echo '<div class="col-sm-3"><div class="job-match-figure-outer"><div class="job-match-figure"><span>Match</span><br /><span style="font-size: 3em;">' . $matchScore . '%</span></div></div></div>';
+						}
+					?>
 				</div>
 				
 				<!-- Contact Details -->
@@ -132,26 +172,7 @@
 				
 				<div class="row">
 					<div class="col-sm-12">
-						<p><strong>Address 1: </strong><?php echo htmlspecialchars($address1); ?></p>
-					</div>
-					<?php if(strlen(htmlspecialchars($address2)) > 0){ ?>
-						<div class="col-sm-12">
-							<p><strong>Address 2: </strong><?php echo htmlspecialchars($address2); ?></p>
-						</div>
-					<?php } ?>
-				</div>
-				
-				<div class="row">
-					<div class="col-sm-4">
-						<p><strong>City: </strong><?php echo htmlspecialchars($city); ?></p>
-					</div>
-					
-					<div class="col-sm-4">
-						<p><strong>State: </strong><?php echo htmlspecialchars($state); ?></p>
-					</div>
-					
-					<div class="col-sm-4">
-						<p><strong>Post code: </strong><?php echo htmlspecialchars($postcode); ?></p>
+						<p><strong>Address: </strong><br /><?php echo str_replace("\n", "<br />", htmlspecialchars($address)); ?></p>
 					</div>
 				</div>
 				
@@ -237,6 +258,7 @@
 						<?php
 							// If the user is an employer and the job skills have been loaded display skills in different colours
 							if ($user->userType == 1 && sizeof($jobRequiredSkills) > 0) {
+								echo "<p>Displayed below are the job seekers skills. Skills displayed in green match skills required for this position.</p>";
 								// Loop through array of skills to display skill name
 								foreach($selectedSkills as $skill){
 									if (in_array($skill, $jobRequiredSkills)){
@@ -245,10 +267,10 @@
 									}
 									else {
 										// Show skill as blue if it's not
-										echo "<span class='badge badge-info jobSkillDisplay'>$skill->skillName</span>";
+										echo "<span class='badge badge-info jobSkillDisplay unmatched'>$skill->skillName</span>";
 									}
 								}
-								echo "<p class='skillsInfo'><span style='color:#28a745'>Green</span> skills are your required skills for this position. <span style='color:#17a2b8'>Blue</span> skills are this job seekers additional skills</p>";
+								
 							}
 							else {
 								// Display skills as one colour
@@ -270,12 +292,12 @@
 					<div id="jobRequiredSkills">
 						<div class="row mt-4">
 							<div class="col-sm-12">
-								<h4>Missing Skills</h4>
+								<h4>Unmatched Skills</h4>
 							</div>
 						</div>
 						<div class="row">
 							<div class="col-sm-12">
-								<p>This job seeker does <strong>not</strong> have the following skill(s) required for your <?php echo htmlspecialchars($jobName); ?> position:</p>
+								<p>This job seeker does <strong>not</strong> have the following skills required for the position:</p>
 							</div>
 						</div>
 						<div class="col-sm-12 jobSkillsList">
@@ -295,4 +317,14 @@
 <?php
 	$footer = new \Template\Footer();
 	echo $footer->Bind();
+	
+	
+	function GetCardDetail($text) {
+		
+		$html = '<div class="card dashboard-detail-card">
+			<div class="card-body">' . $text . '</div>
+		</div>';
+		
+		return $html;	
+	}
 ?>

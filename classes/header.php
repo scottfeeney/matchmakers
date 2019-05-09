@@ -15,7 +15,8 @@
 					<head>
 						<!-- Required meta tags -->
 						<meta charset="utf-8">
-						<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+						<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+						<link rel="shortcut icon" type="image/png" href="/images/favicon.png"/>
 						
 						<!-- Project Team members -->
 						<meta name="author" content="Blair Fraser">

@@ -26,11 +26,12 @@
 	// Get job id from get reqeuest and load job details
 	$jobId = \Utilities\Common::GetRequest("j");
 	$job = new \Classes\Job($jobId);
+	$employer = new \Classes\Employer($job->employerId);
 	
 	// Create variables of job details for more reusable code.
 	$positionName = $job->jobName;
 	$numberAvailable = $job->numberAvailable;
-	$companyName = (new \Classes\Employer($job->employerId))->companyName;
+	$companyName = $employer->companyName;
 	$jobTypeName = (new \Classes\JobType($job->jobTypeId))->jobTypeName;
 	$positionAvailability = $job->positionAvailability;
 	$referenceNumber = $job->referenceNumber;
@@ -39,10 +40,12 @@
 	$locationName = (new \Classes\Location($job->locationId))->name;
 	$active = $job->active;
 	
+	$matchScore = null;
 
 	// Load job seeker information (for Job Seeker view only)
 	if ($user->userType == 2) {
-		$jobseekerId = (\Classes\JobSeeker::GetJobSeekerByUserId($user->userId))->jobSeekerId;		
+		$jobseeker = \Classes\JobSeeker::GetJobSeekerByUserId($user->userId);
+		$jobseekerId = $jobseeker->jobSeekerId;		
 		$jobSeekerSkills = \Classes\Skill::GetSkillsByJobSeeker($jobseekerId);
 		$missingSkills = array();
 		
@@ -52,6 +55,9 @@
 				array_push($missingSkills, $skill);
 			}
 		}
+		
+		$matchScore = $jobseeker->GetJobMatch($job->jobId);
+		
 	}
 	
 	
@@ -84,12 +90,12 @@
         <section>
 			<div class="row">
 				<!-- Page heading-->
-				<div class="col-6">
+				<div class="col-9">
 					<h2>Job Details</h2>
 				</div>
 				<!-- Back Button -->
-				<div class="col-6">
-					<a class="float-right btn btn-primary mb-3 backButton" href="<?php echo $btnLink; ?>" role="button"><i class="fas fa-arrow-left"></i> <?php echo $btnTxt; ?></a>
+				<div class="col-3">
+					<a class="float-right btn btn-primary mb-3 backButton" href="<?php echo $btnLink; ?>" role="button"><i class="fas fa-arrow-left"></i><span class="back-button-text"> <?php echo $btnTxt; ?></span></a>
 				</div>
 			</div>
 			
@@ -105,22 +111,37 @@
 				<div class="card-body">
 					<!-- Position name -->
 					<div class="row">
-						<div class="col-sm-12">
-							<h2 class="job-view-title"><?php echo htmlspecialchars($positionName); ?></h2>					
-							<?php 	
-								if($numberAvailable > 1){
-									echo '<span class="badge badge-success job-positions">' . $numberAvailable . ' positions</span>';
-								}
-							?>
+						<div class="<?php echo ($matchScore == null ? "col-sm-12" : "col-sm-9") ?>">
+						
+							<div class="row mt-2">
+								<div class="col-sm-12">
+						
+									<h2 class="job-view-title"><?php echo htmlspecialchars($positionName); ?></h2>					
+									<?php 	
+										if($numberAvailable > 1){
+											echo '<span class="badge badge-success job-positions">' . $numberAvailable . ' positions</span>';
+										}
+									?>
+							
+								</div>
+							</div>
+							
+							<!-- Company name -->
+							<div class="row mt-2">
+								<div class="col-sm-12">
+									<p><strong>Employer: </strong><?php echo $companyName; ?></p>
+								</div>
+							</div>
+							
 						</div>
+						<?php 
+							if ($matchScore != null) {
+								echo '<div class="col-sm-3"><div class="job-match-figure-outer"><div class="job-match-figure"><span>Match</span><br /><span style="font-size: 3em;">' . $matchScore . '%</span></div></div></div>';
+							}
+						?>
 					</div>
 					
-					<!-- Company name -->
-					<div class="row mt-2">
-						<div class="col-sm-12">
-							<p><strong>Employer: </strong><?php echo $companyName; ?></p>
-						</div>
-					</div>
+					
 					
 					<!-- Job Type, Start period, and Reference No.-->
 					<div class="row mt-2">
@@ -140,18 +161,22 @@
 					<!-- Description -->
 					<div class="row mt-2">
 						<div class="col-sm-12">
-							<h2>Job Description</h2>
-							<p><?php echo htmlspecialchars($positionDescription); ?></p>
+							<h3>Job Description</h3>
+							<div class="card"><div class="card-body"><?php echo str_replace("\n", "<br />", htmlspecialchars($positionDescription)); ?></div></div>
 						</div>
 					</div>
 					
 					<!-- Skills -->
 					<div id="skillsSection">
-						<h3>Required Skills</h3>
+						<h3 class="mt-3">Required Skills</h3>
 						<div class="col-sm-12 jobSkillsList">
 							<?php
+							
 							// If the user is an employer and the job skills have been loaded display skills in different colours
 							if ($user->userType == 2 && sizeof($jobSeekerSkills) > 0) {
+								
+								echo "<p>Displayed below are the required skills for this position. Skills displayed in green are your matched skills.</p>";
+								
 								// Loop through array of skills to display skill name
 								foreach($selectedSkills as $skill){
 									if (in_array($skill, $jobSeekerSkills)){
@@ -160,10 +185,10 @@
 									}
 									else {
 										// Show skill as blue if it's not
-										echo "<span class='badge badge-info jobSkillDisplay'>$skill->skillName</span>";
+										echo "<span class='badge badge-info jobSkillDisplay unmatched'>$skill->skillName</span>";
 									}
 								}
-								echo "<p class='skillsInfo'><span style='color:#28a745'>Green</span> skills are your skills that match this jobs requirements.</p>";
+								
 							}
 							else {
 								// Display skills as one colour
@@ -180,7 +205,7 @@
 					<!-- Location-->
 					<div id="locationSection">
 						<div>
-							<h2>Location: <?php echo $locationName; ?></h2>
+							<h3 class="mt-3">Location: <?php echo $locationName; ?></h3>
 							
 							<div class="map-container">
 								<iframe width="485" 
@@ -192,6 +217,25 @@
 							</div>
 						</div>
 					</div>
+					
+					
+					<?php if ($user->userType == 2 ) { ?>
+						<h3 class="mt-4">Contact</h3>
+						<p class="mb-0"><?php 
+							$mainContact = $employer->title . " " . $employer->firstName . " " . $employer->lastName . ": "  . $employer->phoneAreaCode . " " . $employer->phoneNumber;
+							echo htmlspecialchars($mainContact);
+						?></p>
+						<?php 
+						
+							if ($employer->otherLastName != "" && $employer->otherPhoneNumber != "") {
+								$otherContact = trim($employer->otherTitle . " " . $employer->otherFirstName . " " . $employer->otherLastName) . ": "  . trim($employer->otherPhoneAreaCode . " " . $employer->otherPhoneNumber);
+								echo '<p class="mb-0">' . htmlspecialchars($otherContact) . '</p>';
+							}
+						?>
+					
+					<?php } ?>
+					
+					
 				</div>
 			</div>
 			
@@ -199,14 +243,14 @@
 			<div class="card mt-2">
 				<div class="card-body">
 					<div id="jobRequiredSkills">
-						<div class="row mt-4">
+						<div class="row">
 							<div class="col-sm-12">
-								<h4>Missing Skills</h4>
+								<h4>Unmatched Skills</h4>
 							</div>
 						</div>
 						<div class="row">
 							<div class="col-sm-12">
-								<p>You do <strong>not</strong> have the following skill(s) required this position:</p>
+								<p>You do <strong>not</strong> have the following skills required this position:</p>
 							</div>
 						</div>
 						<div class="col-sm-12 jobSkillsList">
