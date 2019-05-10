@@ -225,6 +225,13 @@ final class SkillTest extends TestCase {
         $this->assertTrue(\Classes\Skill::GetSkillExists($realSkillDuplicate));
     }
 
+
+    
+    /**
+     * setUp and tearDown section
+     * 
+     */
+
     //refactored to allow external use
     public static function staticSetupSkillCat($skillCatName) {
         $conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);

@@ -133,227 +133,7 @@ final class APITest extends TestCase {
     }
 
 
-    //Most endpoints return json generated from APIResult objects. This function performs some basic checks of the
-    //form and content of the json generated to see if it came from an APIResult object.
-    public static function isAPIResult($data, $baseURL) {
-        $dataArr = (array)json_decode($data);
-        $keys = array_keys($dataArr);
-        //var_dump($dataArr);
-        //var_dump(strtolower($dataArr['documentation']));
-        //var_dump(strtolower($baseURL).'index.php');
-        return (in_array('result', $keys) && in_array('details', $keys) && in_array('documentation', $keys) 
-                && in_array($dataArr['result'], array('success','failure'))
-                && strtolower($dataArr['documentation']) == strtolower($baseURL).'index.php');
-    }
-
-
-    public static function checkNoToken($endpointURL, $curlObj, $baseProdURL) {
-        curl_setopt($curlObj, CURLOPT_URL, $endpointURL);
-        $data = curl_exec($curlObj);
-        $returnCode = curl_getinfo($curlObj, CURLINFO_HTTP_CODE);
-        $dataArr = (array)json_decode($data);
-        //var_dump($data);
-        if (!APITest::isAPIResult($data, $baseProdURL)) {
-            return array(false, 'Response not in APIResult form');
-        }
-        if ($returnCode != 401) {
-            return array(false, 'Incorrect return code given for tokenless attempt should be 401 is '.$returnCode);
-        }
-        if ($dataArr['result'] != 'failure') {
-            return array(false, 'Access to endpoint with no token supplied erroneously succeeded');
-        }
-        if ($dataArr['details'] != 'Token not supplied') {
-            return array(false, 'Incorrect (or changed) failure message');        
-        }
-        return array(true, "");
-    }
-
-    public static function checkIncorrectToken($endpointURL, $curlObj, $baseProdURL) {
-        curl_setopt($curlObj, CURLOPT_URL, $endpointURL);
-        $sendHeaders = array("TOKEN: 123");
-        curl_setopt($curlObj, CURLOPT_HTTPHEADER, $sendHeaders);
-        $data = curl_exec($curlObj);
-        $returnCode = curl_getinfo($curlObj, CURLINFO_HTTP_CODE);
-        $dataArr = (array)json_decode($data);
-        //var_dump($data);
-        if (!APITest::isAPIResult($data, $baseProdURL)) {
-            return array(false, 'Response not in APIResult form');
-        }
-        if ($returnCode != 401) {
-            return array(false, 'Incorrect return code given for wrong token attempt should be 401 is '.$returnCode);
-        }
-        if ($dataArr['result'] != 'failure') {
-            return array(false, 'Access to endpoint with wrong token supplied erroneously succeeded');
-        }
-        if ($dataArr['details'] != 'You are not logged in') {
-            return array(false, 'Incorrect (or changed) failure message');        
-        }
-        return array(true, "");
-    }
-
-    //
-    public static function checkCurrentToken($endpointURL, $curlObj, $baseProdURL, $uid, $email, $baseURL, 
-                                                $checkType = false, $typeExpected = "", $userTypes = array(),
-                                                $checkPOSTVars = false, $POSTVarsTypeGiven = "", $POSTVars = array(), $POSTErrorMsgExpected = "") {
-
-        $tokenAttemptRes = APITest::authenticateGetToken($uid, $email, $curlObj, $baseURL);
-        if ($tokenAttemptRes[0] == false) {
-            return array(false, $tokenAttemptRes[1]);
-        }
-
-        $token = $tokenAttemptRes[1];
-        
-        curl_setopt($curlObj, CURLOPT_URL, $endpointURL);
-        $sendHeaders = array("TOKEN: ".$token);
-        curl_setopt($curlObj, CURLOPT_HTTPHEADER, $sendHeaders);
-        curl_setopt($curlObj, CURLOPT_HEADER, 0);
-        //For endpoints that require POST vars be passed
-        if ($checkPOSTVars) {
-            $POSTVarString = "";
-            /**
-            foreach ($POSTVars as $key => $value) {
-                if ($POSTVarString == "") {
-                    $POSTVarString = $key."=".$value;
-                } else {
-                    $POSTVarString .= "&".$key."=".$value;
-                }
-            } */
-            curl_setopt($curlObj, CURLOPT_POST,1);
-            curl_setopt($curlObj, CURLOPT_POSTFIELDS, http_build_query($POSTVars));
-        }
-
-        $data = curl_exec($curlObj);
-        $returnCode = curl_getinfo($curlObj, CURLINFO_HTTP_CODE);
-        $dataArr = (array)json_decode($data);
-        //var_dump($data);
-        //var_dump($token);
-        if (!APITest::isAPIResult($data, $baseProdURL)) {
-            return array(false, 'Response not in APIResult form');
-        }
-
-        //For endpoints that require user be logged in as a certain type
-        if ($checkType) {
-            $user = new \Classes\User($uid);
-            $userType = $userTypes[$user->userType];
-            if ($userType != $typeExpected) {
-                if ($returnCode != 401) {
-                    return array(false, 'Incorrect return code for wrong user type - should be 401 is '.$returnCode);
-                }
-                if ($dataArr['result'] != 'failure') {
-                    return array(false, 'Success returned as result type for wrong user type');
-                }
-                if ($dataArr['details'] != 'You are not logged in as an '.$typeExpected) {
-                    return array(false, 'Incorrect (or changed) failure message for wrong user type');
-                }
-            }
-            //For endpoints that require POST vars be passed AND user type checks performed
-            if ($checkPOSTVars) {
-                if ($POSTVarsTypeGiven != "correct") {
-                    if ($dataArr['result'] == 'success') {
-                        return array(false, "Incorrect POST vars given but success still returned");
-                    }
-                    if ($dataArr['details'] != $POSTErrorMsgExpected) {
-                        return array(false, "Unexpected error message received when incorrect POST vars given: ".PHP_EOL."'"
-                                .$dataArr['details']."'".PHP_EOL."received,".PHP_EOL."'".$POSTErrorMsgExpected."'".PHP_EOL
-                                ."expected. POST vars were:".PHP_EOL.print_r($POSTVars,true));
-                    }
-                } else {
-                    if ($dataArr['result'] != 'success') {
-                        return array(false, "Correct POST vars given but failure still returned");
-                    }
-                }
-            }
-            return array(true,"");
-        }
-        //For endpoints that don't require user type checks but do require POST var passing (probably should be refactored)
-        if ($checkPOSTVars) {
-            if ($POSTVarsTypeGiven != "correct") {
-                if ($dataArr['result'] == 'success') {
-                    return array(false, "Incorrect POST vars given but success still returned");
-                }
-                if ($dataArr['details'] != $POSTErrorMsgExpected) {
-                    return array(false, "Unexpected error message received when incorrect POST vars given: ".PHP_EOL."'"
-                            .$dataArr['details']."'".PHP_EOL."received,".PHP_EOL."'".$POSTErrorMsgExpected."'".PHP_EOL
-                            ."expected. POST vars were:".PHP_EOL.print_r($POSTVars,true));
-                }
-            } else {
-                if ($returnCode != 200) {
-                    return array(false, 'Incorrect return code given for legitimate attempt should be 200 is '.$returnCode);
-                }
-                if ($dataArr['result'] != 'success') {
-                    return array(false, "Correct POST vars given but failure still returned");
-                }
-            }
-            return array(true, "");
-        }
-
-        //For endpoints that don't require either user type checks or POST var passing
-        if ($returnCode != 200) {
-            return array(false, 'Incorrect return code given for legitimate attempt should be 200 is '.$returnCode);
-        }
-        if ($dataArr['result'] != 'success') {
-            return array(false, 'Access to endpoint with legitimate token supplied erroneously failed');
-        }
-        return array(true, "");
-    }
-
-
-    //Functions to create adminStaff table records and delete them (i.e. to be called by setup and tearDown, as
-    //existing functions borrowed from SkillTest only deal with entries in the User table)
-
-    public static function setupAdminStaffRecord($uid) {
-        //In most cases would use relevant class to create record, however
-        //as our frontend isn't designed to facilitate creation of admin accounts
-        //we need to create these records directly
-        $conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);
-        $sql =  "insert into admin_staff (userid, firstname, lastname, created) "
-                ."values (?, 'Bob', 'Smith', UTC_TIMESTAMP())";
-
-        if($stmt = $conn->prepare($sql)) {
-            $stmt->bind_param("i", $uid);
-            $stmt->execute();
-            if ($conn->affected_rows != 1) {
-                $errMsg = $conn->errno.': '.$conn->error;
-                var_dump($errMsg);
-                $conn->close();
-                return array('false', "Could not verify creation of record in adminstaff table for userId ".$uid.":".PHP_EOL.$errMsg);
-            }
-            $insertedId = $stmt->insert_id;
-        } 
-        else {
-            $errMsg = $conn->errno.': '.$conn->error;
-            var_dump($errMsg);
-            $conn->close();
-            return array('false', "Could not create record in adminStaff table for userId ".$uid.":".PHP_EOL.$errMsg);
-        }
-        $conn->close();
-        //var_dump("Looks to have successfully set up adminStaff record for ".$uid);
-        return array(true, array('adminStaff' => new \Classes\AdminStaff($insertedId)));
-    }
-
-    public static function tearDownAdminStaffRecord($uid) {
-        $conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);
-
-        $sql =  "delete from admin_staff where userId = ?";
-
-        
-        if($stmt = $conn->prepare($sql)) {
-            $stmt->bind_param("i", $uid);
-            $stmt->execute();
-            if ($conn->affected_rows != 1) {
-                $conn->close();
-                return array('false', "Could not verify deletion of record in adminstaff table for userId ".$uid);
-            }
-        } 
-        else {
-            $conn->close();
-            return array('false', "Could not delete record in adminStaff table for userId ".$uid);
-        }
-        $conn->close();
-        return array(true, '');
-    }
-
-
+ 
 
     /**
      * categories.php
@@ -826,6 +606,242 @@ final class APITest extends TestCase {
         $this->assertTrue($successRes[0], $successRes[1]);
     }
 
+
+    /**
+     * Helper functions to provide common functionality to many of the tests in this file
+     * (checking result is in expected (APIResult) form, checking output when no token given,
+     * invalid (or not current) token given, or current token given)
+     */
+
+
+
+    //Most endpoints return json generated from APIResult objects. This helper function performs some basic checks of the
+    //form and content of the json generated to see if it came from an APIResult object.
+    public static function isAPIResult($data, $baseURL) {
+        $dataArr = (array)json_decode($data);
+        $keys = array_keys($dataArr);
+        //var_dump($dataArr);
+        //var_dump(strtolower($dataArr['documentation']));
+        //var_dump(strtolower($baseURL).'index.php');
+        return (in_array('result', $keys) && in_array('details', $keys) && in_array('documentation', $keys) 
+                && in_array($dataArr['result'], array('success','failure'))
+                && strtolower($dataArr['documentation']) == strtolower($baseURL).'index.php');
+    }
+
+
+    public static function checkNoToken($endpointURL, $curlObj, $baseProdURL) {
+        curl_setopt($curlObj, CURLOPT_URL, $endpointURL);
+        $data = curl_exec($curlObj);
+        $returnCode = curl_getinfo($curlObj, CURLINFO_HTTP_CODE);
+        $dataArr = (array)json_decode($data);
+        //var_dump($data);
+        if (!APITest::isAPIResult($data, $baseProdURL)) {
+            return array(false, 'Response not in APIResult form');
+        }
+        if ($returnCode != 401) {
+            return array(false, 'Incorrect return code given for tokenless attempt should be 401 is '.$returnCode);
+        }
+        if ($dataArr['result'] != 'failure') {
+            return array(false, 'Access to endpoint with no token supplied erroneously succeeded');
+        }
+        if ($dataArr['details'] != 'Token not supplied') {
+            return array(false, 'Incorrect (or changed) failure message');        
+        }
+        return array(true, "");
+    }
+
+    public static function checkIncorrectToken($endpointURL, $curlObj, $baseProdURL) {
+        curl_setopt($curlObj, CURLOPT_URL, $endpointURL);
+        $sendHeaders = array("TOKEN: 123");
+        curl_setopt($curlObj, CURLOPT_HTTPHEADER, $sendHeaders);
+        $data = curl_exec($curlObj);
+        $returnCode = curl_getinfo($curlObj, CURLINFO_HTTP_CODE);
+        $dataArr = (array)json_decode($data);
+        //var_dump($data);
+        if (!APITest::isAPIResult($data, $baseProdURL)) {
+            return array(false, 'Response not in APIResult form');
+        }
+        if ($returnCode != 401) {
+            return array(false, 'Incorrect return code given for wrong token attempt should be 401 is '.$returnCode);
+        }
+        if ($dataArr['result'] != 'failure') {
+            return array(false, 'Access to endpoint with wrong token supplied erroneously succeeded');
+        }
+        if ($dataArr['details'] != 'You are not logged in') {
+            return array(false, 'Incorrect (or changed) failure message');        
+        }
+        return array(true, "");
+    }
+
+    //
+    public static function checkCurrentToken($endpointURL, $curlObj, $baseProdURL, $uid, $email, $baseURL, 
+                                                $checkType = false, $typeExpected = "", $userTypes = array(),
+                                                $checkPOSTVars = false, $POSTVarsTypeGiven = "", $POSTVars = array(), $POSTErrorMsgExpected = "") {
+
+        $tokenAttemptRes = APITest::authenticateGetToken($uid, $email, $curlObj, $baseURL);
+        if ($tokenAttemptRes[0] == false) {
+            return array(false, $tokenAttemptRes[1]);
+        }
+
+        $token = $tokenAttemptRes[1];
+        
+        curl_setopt($curlObj, CURLOPT_URL, $endpointURL);
+        $sendHeaders = array("TOKEN: ".$token);
+        curl_setopt($curlObj, CURLOPT_HTTPHEADER, $sendHeaders);
+        curl_setopt($curlObj, CURLOPT_HEADER, 0);
+        //For endpoints that require POST vars be passed
+        if ($checkPOSTVars) {
+            $POSTVarString = "";
+            /**
+            foreach ($POSTVars as $key => $value) {
+                if ($POSTVarString == "") {
+                    $POSTVarString = $key."=".$value;
+                } else {
+                    $POSTVarString .= "&".$key."=".$value;
+                }
+            } */
+            curl_setopt($curlObj, CURLOPT_POST,1);
+            curl_setopt($curlObj, CURLOPT_POSTFIELDS, http_build_query($POSTVars));
+        }
+
+        $data = curl_exec($curlObj);
+        $returnCode = curl_getinfo($curlObj, CURLINFO_HTTP_CODE);
+        $dataArr = (array)json_decode($data);
+        //var_dump($data);
+        //var_dump($token);
+        if (!APITest::isAPIResult($data, $baseProdURL)) {
+            return array(false, 'Response not in APIResult form');
+        }
+
+        //For endpoints that require user be logged in as a certain type
+        if ($checkType) {
+            $user = new \Classes\User($uid);
+            $userType = $userTypes[$user->userType];
+            if ($userType != $typeExpected) {
+                if ($returnCode != 401) {
+                    return array(false, 'Incorrect return code for wrong user type - should be 401 is '.$returnCode);
+                }
+                if ($dataArr['result'] != 'failure') {
+                    return array(false, 'Success returned as result type for wrong user type');
+                }
+                if ($dataArr['details'] != 'You are not logged in as an '.$typeExpected) {
+                    return array(false, 'Incorrect (or changed) failure message for wrong user type');
+                }
+            }
+            //For endpoints that require POST vars be passed AND user type checks performed
+            if ($checkPOSTVars) {
+                if ($POSTVarsTypeGiven != "correct") {
+                    if ($dataArr['result'] == 'success') {
+                        return array(false, "Incorrect POST vars given but success still returned");
+                    }
+                    if ($dataArr['details'] != $POSTErrorMsgExpected) {
+                        return array(false, "Unexpected error message received when incorrect POST vars given: ".PHP_EOL."'"
+                                .$dataArr['details']."'".PHP_EOL."received,".PHP_EOL."'".$POSTErrorMsgExpected."'".PHP_EOL
+                                ."expected. POST vars were:".PHP_EOL.print_r($POSTVars,true));
+                    }
+                } else {
+                    if ($dataArr['result'] != 'success') {
+                        return array(false, "Correct POST vars given but failure still returned");
+                    }
+                }
+            }
+            return array(true,"");
+        }
+        //For endpoints that don't require user type checks but do require POST var passing (probably should be refactored)
+        if ($checkPOSTVars) {
+            if ($POSTVarsTypeGiven != "correct") {
+                if ($dataArr['result'] == 'success') {
+                    return array(false, "Incorrect POST vars given but success still returned");
+                }
+                if ($dataArr['details'] != $POSTErrorMsgExpected) {
+                    return array(false, "Unexpected error message received when incorrect POST vars given: ".PHP_EOL."'"
+                            .$dataArr['details']."'".PHP_EOL."received,".PHP_EOL."'".$POSTErrorMsgExpected."'".PHP_EOL
+                            ."expected. POST vars were:".PHP_EOL.print_r($POSTVars,true));
+                }
+            } else {
+                if ($returnCode != 200) {
+                    return array(false, 'Incorrect return code given for legitimate attempt should be 200 is '.$returnCode);
+                }
+                if ($dataArr['result'] != 'success') {
+                    return array(false, "Correct POST vars given but failure still returned");
+                }
+            }
+            return array(true, "");
+        }
+
+        //For endpoints that don't require either user type checks or POST var passing
+        if ($returnCode != 200) {
+            return array(false, 'Incorrect return code given for legitimate attempt should be 200 is '.$returnCode);
+        }
+        if ($dataArr['result'] != 'success') {
+            return array(false, 'Access to endpoint with legitimate token supplied erroneously failed');
+        }
+        return array(true, "");
+    }
+
+
+
+
+    /**
+     * 
+     * setUp and tearDown functions
+     * 
+     */
+
+    //Functions to create adminStaff table records and delete them (i.e. to be called by setup and tearDown, as
+    //existing functions borrowed from SkillTest only deal with entries in the User table)
+
+    public static function setupAdminStaffRecord($uid) {
+        //In most cases would use relevant class to create record, however
+        //as our frontend isn't designed to facilitate creation of admin accounts
+        //we need to create these records directly
+        $conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);
+        $sql =  "insert into admin_staff (userid, firstname, lastname, created) "
+                ."values (?, 'Bob', 'Smith', UTC_TIMESTAMP())";
+
+        if($stmt = $conn->prepare($sql)) {
+            $stmt->bind_param("i", $uid);
+            $stmt->execute();
+            if ($conn->affected_rows != 1) {
+                $errMsg = $conn->errno.': '.$conn->error;
+                var_dump($errMsg);
+                $conn->close();
+                return array('false', "Could not verify creation of record in adminstaff table for userId ".$uid.":".PHP_EOL.$errMsg);
+            }
+            $insertedId = $stmt->insert_id;
+        } 
+        else {
+            $errMsg = $conn->errno.': '.$conn->error;
+            var_dump($errMsg);
+            $conn->close();
+            return array('false', "Could not create record in adminStaff table for userId ".$uid.":".PHP_EOL.$errMsg);
+        }
+        $conn->close();
+        //var_dump("Looks to have successfully set up adminStaff record for ".$uid);
+        return array(true, array('adminStaff' => new \Classes\AdminStaff($insertedId)));
+    }
+
+    public static function tearDownAdminStaffRecord($uid) {
+        $conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);
+
+        $sql =  "delete from admin_staff where userId = ?";
+
+        
+        if($stmt = $conn->prepare($sql)) {
+            $stmt->bind_param("i", $uid);
+            $stmt->execute();
+            if ($conn->affected_rows != 1) {
+                $conn->close();
+                return array('false', "Could not verify deletion of record in adminstaff table for userId ".$uid);
+            }
+        } 
+        else {
+            $conn->close();
+            return array('false', "Could not delete record in adminStaff table for userId ".$uid);
+        }
+        $conn->close();
+        return array(true, '');
+    }
 
     protected function setUp(): void {
         parent::setUp();

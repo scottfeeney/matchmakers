@@ -18,7 +18,7 @@ final class AdminStaffTest extends TestCase {
     private $testEmail = "anAdminPersonBeingTested@email321.com";
 
 
-
+    //Simple constructor tests
     public function testConstructor() {
         $adminStaff = new \Classes\AdminStaff(0);
         $this->assertSame(0, $adminStaff->adminStaffId);
@@ -26,7 +26,7 @@ final class AdminStaffTest extends TestCase {
 
     public function testConstructorNegative() {
         $adminStaff = new \Classes\AdminStaff(-1);
-        $this->assertSame(0, $adminStaff->adminStaffId);
+        $this->assertSame(null, $adminStaff->adminStaffId);
     }
 
     public function testConstructorSuccess() {
@@ -71,14 +71,19 @@ final class AdminStaffTest extends TestCase {
 
     */
 
+    //Test of indicated method for failure and success
     public function testGetAdminStaffByUserIdFailure() {
         $this->assertSame(null, \Classes\AdminStaff::GetAdminStaffByUserId(0));
     }
 
     public function testGetAdminStaffByUserIdSuccess() {
-        $this->assertTrue(\Classes\AdminStaff::GetAdminStaffByUserId($this->adminStaff->userId) != null);
+        $this->assertTrue(\Classes\AdminStaff::GetAdminStaffByUserId($this->adminStaffUserRecord->userId) != null);
     }
 
+
+    //setUp and tearDown functions utilizing setUp and tearDown functionality from other classes
+    //as the setUp and tearDown functionality for this class was not properly completed before
+    //the same functionality was implemented elsewhere
     protected function setUp(): void {
         parent::setUp();
         //create record in user table

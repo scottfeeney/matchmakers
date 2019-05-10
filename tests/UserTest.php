@@ -79,6 +79,8 @@ final class UserTest extends TestCase {
     private $testEmails = array(1 => "unit@tester.com", 2 => "reallyunittesting@test.com");
     private $testPassword = "notavery1good+password";
 
+
+    //Simple tests to ensure constructor fails when it should
     public function testConstructorUserIdZeroGivenZero() {
         $this->assertEquals(0, (new \Classes\User(0))->userId);
     }
@@ -87,6 +89,8 @@ final class UserTest extends TestCase {
         $this->assertEquals(0, (new \Classes\User(-1))->userId);
     }
 
+    
+    //Make sure attempt to save record with email that already belongs to another record fails
     public function testSaveEmailExists() {
         $oid = $this->saveNewUser($this->testEmails[1]);
         $this->idsToDelete[] = $oid;
@@ -98,6 +102,10 @@ final class UserTest extends TestCase {
         $this->assertEquals(true, $objSave->hasError);
     }
 
+    //helper function to create user with indicated email address.
+    //UPDATE: Expanded to allow userType to be indicated also (so as to allow creation of
+    //admin-type records in user table - creation of skills requires this (but does not
+    //actually require a record in the admin_staff table))
     public static function saveNewUser($email, $userType = 1, $errorExpected = false) {
         $user = new \Classes\User(0);
         $user->userType = $userType;
@@ -117,6 +125,8 @@ final class UserTest extends TestCase {
         return $objSave->objectId;
     }
 
+    
+    //Test that changing a user's details (email) works
     public function testUpdateUser() {
         $oid = $this->saveNewUser($this->testEmails[1]);
         $user = new \Classes\User($oid);
@@ -131,6 +141,8 @@ final class UserTest extends TestCase {
         $this->assertEquals($this->testEmails[2], $user2->email);
     }
 
+    
+    //Test retrieval of data via creation of a new user
     public function testSaveGetUser() {
         $oid = $this->saveNewUser($this->testEmails[1]);
         $user = new \Classes\User($oid);
@@ -145,6 +157,8 @@ final class UserTest extends TestCase {
         $this->assertEquals(NULL, $user->resetCode);
     }
 
+    
+    //test ability to check if email exists in a user record
     public function testGetEmailExists() {
         $oid = $this->saveNewUser($this->testEmails[1]);
         $user = new \Classes\User($oid);
@@ -152,6 +166,8 @@ final class UserTest extends TestCase {
         $this->assertSame(true, $user->GetEmailExists($user->email, 0));
     }
 
+
+    //GetEmailExists should return false if an invalid value for email is passed to it
     public function testGetEmailExistsFailure() {
         $oid = $this->saveNewUser($this->testEmails[1]);
         $user = new \Classes\User($oid);
@@ -159,6 +175,8 @@ final class UserTest extends TestCase {
         $this->assertSame(false, $user->GetEmailExists(NULL, 0));
     }
 
+
+    //Test ability to retrieve real user record by verifyCode
     public function testGetUserByVerifyCode() {
         $oid = $this->saveNewUser($this->testEmails[1]);
         $user = new \Classes\User($oid);
@@ -169,6 +187,8 @@ final class UserTest extends TestCase {
         $this->assertEquals($user, \Classes\User::GetUserByVerifyCode($user->verifyCode));
     }
 
+
+    //Test failure of above method
     public function testGetUserByVerifyCodeFailure() {
         $oid = $this->saveNewUser($this->testEmails[1]);
         $user = new \Classes\User($oid);
@@ -178,6 +198,8 @@ final class UserTest extends TestCase {
         $this->assertEquals(null, \Classes\User::GetUserByVerifyCode($user->verifyCode));
     }
 
+
+    //Test ability to get user record from their email address
     public function testGetUserByEmailAddress() {
         $oid = $this->saveNewUser($this->testEmails[1]);
         $user = new \Classes\User($oid);
@@ -188,6 +210,8 @@ final class UserTest extends TestCase {
         $this->assertEquals($user, \Classes\User::GetUserByEmailAddress($user->email));
     }
 
+
+    //Test failure of above method
     public function testGetUserByEmailAddressFailure() {
         $oid = $this->saveNewUser($this->testEmails[1]);
         $user = new \Classes\User($oid);
@@ -195,6 +219,8 @@ final class UserTest extends TestCase {
         $this->assertEquals(null, \Classes\User::GetUserByEmailAddress($user->email));
     }
 
+
+    //test ability to get user record from their reset code
     public function testGetUserByResetCode() {
         $oid = $this->saveNewUser($this->testEmails[1]);
         $user = new \Classes\User($oid);
@@ -206,6 +232,8 @@ final class UserTest extends TestCase {
         $this->assertEquals($user, \Classes\User::GetUserByResetCode($user->resetCode));
     }
 
+
+    //test failure of above method
     public function testGetUserByResetCodeFailureNoMatch() {
         $oid = $this->saveNewUser($this->testEmails[1]);
         $user = new \Classes\User($oid);
@@ -213,6 +241,8 @@ final class UserTest extends TestCase {
         $this->assertEquals(null, \Classes\User::GetUserByResetCode($user->resetCode));
     }
 
+
+    //test failure of above due to code being wrong length
     public function testGetUserByResetCodeFailurecodeLength() {
         $oid = $this->saveNewUser($this->testEmails[1]);
         $user = new \Classes\User($oid);
@@ -223,6 +253,8 @@ final class UserTest extends TestCase {
         $this->assertEquals(null, \Classes\User::GetUserByResetCode("123"));
     }
 
+
+    //test ability to log in as legimate user
     public function testGetUserLogin() {
         $oid = $this->saveNewUser($this->testEmails[1]);
         $user = new \Classes\User($oid);
@@ -234,6 +266,8 @@ final class UserTest extends TestCase {
         $this->assertEquals($user, \Classes\User::GetUserLogin($user->email, $this->testPassword));
     }
 
+
+    //test failure of login if password wrong
     public function testGetUserLoginFailInvalidPassword() {
         $oid = $this->saveNewUser($this->testEmails[1]);
         $user = new \Classes\User($oid);
@@ -245,13 +279,14 @@ final class UserTest extends TestCase {
         $this->assertSame(null, \Classes\User::GetUserLogin($user->email, "Wrong password"));
     }
 
+
+    //setUp function no longer needed as all records created in this class use the same emails
     protected function setUp(): void {
         parent::setUp();
-        $this->idsToDelete = array();
     }
 
-    //Refactored to allow use from other test classes
 
+    //Refactored to allow use from other test classes
     public static function staticTearDown($testEmails) {
         $conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);
         foreach ($testEmails as $testEmail) {
@@ -273,6 +308,7 @@ final class UserTest extends TestCase {
         return array(true, "");
     }
 
+    //tearDown function. Original contents deleted as 
     protected function tearDown(): void {
         $this->staticTearDown($this->testEmails);
 

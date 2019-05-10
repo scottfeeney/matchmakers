@@ -15,13 +15,15 @@ final class EmployerTest extends TestCase {
 
     private $uidsToDelete;
     private $testEmail = "someEmployerEmail@somewhere.com";
-    //private $eidsToDelete;
 
+
+    //Simplest test possible
     public function testConstructor() {
         $employer = new \Classes\Employer(0);
         $this->assertSame(0, $employer->employerId);
     }
 
+    //Test ability to save user (i.e. test helper class below)
     public function testSaveUser() {
         $result = $this->createUserAndEmployer($this->testEmail);
         if ($result == null) {
@@ -34,6 +36,8 @@ final class EmployerTest extends TestCase {
         $this->assertEquals($employer, new \Classes\Employer($eid));
     }
 
+
+    //Helper class called from a number of other test classes (as well as this one)
     public static function createUserAndEmployer($email) {
         $oid = UserTest::saveNewUser($email);
         if ($oid == null) {
@@ -50,6 +54,8 @@ final class EmployerTest extends TestCase {
         return array('oid' => $oid, 'eid' => $eid, 'employer' => $employer);
     }
 
+    
+    //Test persistence of altered fields after object is saved
     public function testEditEmployer() {
         $result = $this->createUserAndEmployer($this->testEmail);
         if ($result == null) {
@@ -63,10 +69,14 @@ final class EmployerTest extends TestCase {
         $this->assertSame($employer->firstName, (new \Classes\Employer($eid))->firstName);
     }
 
+
+    //Test that indicated method correctly fails when given invalid input
     public function testGetEmployerByUserIdFailure() {
         $this->assertSame(null, \Classes\Employer::GetEmployerByUserId(0));
     }
 
+
+    //Test tha same method works when given legitimate input
     public function testGetEmployerByUserId() {
         $result = $this->createUserAndEmployer($this->testEmail);
         if ($result == null) {
@@ -77,6 +87,8 @@ final class EmployerTest extends TestCase {
         $this->assertEquals(\Classes\Employer::GetEmployerByUserId($oid), $employer);
     }
 
+
+    //setUp function to be automatically executed before any tests
     protected function setUp(): void {
         parent::setUp();
         $this->uidsToDelete = array();
@@ -105,6 +117,7 @@ final class EmployerTest extends TestCase {
         return array(true, "");
     }
 
+    //function to remove temporary test data from database
     protected function tearDown(): void {
         $conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);
         //var_dump($conn);

@@ -43,12 +43,13 @@ final class JobSeekerTest extends TestCase {
 
 
 
-
+    //Simplest JobSeeker test possible
     public function testConstructor() {
         $jobSeeker = new \Classes\JobSeeker(0);
         $this->assertSame(0, $jobSeeker->jobSeekerId);
     }
 
+    /**
     public function testSaveUser() {
         $createUserJSRes = $this->createUserAndJobSeeker($this->testEmail);
         if ($createUserJSRes == null) {
@@ -57,7 +58,7 @@ final class JobSeekerTest extends TestCase {
         extract($createUserJSRes);
         //yields oid, jid and jobSeeker
         $this->assertEquals($jobSeeker, new \Classes\JobSeeker($jid));
-    }
+    } */
 
     /**
      * Helper function as multiple tests will want to work on a record already in the database
@@ -73,6 +74,8 @@ final class JobSeekerTest extends TestCase {
         return array('oid' => $oid, 'jid' => $jid, 'jobSeeker' => $jobSeeker);
     }
 
+
+    //Test that changes to a user are persisted after being saved
     public function testEditUser() {
         $createUserJSRes = $this->createUserAndJobSeeker($this->testEmail);
         if ($createUserJSRes == null) {
@@ -85,24 +88,26 @@ final class JobSeekerTest extends TestCase {
         $this->assertSame($jobSeeker->firstName, (new \Classes\jobSeeker($jid))->firstName);
     }
 
+
+    //Test that method correctly fails when given invalid userId
     public function testGetJobSeekerByUserIdFailure() {
         $this->assertSame(null, \Classes\JobSeeker::GetJobSeekerByUserId(0));
     }
 
+    //test that same method works given legitimate userId
     public function testGetJobSeekerByUserId() {
         $result = $this->createUserAndJobSeeker($this->testEmail);
         if ($result == null) {
             $this->assertTrue(false);
         }
         extract($result);
-        $this->assertEquals(\Classes\jobSeeker::GetJobSeekerByUserId($oid), $jobSeeker);
+        $this->assertEquals(\Classes\JobSeeker::GetJobSeekerByUserId($oid), $jobSeeker);
     }
 
 
-    //Remaining to be tested:
+    //UPDATE: Remaining to be tested:
     //SaveJobSeekerSkills($jobSeekerId, $selectedSkills)
     //GetSkillsByJobSeekerString($jobSeekerId)
-
     public function testJobSeekerSkillsString() {
 
         //create new jobseeker
@@ -191,6 +196,10 @@ final class JobSeekerTest extends TestCase {
     }
 
 
+    /**
+     * Start of section related to matching algorithm testing
+     */
+
     //Helper function to emulate the job matching algorithm. With tests using this function, any later adjustments to the 
     //algorithm will require only adjusting this function to bring testing in line, rather than adjusting each test function
     public static function matchingFormula($job, $jobSeeker, $returnType) {
@@ -241,6 +250,9 @@ final class JobSeekerTest extends TestCase {
         return array($obj);
     }
 
+
+    //Helper function to find the nominated job (or jobseeker) in a list of potentially many matches and
+    //return their score
     public static function checkMatchScore($jid, $matches) {
         $score = null;
         //Works for both job seekers and jobs
@@ -259,30 +271,56 @@ final class JobSeekerTest extends TestCase {
         return round($score);
     }
 
+
     public function testDummy() {
         var_dump("This dummy test serves no purpose other than to warn that the next test to execute is expected to take quite a while to run "
                 ."(takes around 9min on our testing platform (AWS free tier instance))".PHP_EOL."Starting test at ".date("H:i:s"));
         $this->assertTrue(true);
     }
 
+
+    /**
+     * Exhaustive testing of all matching algorithm related functionality
+     * 
+     * Methods tested:
+     * 
+     * JobSeeker::GetJobSeekerMatchesByJob
+     * JobSeeker::GetJobMatch
+     * Job::GetJobMatchesByJobSeeker
+     * Job::GetJobSeekerMatch
+     * 
+     * Testing is done exclusively in this class to allow for cross-comparison of
+     * results of methods from both Job and JobSeeker classes.
+     */
     public function testGetJobMatchesByJobSeekerAndGetJobMatchExhaustive() {
-        //$this->assertTrue(false); //temporarily disabled to speed up test suite execution
+        $this->assertTrue(false); //temporarily disabled to speed up test suite execution
         //$limit = 1; //to limit but not entirely disable this function
         $totalNumSkills = count($this->testSkills);
+
+        //For each possible number of skills to be assigned to JobSeeker
         for ($i = 1; $i < $totalNumSkills; $i++) {
             //if ($i > $limit) {
             //    break;
             //}
-            //$skillsNotSelected = $totalNumSkills - $i;
+
+            //For each possible number of skills to be assigned to Job
             for ($j = 1; $j < $totalNumSkills; $j++) {
+
+                //For each possible start position for those Job skills (given the total number of skills available)
+                //(adjusting start position alters crossover with JobSeeker's skills - i.e. number of matching skills)
                 for ($startIndex = 1; $startIndex < $totalNumSkills - $j; $startIndex++) {
+
+                    //Foreach possible state for location and jobtype matching or not
                     foreach (array(true, false) as $locMatch) {
                         foreach (array(true, false) as $jobTypeMatch) {
+
+                            //Prep jobSeeker
                             $this->testJobSeeker->locationId = $this->location1Id;
                             $this->testJobSeeker->jobTypeId = $this->jobType1Id;
                             $this->testJobSeeker->skillCategoryId = $this->testSkillCategory->skillCategoryId;
                             $this->testJobSeeker->Save();
 
+                            //Add jobSeeker skills
                             $jobSeekerSkillsIDsStr = "";
                             for ($k = 1; $k <= $i; $k++) {
                                 $jobSeekerSkillsIDsStr .= $jobSeekerSkillsIDsStr == "" ? "" : ",";
@@ -293,13 +331,15 @@ final class JobSeekerTest extends TestCase {
                             }
                             \Classes\JobSeeker::SaveJobSeekerSkills($this->testJobSeeker->jobSeekerId, $jobSeekerSkillsIDsStr);
 
+                            
+                            //Prep job
                             $this->testJob->locationId = $locMatch ? $this->location1Id : $this->location2Id;
                             $this->testJob->jobTypeId = $jobTypeMatch ? $this->jobType1Id : $this->jobType2Id;
                             $this->testJob->skillCategoryId = $this->testSkillCategory->skillCategoryId;
                             $this->testJob->Save();
                             
+                            //Add job skills
                             $jobSkillsIDsStr = "";
-                            
                             for ($l = $startIndex; $l <= $j; $l++) {
                                 $jobSkillsIDsStr .= $jobSkillsIDsStr == "" ? "" : ",";
                                 $jobSkillsIDsStr .= ($this->testSkills[$l])->skillId;
@@ -309,22 +349,27 @@ final class JobSeekerTest extends TestCase {
                             }
                             \Classes\Job::SaveJobSkills($this->testJob->jobId, $jobSkillsIDsStr);
 
+                            
+                            //Determine expected (as calculated by implementation of matching formula in helper function)
+                            //and actual matches using GetXXXMatchesByYYY methods in both job and jobseeker classes
                             $expectedMatches = $this->matchingFormula($this->testJob, $this->testJobSeeker, "seekers");
                             $expectedMatchesJobs = $this->matchingFormula($this->testJob, $this->testJobSeeker, "jobs");
                             $actualMatches = \Classes\JobSeeker::GetJobSeekerMatchesByJob($this->testJob->jobId);
                             $actualMatchesJobs = \Classes\Job::GetJobMatchesByJobSeeker($this->testJobSeeker->jobSeekerId);
                             
+                            
+                            //Process those match objects to retrieve the match scores
                             $expectedScore = $this->checkMatchScore($this->testJobSeeker->jobSeekerId, $expectedMatches);
                             $actualScore = $this->checkMatchScore($this->testJobSeeker->jobSeekerId, $actualMatches);
-
                             $expectedJobsScore = $this->checkMatchScore($this->testJob->jobId, $expectedMatchesJobs);
                             $actualScoreJobs = $this->checkMatchScore($this->testJob->jobId, $actualMatchesJobs);
 
+                            //Also get scores returned directly by GetXXXMatch methods in job and jobseeker classes
                             $getJobMatchScore = $this->testJobSeeker->GetJobMatch($this->testJob->jobId);
-
                             $getJobSeekerMatchScore = $this->testJob->GetJobSeekerMatch($this->testJobSeeker->jobSeekerId);
 
-                            //if ($expectedScore != $actualScore) {
+
+                            //check that expected result matches results of methods in JobSeeker class
                             $this->assertTrue($expectedScore == $actualScore, "Matching (::GetJobSeekerMatchesByJob) returned unexpected result: expected ".$expectedScore.", got "
                                                         .$actualScore.PHP_EOL."Parameters were: ".PHP_EOL."Jobseeker SkillIDs: ".$jobSeekerSkillsIDsStr
                                                         .PHP_EOL."Job SkillIDs: ".$jobSkillsIDsStr.PHP_EOL."Location match: ".($locMatch ? "true" : "false").PHP_EOL
@@ -334,6 +379,7 @@ final class JobSeekerTest extends TestCase {
                                                         .PHP_EOL."Job SkillIDs: ".$jobSkillsIDsStr.PHP_EOL."Location match: ".($locMatch ? "true" : "false").PHP_EOL
                                                         ."Job Type Match: ".($jobTypeMatch ? "true" : "false"));
 
+                            //check that expected result matches results of methods in Job class
                             $this->assertTrue($expectedJobsScore == $actualScoreJobs, "Matching (::GetJobMatchesByJobSeeker) returned unexpected result: expected ".$expectedJobsScore.", got "
                                                         .$actualScoreJobs.PHP_EOL."Parameters were: ".PHP_EOL."Jobseeker SkillIDs: ".$jobSeekerSkillsIDsStr
                                                         .PHP_EOL."Job SkillIDs: ".$jobSkillsIDsStr.PHP_EOL."Location match: ".($locMatch ? "true" : "false").PHP_EOL
@@ -343,11 +389,15 @@ final class JobSeekerTest extends TestCase {
                                                         .PHP_EOL."Job SkillIDs: ".$jobSkillsIDsStr.PHP_EOL."Location match: ".($locMatch ? "true" : "false").PHP_EOL
                                                         ."Job Type Match: ".($jobTypeMatch ? "true" : "false"));
 
+                            //Compare results from Job and JobSeeker classes
                             $this->assertTrue($actualScore == $actualScoreJobs, "Matching (::GetJobSeekerMatchesByJob to ::GetJobMatchesByJobSeeker) returned unexpected result: ".$actualScoreJobs." doesn't match "
                                                         .$actualScore.PHP_EOL."Parameters were: ".PHP_EOL."Jobseeker SkillIDs: ".$jobSeekerSkillsIDsStr
                                                         .PHP_EOL."Job SkillIDs: ".$jobSkillsIDsStr.PHP_EOL."Location match: ".($locMatch ? "true" : "false").PHP_EOL
                                                         ."Job Type Match: ".($jobTypeMatch ? "true" : "false"));
                             
+
+                            //Debugging statements
+
                             //var_dump("Expected ".$expectedScore." got ".$actualScore);
                             //var_dump("Expected ".$expectedScore.", got "
                             //    .$actualScore.PHP_EOL."Parameters were: ".PHP_EOL."Jobseeker SkillIDs: ".$jobSeekerSkillsIDsStr
@@ -355,12 +405,12 @@ final class JobSeekerTest extends TestCase {
                             //    ."Job Type Match: ".($jobTypeMatch ? "true" : "false"));
                             //var_dump($expectedMatches);
                             //var_dump($actualMatches);
-                            //}
-                            //var_dump("AFTER ASSERT");
 
 
+                            
                             //sleep for 0.15sec. This is necessary to prevent windows running out of available network ports for database connections.
                             //May not be necessary under linux or OSX
+                            
                             usleep(150000);
                         }
                     }
@@ -374,10 +424,10 @@ final class JobSeekerTest extends TestCase {
         $this->assertTrue(true);
     }
 
-    //Test Matching
-    //For these tests we assume that there are already at least two locations and two jobTypes in the database,
-    //using IDs 1 and 2 in each table.
+
+    //Section containing one-off tests. Pretty much redundant now that the exhaustive testing above has been implemented
     
+    /**
     //Only location matches - not listed, 25%
     //add one skill to job and jobseeker to avoid divide by zero error
     public function testMatchingLocOnly() {
@@ -478,19 +528,37 @@ final class JobSeekerTest extends TestCase {
         $testRes = JobSeekerTest::matchingTest($testParams, $testVars, "seekers");
         $this->assertEquals($testRes[0], $testRes[1], "Expected ".$testRes[0].", got ".$testRes[1]);
     }
+
+    */
     
+
+    /**
+     * Helper function to allow testing of the matching algorithm to be initiated from another class
+     * Originally created when I'd planned to do matching algorithm testing in JobTest.php as well as
+     * this class, however ultimately it was decided to do all unit matching in one class to allow for
+     * comparison of the results of Job::GetJobSeekerMatch and JobSeeker::GetJobMatch etc.
+     * 
+     * This class could still be useful in the future though so not commenting out (although you would
+     * most likely want to expand it to cover all matching algorithm methods as the above method does - 
+     * currently it only covers JobSeeker::GetJobSeekerMatchesByJob)
+     */
+
     public static function matchingTest($testParams, $testVars, $matchType) {
         //var_dump($testParams);
         //var_dump($testVars);
         //var_dump($matchType);
+
+        //turn array parameters back into individual variables
         list($seekerSkills, $matchingSkills, $jobSkills, $locMatch, $jobTypeMatch) = $testParams;
         list($testJob, $testJobSeeker, $testSkills, $testSkillCategory, $location1Id, $location2Id, $jobType1Id, $jobType2Id) = $testVars;
 
+        //Prep test job
         $testJob->locationId = $location1Id;
         $testJob->jobTypeId = $jobType1Id;
         $testJob->skillCategoryId = $testSkillCategory->skillCategoryId;
         $testJob->Save();
 
+        //Add job skills
         $jobSkillIdsStr = "";
         for($i = 0; $i < $jobSkills; $i++) {
             $jobSkillIdsStr .= $jobSkillIdsStr == "" ? "" : ",";
@@ -499,12 +567,15 @@ final class JobSeekerTest extends TestCase {
         //var_dump($jobSkillIdsStr);
         \Classes\Job::SaveJobSkills($testJob->jobId, $jobSkillIdsStr);
 
+        //Prep test job seeker
         $testJobSeeker->locationId = $locMatch ? $location1Id : $location2Id;
         $testJobSeeker->jobTypeId = $jobTypeMatch ? $jobType1Id : $jobType2Id;
         $testJobSeeker->skillCategoryId = $testSkillCategory->skillCategoryId;
         $testJobSeeker->Save();
 
         $matchDiff = $jobSkills - $matchingSkills;
+
+        //Add job seeker skills
         $seekerSkillIdsStr = "";
         for($i = $matchDiff; $i < $seekerSkills + $matchDiff; $i++) {
             $seekerSkillIdsStr .= $seekerSkillIdsStr == "" ? "" : ",";
@@ -513,6 +584,7 @@ final class JobSeekerTest extends TestCase {
         //var_dump($seekerSkillIdsStr);
         \Classes\JobSeeker::SaveJobSeekerSkills($testJobSeeker->jobSeekerId, $seekerSkillIdsStr);
 
+        //Get expected and actual matching results
         $expectedMatches = JobSeekerTest::matchingFormula($testJob, $testJobSeeker, $matchType);
         $actualMatches = \Classes\JobSeeker::GetJobSeekerMatchesByJob($testJob->jobId);
         //var_dump($actualMatches);
@@ -523,7 +595,12 @@ final class JobSeekerTest extends TestCase {
     }
 
 
+    /**
+     * setUp and tearDown functions and helper functions
+     */
 
+
+    //Called from setUp
     public static function setUpForMatchingAlgoTest($jsEmail, $empEmail, $jobName, $skillCatName, $skillNames, $adminEmail, 
                                                     $loc1Name, $loc2Name, $jobType1Name, $jobType2Name) {
         
