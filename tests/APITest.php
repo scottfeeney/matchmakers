@@ -49,7 +49,7 @@ final class APITest extends TestCase {
     //lookup for userTypes
     private $userTypes = array(1 => "employer", 2 => "jobseeker", 3 => "admin");
     
-    
+
     /**
      * authenticate.php
      */

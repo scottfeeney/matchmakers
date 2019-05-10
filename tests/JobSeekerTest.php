@@ -216,9 +216,9 @@ final class JobSeekerTest extends TestCase {
         //var_dump(array('matched' => $matched, 'seekerNoMatch' => $seekerNoMatch, 'jobTotal' => $jobTotal));
 
         //Add score for weighted skills with 'jack of all trades' penalty if applicable
-        $pros = $matched / $jobTotal * 50 * 11;
-        $cons = $seekerNoMatch / $jobTotal * 50;
-        $skillsScore = ($pros - $cons) / 11;
+        $pros = ($matched * 1.0) / $jobTotal * 50 * 11;
+        $cons = ($seekerNoMatch * 1.0) / $jobTotal * 50;
+        $skillsScore = ($pros - $cons) / 11.0;
 
         //var_dump(array('pros' => $pros, 'cons' => $cons, 'skillsScore' => $skillsScore));
 
@@ -231,11 +231,11 @@ final class JobSeekerTest extends TestCase {
         if ($returnType == "seekers") {
             $obj = new \StdClass;
             $obj->jobSeekerId = $jobSeeker->jobSeekerId;
-            $obj->score = $matchPercent;
+            $obj->score = round($matchPercent);
         } else {
             $obj = new \StdClass;
             $obj->jobId = $job->jobId;
-            $obj->score = $matchPercent;
+            $obj->score = round($matchPercent);
         }
         //var_dump($obj);
         return array($obj);
@@ -256,10 +256,123 @@ final class JobSeekerTest extends TestCase {
                 }
             }
         }
-        return intval($score);
+        return round($score);
     }
 
-    
+    public function testDummy() {
+        var_dump("This dummy test serves no purpose other than to warn that the next test to execute is expected to take quite a while to run "
+                ."(takes around 9min on our testing platform (AWS free tier instance))".PHP_EOL."Starting test at ".date("H:i:s"));
+        $this->assertTrue(true);
+    }
+
+    public function testGetJobMatchesByJobSeekerAndGetJobMatchExhaustive() {
+        //$this->assertTrue(false); //temporarily disabled to speed up test suite execution
+        //$limit = 1; //to limit but not entirely disable this function
+        $totalNumSkills = count($this->testSkills);
+        for ($i = 1; $i < $totalNumSkills; $i++) {
+            //if ($i > $limit) {
+            //    break;
+            //}
+            //$skillsNotSelected = $totalNumSkills - $i;
+            for ($j = 1; $j < $totalNumSkills; $j++) {
+                for ($startIndex = 1; $startIndex < $totalNumSkills - $j; $startIndex++) {
+                    foreach (array(true, false) as $locMatch) {
+                        foreach (array(true, false) as $jobTypeMatch) {
+                            $this->testJobSeeker->locationId = $this->location1Id;
+                            $this->testJobSeeker->jobTypeId = $this->jobType1Id;
+                            $this->testJobSeeker->skillCategoryId = $this->testSkillCategory->skillCategoryId;
+                            $this->testJobSeeker->Save();
+
+                            $jobSeekerSkillsIDsStr = "";
+                            for ($k = 1; $k <= $i; $k++) {
+                                $jobSeekerSkillsIDsStr .= $jobSeekerSkillsIDsStr == "" ? "" : ",";
+                                $jobSeekerSkillsIDsStr .= ($this->testSkills[$k])->skillId;
+                            }
+                            if ($jobSeekerSkillsIDsStr == "") {
+                                continue; //must have at least one skill
+                            }
+                            \Classes\JobSeeker::SaveJobSeekerSkills($this->testJobSeeker->jobSeekerId, $jobSeekerSkillsIDsStr);
+
+                            $this->testJob->locationId = $locMatch ? $this->location1Id : $this->location2Id;
+                            $this->testJob->jobTypeId = $jobTypeMatch ? $this->jobType1Id : $this->jobType2Id;
+                            $this->testJob->skillCategoryId = $this->testSkillCategory->skillCategoryId;
+                            $this->testJob->Save();
+                            
+                            $jobSkillsIDsStr = "";
+                            
+                            for ($l = $startIndex; $l <= $j; $l++) {
+                                $jobSkillsIDsStr .= $jobSkillsIDsStr == "" ? "" : ",";
+                                $jobSkillsIDsStr .= ($this->testSkills[$l])->skillId;
+                            }
+                            if ($jobSkillsIDsStr == "") {
+                                continue; //must have at least one skill
+                            }
+                            \Classes\Job::SaveJobSkills($this->testJob->jobId, $jobSkillsIDsStr);
+
+                            $expectedMatches = $this->matchingFormula($this->testJob, $this->testJobSeeker, "seekers");
+                            $expectedMatchesJobs = $this->matchingFormula($this->testJob, $this->testJobSeeker, "jobs");
+                            $actualMatches = \Classes\JobSeeker::GetJobSeekerMatchesByJob($this->testJob->jobId);
+                            $actualMatchesJobs = \Classes\Job::GetJobMatchesByJobSeeker($this->testJobSeeker->jobSeekerId);
+                            
+                            $expectedScore = $this->checkMatchScore($this->testJobSeeker->jobSeekerId, $expectedMatches);
+                            $actualScore = $this->checkMatchScore($this->testJobSeeker->jobSeekerId, $actualMatches);
+
+                            $expectedJobsScore = $this->checkMatchScore($this->testJob->jobId, $expectedMatchesJobs);
+                            $actualScoreJobs = $this->checkMatchScore($this->testJob->jobId, $actualMatchesJobs);
+
+                            $getJobMatchScore = $this->testJobSeeker->GetJobMatch($this->testJob->jobId);
+
+                            $getJobSeekerMatchScore = $this->testJob->GetJobSeekerMatch($this->testJobSeeker->jobSeekerId);
+
+                            //if ($expectedScore != $actualScore) {
+                            $this->assertTrue($expectedScore == $actualScore, "Matching (::GetJobSeekerMatchesByJob) returned unexpected result: expected ".$expectedScore.", got "
+                                                        .$actualScore.PHP_EOL."Parameters were: ".PHP_EOL."Jobseeker SkillIDs: ".$jobSeekerSkillsIDsStr
+                                                        .PHP_EOL."Job SkillIDs: ".$jobSkillsIDsStr.PHP_EOL."Location match: ".($locMatch ? "true" : "false").PHP_EOL
+                                                        ."Job Type Match: ".($jobTypeMatch ? "true" : "false"));
+                            $this->assertTrue($expectedScore == $getJobMatchScore, "Matching (::GetJobMatch) returned unexpected result: expected ".$expectedScore.", got "
+                                                        .$getJobMatchScore.PHP_EOL."Parameters were: ".PHP_EOL."Jobseeker SkillIDs: ".$jobSeekerSkillsIDsStr
+                                                        .PHP_EOL."Job SkillIDs: ".$jobSkillsIDsStr.PHP_EOL."Location match: ".($locMatch ? "true" : "false").PHP_EOL
+                                                        ."Job Type Match: ".($jobTypeMatch ? "true" : "false"));
+
+                            $this->assertTrue($expectedJobsScore == $actualScoreJobs, "Matching (::GetJobMatchesByJobSeeker) returned unexpected result: expected ".$expectedJobsScore.", got "
+                                                        .$actualScoreJobs.PHP_EOL."Parameters were: ".PHP_EOL."Jobseeker SkillIDs: ".$jobSeekerSkillsIDsStr
+                                                        .PHP_EOL."Job SkillIDs: ".$jobSkillsIDsStr.PHP_EOL."Location match: ".($locMatch ? "true" : "false").PHP_EOL
+                                                        ."Job Type Match: ".($jobTypeMatch ? "true" : "false"));
+                            $this->assertTrue($expectedJobsScore == $getJobSeekerMatchScore, "Matching (::GetJobSeekerMatch) returned unexpected result: expected ".$expectedJobsScore.", got "
+                                                        .$getJobSeekerMatchScore.PHP_EOL."Parameters were: ".PHP_EOL."Jobseeker SkillIDs: ".$jobSeekerSkillsIDsStr
+                                                        .PHP_EOL."Job SkillIDs: ".$jobSkillsIDsStr.PHP_EOL."Location match: ".($locMatch ? "true" : "false").PHP_EOL
+                                                        ."Job Type Match: ".($jobTypeMatch ? "true" : "false"));
+
+                            $this->assertTrue($actualScore == $actualScoreJobs, "Matching (::GetJobSeekerMatchesByJob to ::GetJobMatchesByJobSeeker) returned unexpected result: ".$actualScoreJobs." doesn't match "
+                                                        .$actualScore.PHP_EOL."Parameters were: ".PHP_EOL."Jobseeker SkillIDs: ".$jobSeekerSkillsIDsStr
+                                                        .PHP_EOL."Job SkillIDs: ".$jobSkillsIDsStr.PHP_EOL."Location match: ".($locMatch ? "true" : "false").PHP_EOL
+                                                        ."Job Type Match: ".($jobTypeMatch ? "true" : "false"));
+                            
+                            //var_dump("Expected ".$expectedScore." got ".$actualScore);
+                            //var_dump("Expected ".$expectedScore.", got "
+                            //    .$actualScore.PHP_EOL."Parameters were: ".PHP_EOL."Jobseeker SkillIDs: ".$jobSeekerSkillsIDsStr
+                            //    .PHP_EOL."Job SkillIDs: ".$jobSkillsIDsStr.PHP_EOL."Location match: ".($locMatch ? "true" : "false").PHP_EOL
+                            //    ."Job Type Match: ".($jobTypeMatch ? "true" : "false"));
+                            //var_dump($expectedMatches);
+                            //var_dump($actualMatches);
+                            //}
+                            //var_dump("AFTER ASSERT");
+
+
+                            //sleep for 0.15sec. This is necessary to prevent windows running out of available network ports for database connections.
+                            //May not be necessary under linux or OSX
+                            usleep(150000);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    public function testDummy2() {
+        var_dump("This dummy test serves no purpose other than to log the time the above test finished: ".date("H:i:s"));
+        $this->assertTrue(true);
+    }
 
     //Test Matching
     //For these tests we assume that there are already at least two locations and two jobTypes in the database,
@@ -271,11 +384,13 @@ final class JobSeekerTest extends TestCase {
 
         $this->testJob->locationId = $this->location1Id;
         $this->testJob->jobTypeId = $this->jobType1Id;
+        $this->testJob->skillCategoryId = $this->testSkillCategory->skillCategoryId;
         $this->testJob->Save();
         \Classes\Job::SaveJobSkills($this->testJob->jobId, ($this->testSkills[0])->skillId);
 
         $this->testJobSeeker->locationId = $this->location1Id;
         $this->testJobSeeker->jobTypeId = $this->jobType2Id;
+        $this->testJobSeeker->skillCategoryId = $this->testSkillCategory->skillCategoryId;
         $this->testJobSeeker->Save();
         \Classes\JobSeeker::SaveJobSeekerSkills($this->testJobSeeker->jobSeekerId, ($this->testSkills[1])->skillId);
 
@@ -343,6 +458,26 @@ final class JobSeekerTest extends TestCase {
         $testRes = JobSeekerTest::matchingTest($testParams, $testVars, "seekers");
         $this->assertEquals($testRes[0], $testRes[1], "Expected ".$testRes[0].", got ".$testRes[1]);
     }
+
+    public function testJobLoc445() {
+        $testParams = array(4,4,5,true,true);
+        $testVars = array($this->testJob, $this->testJobSeeker, $this->testSkills, $this->testSkillCategory, 
+                        $this->location1Id, $this->location2Id, $this->jobType1Id, $this->jobType2Id);
+        //var_dump($testParams);
+        //var_dump($testVars);
+        $testRes = JobSeekerTest::matchingTest($testParams, $testVars, "seekers");
+        $this->assertEquals($testRes[0], $testRes[1], "Expected ".$testRes[0].", got ".$testRes[1]);
+    }
+
+    public function testJobLoc1111() {
+        $testParams = array(1,1,11,true,true);
+        $testVars = array($this->testJob, $this->testJobSeeker, $this->testSkills, $this->testSkillCategory, 
+                        $this->location1Id, $this->location2Id, $this->jobType1Id, $this->jobType2Id);
+        //var_dump($testParams);
+        //var_dump($testVars);
+        $testRes = JobSeekerTest::matchingTest($testParams, $testVars, "seekers");
+        $this->assertEquals($testRes[0], $testRes[1], "Expected ".$testRes[0].", got ".$testRes[1]);
+    }
     
     public static function matchingTest($testParams, $testVars, $matchType) {
         //var_dump($testParams);
@@ -361,6 +496,7 @@ final class JobSeekerTest extends TestCase {
             $jobSkillIdsStr .= $jobSkillIdsStr == "" ? "" : ",";
             $jobSkillIdsStr .= ($testSkills[$i])->skillId;
         }
+        //var_dump($jobSkillIdsStr);
         \Classes\Job::SaveJobSkills($testJob->jobId, $jobSkillIdsStr);
 
         $testJobSeeker->locationId = $locMatch ? $location1Id : $location2Id;
@@ -368,12 +504,13 @@ final class JobSeekerTest extends TestCase {
         $testJobSeeker->skillCategoryId = $testSkillCategory->skillCategoryId;
         $testJobSeeker->Save();
 
-        $matchDiff = $seekerSkills - $matchingSkills;
+        $matchDiff = $jobSkills - $matchingSkills;
         $seekerSkillIdsStr = "";
         for($i = $matchDiff; $i < $seekerSkills + $matchDiff; $i++) {
             $seekerSkillIdsStr .= $seekerSkillIdsStr == "" ? "" : ",";
             $seekerSkillIdsStr .= ($testSkills[$i])->skillId;
         }
+        //var_dump($seekerSkillIdsStr);
         \Classes\JobSeeker::SaveJobSeekerSkills($testJobSeeker->jobSeekerId, $seekerSkillIdsStr);
 
         $expectedMatches = JobSeekerTest::matchingFormula($testJob, $testJobSeeker, $matchType);
@@ -385,40 +522,10 @@ final class JobSeekerTest extends TestCase {
                             JobSeekerTest::checkMatchScore($testJobSeeker->jobSeekerId, $actualMatches));        
     }
 
-    //Both jobtype and location match, seeker has 5 skills, 4 of them match, job has 8 skills
-    //listed 74.43 18 repeating %
-
-    //Both jobtype and location match, seeker has 5 skills, 5 of them match, job has 5 skills
-    //listed 100%
-
-    //both jobtype and location match, seeker has 5 skills, 5 of them match, job has 12 skills
-    //listed 70.8 3 repeating
-
-    //jobtype doesn't match location does, seeker has 5 skills, 4 match, job has 8 skills
-    //not listed 49.43 18 repeating %
-
-    //location doesn't match jobtype does seeker has 5 skills 4 match job has 8 skills
-    //not listed 49 43 18 repeating %
-
-    //jobtype doesn't match location does, seeker has 5 skills, 4 match, job has 6 skills
-    //listed 57.57 repeating
-
-    //location doesn't match jobtype does, seeker has 5 skills, 4 match, job has 6 skills
-    //listed 57.57 repeating
-
-    //neither location or jobtype match, seeker has 5 skills 5 match job has 5 skills
-    //listed 50
-
-    //neither location or jobtype match, seeker has 5 skills 4 match job has 4 skills
-    //not listed 47 72 repeating
-    
-    //neither location or jobtype match, seeker has 5 skills 5 match job has 6 skills
-    //not listed 41.6 repeating
-
 
 
     public static function setUpForMatchingAlgoTest($jsEmail, $empEmail, $jobName, $skillCatName, $skillNames, $adminEmail, 
-                                                    $loc1Name, $jobType1Name, $loc2Name, $jobType2Name) {
+                                                    $loc1Name, $loc2Name, $jobType1Name, $jobType2Name) {
         
         //probably some neat way to do the below using reflection classes, but probably not worth the effort to work out how
         $thisMethod = "JobSeekerTest::setUpForMatchingAlgoTest";

@@ -16,7 +16,13 @@ use PHPUnit\Framework\TestCase;
  * List of gotchas for other prospective unit test authors:
  * 
  * Any code after the first $this->assertXYZ statement in a test function,
- * will not be executed (unless that code is other $this->assert statements).
+ * will not be executed (unless that code is other $this->assert statements, or
+ * the assert function is wrapped inside an if statement with a condition that
+ * does not evaluate to true).
+ * 
+ * UPDATE: The above does not seem to be true, or at least not in all cases, as
+ * JobSeekerTest::testGetJobMatchesByJobSeekerExhaustive shows execution continuing
+ * after the assertion.
  * 
  * 
  * If you have setUp() or tearDown() functions that have a different method
@@ -28,27 +34,42 @@ use PHPUnit\Framework\TestCase;
  * 
  * echo doesn't work inside of a PHPUnit unit test, as stdout has been redirected.
  * It seems like the only way to write terminal output when inside a unit test is
- * by using var_dump.
+ * by using var_dump (the --debug flag may also need to be passed to phpunit in order
+ * to see this output), or by intentionally causing the test to fail with something like
+ * $this->assertTrue(false, print_r($varIWantToInspect, true));
  * 
- * 
- * Autoloader (which is not part of PHPUnit apparently but is provider by Composer,
- * the PHP package management framework that PHPUnit was instaled through) needs to
- * be updated each time a new class is introduced to the class hierarchy in order
- * for PHPUnit to be aware of it and able to use it in unit tests.
- * 
- * 
- * Found the composer binary (well, batch file) and added to prodUnitTests batch file
- * in wwwroot directory. Problem of not being able to use PHPUnit for both our version
- * of the site that exists in that directory AND the version that exists in dev (as
- * the autloader can only track one of the two class hierarchies at any given time)
- * remains at this stage.
+ * Initially attempted to use the version of PHPUnit installed through composer, but
+ * ran into a number of difficult to debug issues when attempting to use that version of
+ * PHPUnit with multiple sites (development and production). Ended up switching to standalone
+ * phpunit.phar file available from phpunit.de
  * 
  * UDPATE: Standalone version of PHPUnit (i.e. not installed via composer) appears to
  * work when the optional (apparently not so optional) phpunit.xml file is added and
  * a custom bootstrap.php file is created.
  * 
+ * FURTHER UPDATE: phpunit.xml can be ignored if the --bootstrap flag is used to indicate
+ * the location of the bootstrap file (in which a custom autoload function is passed to
+ * spl_autoload_register())
+ * 
  * Syntax is php phpunit.phar --debug tests in top-level directory of dev site
  * to run all tests in classes in the tests/ subdirectory.
+ * 
+ * A further gotcha encountered later is that it seems that tests that are
+ * marked as incomplete (via $this->markTestIncomplete()) result in the setUp
+ * function getting executed, but the tearDown function not getting execute.
+ * This can obviously cause problems if you are created temporary records in the
+ * database in the setUp function under the assumption that they will always be
+ * removed regardless of test result.
+ * 
+ * Also, creation of helper functions can be quite useful, but make sure to NOT
+ * name them with the word 'test' at the start, as the unit testing framework will
+ * treat them as a test and you will most likely end up with a ArgumentCountError
+ * (unless the helper function takes no parameters).
+ * 
+ * Also, it is highly recommended to NOT halt the unit test script with CTRL-C if
+ * you have any tests that write records into the database in setUp expecting that they
+ * will be removed in tearDown - CTRL-C may very well break execution after setUp
+ * but before tearDown leaving the database in an inconsistent state
  * 
  */
 
