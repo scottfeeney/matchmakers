@@ -213,13 +213,17 @@ final class JobSeekerTest extends TestCase {
         $seekerNoMatch = count($seekerSkills) - $matched;
         $jobTotal = count($jobSkills);
 
+        //var_dump(array('matched' => $matched, 'seekerNoMatch' => $seekerNoMatch, 'jobTotal' => $jobTotal));
+
         //Add score for weighted skills with 'jack of all trades' penalty if applicable
         $pros = $matched / $jobTotal * 50 * 11;
         $cons = $seekerNoMatch / $jobTotal * 50;
         $skillsScore = ($pros - $cons) / 11;
 
+        //var_dump(array('pros' => $pros, 'cons' => $cons, 'skillsScore' => $skillsScore));
+
         //SkillsScore ignored if negative
-        $matchPercent += $skillsScore ? $skillsScore > 0 : 0;
+        $matchPercent += $skillsScore > 0 ? $skillsScore : 0;
         
         if ($matchPercent < $cutoffPercent) {
             return array();
@@ -228,13 +232,13 @@ final class JobSeekerTest extends TestCase {
             $obj = new \StdClass;
             $obj->jobSeekerId = $jobSeeker->jobSeekerId;
             $obj->score = $matchPercent;
-            return array($obj);
         } else {
             $obj = new \StdClass;
             $obj->jobId = $job->jobId;
             $obj->score = $matchPercent;
-            return array($obj);
         }
+        //var_dump($obj);
+        return array($obj);
     }
 
     public static function checkMatchScore($jid, $matches) {
@@ -263,7 +267,7 @@ final class JobSeekerTest extends TestCase {
     
     //Only location matches - not listed, 25%
     //add one skill to job and jobseeker to avoid divide by zero error
-    public function testLocOnly() {
+    public function testMatchingLocOnly() {
 
         $this->testJob->locationId = $this->location1Id;
         $this->testJob->jobTypeId = $this->jobType1Id;
@@ -283,7 +287,7 @@ final class JobSeekerTest extends TestCase {
     }
     
     //only jobtype matches - not listed, 25%
-    public function testJobTypeOnly() {
+    public function testMatchingJobTypeOnly() {
 
         $this->testJob->locationId = $this->location1Id;
         $this->testJob->jobTypeId = $this->jobType1Id;
@@ -304,7 +308,7 @@ final class JobSeekerTest extends TestCase {
     
     //Both jobtype and location match, no skills match
     //listed, 50%
-    public function testJobTypeLocOnly() {
+    public function testMatchingJobTypeLocOnly() {
 
         $this->testJob->locationId = $this->location1Id;
         $this->testJob->jobTypeId = $this->jobType1Id;
@@ -327,11 +331,59 @@ final class JobSeekerTest extends TestCase {
                             $this->checkMatchScore($this->testJobSeeker->jobSeekerId, $actualMatches));        
     }
 
-    //Both jobtype and location match, no skills match, seeker has 3 skills selected, job has 2 skills
-    //listed, 50%
-
     //Both jobtype and location match, seeker has 5 skills, 4 of them match, job has 4 skills
     //listed, 97.72 repeating %
+
+    public function testJobLoc544() {
+        $testParams = array(5,4,4,true,true);
+        $testVars = array($this->testJob, $this->testJobSeeker, $this->testSkills, $this->testSkillCategory, 
+                        $this->location1Id, $this->location2Id, $this->jobType1Id, $this->jobType2Id);
+        //var_dump($testParams);
+        //var_dump($testVars);
+        $testRes = JobSeekerTest::matchingTest($testParams, $testVars, "seekers");
+        $this->assertEquals($testRes[0], $testRes[1], "Expected ".$testRes[0].", got ".$testRes[1]);
+    }
+    
+    public static function matchingTest($testParams, $testVars, $matchType) {
+        //var_dump($testParams);
+        //var_dump($testVars);
+        //var_dump($matchType);
+        list($seekerSkills, $matchingSkills, $jobSkills, $locMatch, $jobTypeMatch) = $testParams;
+        list($testJob, $testJobSeeker, $testSkills, $testSkillCategory, $location1Id, $location2Id, $jobType1Id, $jobType2Id) = $testVars;
+
+        $testJob->locationId = $location1Id;
+        $testJob->jobTypeId = $jobType1Id;
+        $testJob->skillCategoryId = $testSkillCategory->skillCategoryId;
+        $testJob->Save();
+
+        $jobSkillIdsStr = "";
+        for($i = 0; $i < $jobSkills; $i++) {
+            $jobSkillIdsStr .= $jobSkillIdsStr == "" ? "" : ",";
+            $jobSkillIdsStr .= ($testSkills[$i])->skillId;
+        }
+        \Classes\Job::SaveJobSkills($testJob->jobId, $jobSkillIdsStr);
+
+        $testJobSeeker->locationId = $locMatch ? $location1Id : $location2Id;
+        $testJobSeeker->jobTypeId = $jobTypeMatch ? $jobType1Id : $jobType2Id;
+        $testJobSeeker->skillCategoryId = $testSkillCategory->skillCategoryId;
+        $testJobSeeker->Save();
+
+        $matchDiff = $seekerSkills - $matchingSkills;
+        $seekerSkillIdsStr = "";
+        for($i = $matchDiff; $i < $seekerSkills + $matchDiff; $i++) {
+            $seekerSkillIdsStr .= $seekerSkillIdsStr == "" ? "" : ",";
+            $seekerSkillIdsStr .= ($testSkills[$i])->skillId;
+        }
+        \Classes\JobSeeker::SaveJobSeekerSkills($testJobSeeker->jobSeekerId, $seekerSkillIdsStr);
+
+        $expectedMatches = JobSeekerTest::matchingFormula($testJob, $testJobSeeker, $matchType);
+        $actualMatches = \Classes\JobSeeker::GetJobSeekerMatchesByJob($testJob->jobId);
+        //var_dump($actualMatches);
+        //var_dump($expectedMatches);
+
+        return array(JobSeekerTest::checkMatchScore($testJobSeeker->jobSeekerId, $expectedMatches),
+                            JobSeekerTest::checkMatchScore($testJobSeeker->jobSeekerId, $actualMatches));        
+    }
 
     //Both jobtype and location match, seeker has 5 skills, 4 of them match, job has 8 skills
     //listed 74.43 18 repeating %
