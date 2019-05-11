@@ -274,7 +274,7 @@ final class JobSeekerTest extends TestCase {
 
     public function testDummy() {
         var_dump("This dummy test serves no purpose other than to warn that the next test to execute is expected to take quite a while to run "
-                ."(takes around 9min on our testing platform (AWS free tier instance))".PHP_EOL."Starting test at ".date("H:i:s"));
+                ."(takes around 10min on our testing platform (AWS free tier instance))".PHP_EOL."Starting test at ".date("H:i:s"));
         $this->assertTrue(true);
     }
 
@@ -293,7 +293,7 @@ final class JobSeekerTest extends TestCase {
      * results of methods from both Job and JobSeeker classes.
      */
     public function testGetJobMatchesByJobSeekerAndGetJobMatchExhaustive() {
-        $this->assertTrue(false); //temporarily disabled to speed up test suite execution
+        //$this->assertTrue(false); //temporarily disabled to speed up test suite execution
         //$limit = 1; //to limit but not entirely disable this function
         $totalNumSkills = count($this->testSkills);
 
