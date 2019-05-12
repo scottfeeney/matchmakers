@@ -104,6 +104,17 @@ final class JobSeekerTest extends TestCase {
         $this->assertEquals(\Classes\JobSeeker::GetJobSeekerByUserId($oid), $jobSeeker);
     }
 
+        //Test method correctly fails when given id for different user type
+    public function testGetEmployerByUserIdWrongType() {
+        $testNonJSUserId = UserTest::saveNewUser($this->testEmail,3);
+        if ($testNonJSUserId == null) {
+            $this->assertTrue(false, "Could not set up non-employer user");
+        }
+        $result = \Classes\JobSeeker::GetJobSeekerByUserId($testNonJSUserId);
+        $this->tearDownByEmail($this->testEmail);
+        $this->assertSame(null, $result);
+    }
+
 
     //UPDATE: Remaining to be tested:
     //SaveJobSeekerSkills($jobSeekerId, $selectedSkills)
@@ -292,7 +303,7 @@ final class JobSeekerTest extends TestCase {
      * Testing is done exclusively in this class to allow for cross-comparison of
      * results of methods from both Job and JobSeeker classes.
      */
-    public function testGetJobMatchesByJobSeekerAndGetJobMatchExhaustive() {
+    public function testMatchingAlgorithmExhaustive() {
         //$this->assertTrue(false); //temporarily disabled to speed up test suite execution
         //$limit = 1; //to limit but not entirely disable this function
         $totalNumSkills = count($this->testSkills);

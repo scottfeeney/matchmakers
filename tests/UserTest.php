@@ -163,16 +163,24 @@ final class UserTest extends TestCase {
         $oid = $this->saveNewUser($this->testEmails[1]);
         $user = new \Classes\User($oid);
         $this->idsToDelete[] = $oid;
-        $this->assertSame(true, $user->GetEmailExists($user->email, 0));
+        $this->assertTrue($user->GetEmailExists($user->email, 0));
     }
 
 
     //GetEmailExists should return false if an invalid value for email is passed to it
-    public function testGetEmailExistsFailure() {
+    public function testGetEmailExistsFalse() {
         $oid = $this->saveNewUser($this->testEmails[1]);
         $user = new \Classes\User($oid);
         $this->idsToDelete[] = $oid;
-        $this->assertSame(false, $user->GetEmailExists(NULL, 0));
+        $this->assertFalse($user->GetEmailExists(NULL, 0));
+    }
+
+    //GetEmailExists should return false if an email and matching userId are passed to it
+    public function testGetEmailExistsFalseSameUser() {
+        $oid = $this->saveNewUser($this->testEmails[1]);
+        $user = new \Classes\User($oid);
+        $this->idsToDelete[] = $oid;
+        $this->assertFalse($user->GetEmailExists($user->email, $user->userId));
     }
 
 
@@ -181,8 +189,6 @@ final class UserTest extends TestCase {
         $oid = $this->saveNewUser($this->testEmails[1]);
         $user = new \Classes\User($oid);
         $this->idsToDelete[] = $oid;
-        $user->verified = false;
-        $user->active = true;
         $user->Save();
         $this->assertEquals($user, \Classes\User::GetUserByVerifyCode($user->verifyCode));
     }
@@ -196,6 +202,15 @@ final class UserTest extends TestCase {
         $user->Save();
         $this->idsToDelete[] = $oid;
         $this->assertEquals(null, \Classes\User::GetUserByVerifyCode($user->verifyCode));
+    }
+
+    //Test failure of above method
+    public function testGetUserByVerifyCodeWrongCode() {
+        $oid = $this->saveNewUser($this->testEmails[1]);
+        $user = new \Classes\User($oid);
+        $user->Save();
+        $this->idsToDelete[] = $oid;
+        $this->assertEquals(null, \Classes\User::GetUserByVerifyCode(null));
     }
 
 
@@ -219,6 +234,22 @@ final class UserTest extends TestCase {
         $this->assertEquals(null, \Classes\User::GetUserByEmailAddress($user->email));
     }
 
+    //Test failure of above method when given invalid email address
+    public function testGetUserByEmailWrongEmail() {
+        $oid = $this->saveNewUser($this->testEmails[1]);
+        $user = new \Classes\User($oid);
+        $user->Save();
+        $this->idsToDelete[] = $oid;
+        $this->assertEquals(null, \Classes\User::GetUserByEmailAddress(null));
+    }
+
+    //GetUnverifiedUserByEmailAddress
+    public function testGetUnverifiedUserByEmail() {
+        $oid = $this->saveNewUser($this->testEmails[1]);
+        $user = new \Classes\User($oid);
+        $this->idsToDelete[] = $oid;
+        $this->assertEquals($user, \Classes\User::GetUnverifiedUserByEmailAddress($user->email));
+    }
 
     //test ability to get user record from their reset code
     public function testGetUserByResetCode() {
@@ -232,7 +263,6 @@ final class UserTest extends TestCase {
         $this->assertEquals($user, \Classes\User::GetUserByResetCode($user->resetCode));
     }
 
-
     //test failure of above method
     public function testGetUserByResetCodeFailureNoMatch() {
         $oid = $this->saveNewUser($this->testEmails[1]);
@@ -242,8 +272,9 @@ final class UserTest extends TestCase {
     }
 
 
+
     //test failure of above due to code being wrong length
-    public function testGetUserByResetCodeFailurecodeLength() {
+    public function testGetUserByResetCodeFailureCodeLength() {
         $oid = $this->saveNewUser($this->testEmails[1]);
         $user = new \Classes\User($oid);
         $this->idsToDelete[] = $oid;
@@ -279,6 +310,10 @@ final class UserTest extends TestCase {
         $this->assertSame(null, \Classes\User::GetUserLogin($user->email, "Wrong password"));
     }
 
+    //test failure of login if email wrong
+    public function testGetUserLoginFailWrongEmail() {
+        $this->assertSame(null, \Classes\User::GetUserLogin(null, "Wrong password"));
+    }
 
     //setUp function no longer needed as all records created in this class use the same emails
     protected function setUp(): void {

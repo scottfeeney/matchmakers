@@ -76,7 +76,7 @@ final class EmployerTest extends TestCase {
     }
 
 
-    //Test tha same method works when given legitimate input
+    //Test the same method works when given legitimate input
     public function testGetEmployerByUserId() {
         $result = $this->createUserAndEmployer($this->testEmail);
         if ($result == null) {
@@ -85,6 +85,16 @@ final class EmployerTest extends TestCase {
         extract($result);
         $this->uidsToDelete[] = $oid;
         $this->assertEquals(\Classes\Employer::GetEmployerByUserId($oid), $employer);
+    }
+
+    //Test method correctly fails when given id for different user type
+    public function testGetEmployerByUserIdWrongType() {
+        $testNonEmployerUserId = UserTest::saveNewUser($this->testEmail,3);
+        if ($testNonEmployerUserId == null) {
+            $this->assertTrue(false, "Could not set up non-employer user");
+        }
+        $this->uidsToDelete[] = $testNonEmployerUserId;
+        $this->assertSame(null, \Classes\Employer::GetEmployerByUserId($testNonEmployerUserId));
     }
 
 

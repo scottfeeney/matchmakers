@@ -74,62 +74,12 @@ final class APITest extends TestCase {
         $this->assertEquals(401, curl_getinfo($this->curlObj, CURLINFO_HTTP_CODE), "Failed to return 401 code when authenticate called with legit username and invalid password");
     }
 
-    /**
-     * Helper functions
-     */
-
-    public static function authenticateGetToken($uid, $email, $curlObj, $baseURL) {
-        //set password
-        $user = new \Classes\User($uid);
-        $user->password = password_hash($email, PASSWORD_BCRYPT);
-        $user->verified = 1;
-        $objSave = $user->Save();
-        //var_dump($objSave);
-        if ($objSave->hasError) {
-            return array(false, 'Attempt to save user with password set to same as email failed: '.$objSave->errorMessage);
-        }
-
-        //set cURL opts and make request
-        curl_setopt($curlObj, CURLOPT_HEADER, 1);
-        //curl_setopt($curlObj, CURLINFO_HEADER_OUT, 1);
-        curl_setopt($curlObj, CURLOPT_URL, $baseURL. 'authenticate.php');
-        $sendHeaders = array("EMAIL: ".$email, "PASSWORD: ".$email);
-
-        curl_setopt($curlObj, CURLOPT_HTTPHEADER, $sendHeaders);
-        $data = curl_exec($curlObj);
-        //var_dump(curl_getinfo($this->curlObj));
-        //var_dump($data);
-
-        //check response
-        if (curl_getinfo($curlObj, CURLINFO_HTTP_CODE) != 200) {
-            return array(false, "Failed to return 200 code when authenticate called with correct username and password");
-        }
-
-        $gotToken = false;
-        $token = "";
-        foreach (explode("\r\n", $data) as $line) { //No body, only headers
-            if (strpos($line, ": ") === FALSE) {
-                continue;
-            }
-            $headerBits = explode(": ", $line);
-            if ($headerBits[0] != "Token") {
-                continue;
-            }
-            if (strlen($headerBits[1]) != 60) {
-                return array(false, "Wrong length token provided - should be 60 characters");
-            }
-            $gotToken = true;
-            $token = $headerBits[1];
-        }
-        if (!$gotToken) {
-            return array(false, "Correct username and password given but no token sent in response");
-        }
-        return array(true, $token);
-    }
-
-    public function testAuthenticateSuccess() {
+     public function testAuthenticateSuccess() {
         $authenticateRes = $this->authenticateGetToken($this->testEmployer->userId, $this->testEmployerEmail, $this->curlObj, $this->baseURL);
         $this->assertTrue($authenticateRes[0], $authenticateRes[1]);
+        $this->assertEquals(substr($authenticateRes[1],0,7), "$2y$10$");
+        $this->assertEquals(60, strlen($authenticateRes[1]));
+        $this->assertEquals(new \Classes\User($this->testEmployer->userId), \Classes\User::GetUserByApiToken($authenticateRes[1]));
     }
 
 
@@ -451,7 +401,7 @@ final class APITest extends TestCase {
         $this->assertTrue($currentTokenRes[0], $currentTokenRes[1]);
     }
 
-    public function testAddSkillPOSTVarsProvided() {
+    public function testAddSkillPOSTVarsNotProvided() {
         $noPOSTVarsRes = $this->checkCurrentToken($this->baseURL.'admin/addskill.php', $this->curlObj, $this->baseProdURL, 
                 $this->testAdminStaff->userId, $this->testAdminEmail, $this->baseURL, true, "admin", $this->userTypes,
                 true, "incorrect", array(), "Must provide both categoryId and skillName via POST");
@@ -503,7 +453,7 @@ final class APITest extends TestCase {
         $this->assertTrue($currentTokenRes[0], $currentTokenRes[1]);
     }
 
-    public function testRenameSkillPOSTVarsProvided() {
+    public function testRenameSkillPOSTVarsNotProvided() {
         $noPOSTVarsRes = $this->checkCurrentToken($this->baseURL.'admin/renameskill.php', $this->curlObj, $this->baseProdURL, 
                 $this->testAdminStaff->userId, $this->testAdminEmail, $this->baseURL, true, "admin", $this->userTypes,
                 true, "incorrect", array(), "Must provide categoryId, skillId and newName via POST");
@@ -571,7 +521,7 @@ final class APITest extends TestCase {
         $this->assertTrue($currentTokenRes[0], $currentTokenRes[1]);
     }
 
-    public function testDeleteSkillPOSTVarsProvided() {
+    public function testDeleteSkillPOSTVarsNotProvided() {
         $noPOSTVarsRes = $this->checkCurrentToken($this->baseURL.'admin/deleteskill.php', $this->curlObj, $this->baseProdURL, 
                 $this->testAdminStaff->userId, $this->testAdminEmail, $this->baseURL, true, "admin", $this->userTypes,
                 true, "incorrect", array(), "Must provide categoryId and skillId via POST");
@@ -780,6 +730,54 @@ final class APITest extends TestCase {
     }
 
 
+    public static function authenticateGetToken($uid, $email, $curlObj, $baseURL) {
+        //set password
+        $user = new \Classes\User($uid);
+        $user->password = password_hash($email, PASSWORD_BCRYPT);
+        $user->verified = 1;
+        $objSave = $user->Save();
+        //var_dump($objSave);
+        if ($objSave->hasError) {
+            return array(false, 'Attempt to save user with password set to same as email failed: '.$objSave->errorMessage);
+        }
+
+        //set cURL opts and make request
+        curl_setopt($curlObj, CURLOPT_HEADER, 1);
+        //curl_setopt($curlObj, CURLINFO_HEADER_OUT, 1);
+        curl_setopt($curlObj, CURLOPT_URL, $baseURL. 'authenticate.php');
+        $sendHeaders = array("EMAIL: ".$email, "PASSWORD: ".$email);
+
+        curl_setopt($curlObj, CURLOPT_HTTPHEADER, $sendHeaders);
+        $data = curl_exec($curlObj);
+        //var_dump(curl_getinfo($this->curlObj));
+        //var_dump($data);
+
+        //check response
+        if (curl_getinfo($curlObj, CURLINFO_HTTP_CODE) != 200) {
+            return array(false, "Failed to return 200 code when authenticate called with correct username and password");
+        }
+
+        $gotToken = false;
+        $token = "";
+        foreach (explode("\r\n", $data) as $line) { //No body, only headers
+            if (strpos($line, ": ") === FALSE) {
+                continue;
+            }
+            $headerBits = explode(": ", $line);
+            if ($headerBits[0] != "Token") {
+                continue;
+            }
+            if (strlen($headerBits[1]) != 60) {
+                return array(false, "Wrong length token provided - should be 60 characters");
+            }
+            $gotToken = true;
+            $token = $headerBits[1];
+        }
+        if (!$gotToken) {
+            return array(false, "Correct username and password given but no token sent in response");
+        }
+        return array(true, $token);
+    }
 
 
     /**

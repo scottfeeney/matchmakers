@@ -16,6 +16,8 @@ final class AdminStaffTest extends TestCase {
     private $adminStaffUserRecord;
     private $adminStaffAdminStaffRecord;
     private $testEmail = "anAdminPersonBeingTested@email321.com";
+    private $testNonAdminEmail = "unit@tester.com";
+    private $testNonAdminUserId;
 
 
     //Simple constructor tests
@@ -79,7 +81,11 @@ final class AdminStaffTest extends TestCase {
     }
 
     public function testGetAdminStaffByUserIdSuccess() {
-        $this->assertTrue(\Classes\AdminStaff::GetAdminStaffByUserId($this->adminStaffUserRecord->userId) != null);
+        $this->assertEquals((\Classes\AdminStaff::GetAdminStaffByUserId($this->adminStaffUserRecord->userId))->userId, $this->adminStaffUserRecord->userId);
+    }
+
+    public function testGetAdminStaffByUserIdNonAdmin() {
+        $this->assertSame(null, \Classes\AdminStaff::GetAdminStaffByUserId($this->testNonAdminUserId));
     }
 
 
@@ -95,11 +101,16 @@ final class AdminStaffTest extends TestCase {
         if ($adminStaffSetupRes[0] != false) {
             $this->adminStaffAdminStaffRecord = $adminStaffSetupRes[1]['adminStaff'];
         }
+        $this->testNonAdminUserId = UserTest::saveNewUser($this->testNonAdminEmail);
+        if ($this->testNonAdminUserId == null) {
+            $this->assertTrue(false, "Could not set up non-Admin user in setUp function");
+        }
     }
 
     protected function tearDown(): void {
         APITest::tearDownAdminStaffRecord($this->adminStaffUserRecord->userId);
         SkillTest::tearDownAdminByEmail($this->adminStaffUserRecord->email);
+        UserTest::staticTearDown(array($this->testNonAdminEmail));
         parent::tearDown();
     }
 

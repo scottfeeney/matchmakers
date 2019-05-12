@@ -107,9 +107,10 @@ final class JobTest extends TestCase {
             $this->assertTrue(false, "createEmployerAndJob failed (returned null)");
         }
         //var_dump($result);
-        extract($result); //$oid, $jib, $objSave, $categoryId, $eid
+        extract($result); //$oid, $jid, $objSave, $categoryId, $eid
         $this->assertFalse($objSave->hasError);
         $this->assertNotEquals(0, $jid);
+        $this->assertEquals($jid, (new \Classes\Job($jid))->jobId);
     }
 
 
