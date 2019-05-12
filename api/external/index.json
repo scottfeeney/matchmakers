@@ -1,6 +1,6 @@
 {
     "No Authentication required" : {
-        "authDesc" : "",
+        "authDesc" : "This section contains all endpoints that do not require any authentication to access",
         "endpoints" : {
             "/api/external/authenticate.php" : {
                 "desc" : "Get Authentication Token",
@@ -85,7 +85,7 @@
                     "categoryId" : "The ID for the category the new skill should be added to",
                     "skillName" : "The name of the new skill"
                 },
-                "output" : "",
+                "output" : "JSON object indicating success",
                 "exampleOutput" : "\n{\n\t\"result\": \"success\",\n\t\"details\": \"Skill successfully added\",\n\t\"documentation\": \"HTTP://ec2-18-221-135-88.us-east-2.compute.amazonaws.com/api/external/index.php\"\n}"
             },
             "/api/external/admin/renameSkill.php" : {
@@ -95,7 +95,7 @@
                     "skillId" : "The ID for the skill to be renamed",
                     "newName" : "The new name for the skill"
                 },
-                "output" : "",
+                "output" : "JSON object indicating success",
                 "exampleOutput" : "\n{\n\t\"result\": \"success\",\n\t\"details\": \"Skill successfully renamed\",\n\t\"documentation\": \"HTTP://ec2-18-221-135-88.us-east-2.compute.amazonaws.com/api/external/index.php\"\n}"
             },
             "/api/external/admin/deleteSkill.php" : {
@@ -104,7 +104,7 @@
                     "categoryId" : "The ID for the category the skill currently belongs to",
                     "skillId" : "The ID for the skill to be deleted"
                 },
-                "output" : "",
+                "output" : "JSON object indicating success",
                 "exampleOutput" : "\n{\n\t\"result\": \"success\",\n\t\"details\": \"Skill successfully deleted\",\n\t\"documentation\": \"HTTP://ec2-18-221-135-88.us-east-2.compute.amazonaws.com/api/external/index.php\"\n}"                
             }
         }
