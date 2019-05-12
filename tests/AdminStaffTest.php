@@ -32,6 +32,7 @@ final class AdminStaffTest extends TestCase {
     public function testConstructorSuccess() {
         $this->assertTrue((new \Classes\AdminStaff($this->adminStaffAdminStaffRecord->adminStaffId))->adminStaffId != 0);
         $this->assertTrue((new \Classes\AdminStaff($this->adminStaffAdminStaffRecord->adminStaffId))->adminStaffId == $this->adminStaffAdminStaffRecord->adminStaffId);
+        $this->assertEquals((new \Classes\AdminStaff($this->adminStaffAdminStaffRecord->adminStaffId)), $this->adminStaffAdminStaffRecord);
         $this->assertTrue((new \Classes\AdminStaff($this->adminStaffAdminStaffRecord->adminStaffId))->userId != null);
     }
 
