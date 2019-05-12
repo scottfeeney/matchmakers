@@ -98,7 +98,7 @@ final class UserTest extends TestCase {
         $newUser = new \Classes\User();
         $newUser->email = $user->email;
         $objSave = $newUser->Save();
-        $this->assertEquals('Email address '.$user->email.' exists in system', $objSave->errorMessage);
+        $this->assertEquals('Email address '.$user->email.' exists in system for userId other than 0', $objSave->errorMessage);
         $this->assertEquals(true, $objSave->hasError);
     }
 
@@ -315,6 +315,134 @@ final class UserTest extends TestCase {
         $this->assertSame(null, \Classes\User::GetUserLogin(null, "Wrong password"));
     }
 
+
+    //UPDATE: New methods added to user class requiring tests:
+
+
+    //CreateApiToken()
+    //static GetUserByApiToken($token)
+
+    public function testCreateApiTokenGetUserByApiToken() {
+        
+        //create new user record
+        $uid = $this->saveNewUser($this->testEmails[1]);
+        $user = new \Classes\User($uid);
+        
+        //verify no records in api_token
+        $tokenRecsPreCreate = $this->getTokenDatetimeActive($uid);
+        //var_dump($tokenRecsPreCreate);
+        $this->assertSame(0, $tokenRecsPreCreate[0]);
+        
+        //createApiToken
+        $user->CreateApiToken();
+        
+        //verify there is a record in api_token
+        $tokenRecsPostCreate1 = $this->getTokenDatetimeActive($uid);
+        if ($tokenRecsPostCreate1[0] === 0) {
+            $this->assertTrue(false, "First call of CreateApiToken did not result in record being added to api_token with userId "
+                                        .$uid.PHP_EOL.$tokenRecsPostCreate1[1]);
+        }
+        //var_dump($tokenRecsPostCreate1);
+        
+        //verify expiry datetime for token is more than 59min in future (may not be exactly an hour
+        //  by the time the assertion runs)
+        //verify expiry datetime for token is less than 61min in future
+        $tokenExpiryStr = $tokenRecsPostCreate1[1]['expiryDate'];
+        $datetime59MinInFuture = new \DateTime('now');
+        $datetime59MinInFuture->setTimezone(new DateTimeZone('UTC'));
+        $datetime59MinInFuture->modify('+59 minute');
+        $datetime61MinInFuture = new \DateTime('now'); 
+        $datetime61MinInFuture->setTimezone(new DateTimeZone('UTC'));
+        $datetime61MinInFuture->modify('+61 minute');
+
+        $tokenExpiryDateTime = date_create_from_format('Y-m-d H:i:s', $tokenExpiryStr);
+        $this->assertTrue($datetime61MinInFuture > $tokenExpiryDateTime, "Token expires in more than 61 minutes");
+        $this->assertTrue($datetime59MinInFuture < $tokenExpiryDateTime, "Token expires in less than 59 minutes");
+
+        //pass token to GetUserByApiToken and check that it returns the original user
+        $token = $tokenRecsPostCreate1[1]['token'];
+        $this->assertEquals($user, \Classes\User::GetUserByApiToken($token));
+        
+        //set expiry on token to sometime in the past
+        $tokenExpiryDateTime->modify('-2 hour');
+        $updateTimeRes = $this->updateTokenExpiryTime($token, $tokenExpiryDateTime);
+        
+        //pass token to GetUserByApiToken and verify it returns null
+        $this->assertEquals(null, \Classes\User::GetUserByApiToken($token));
+        
+        //createApiToken
+        $user->CreateApiToken();
+
+        //verify that old token is marked as active = 0
+        $tokenRecsPostCreate1 = $this->getTokenDatetimeActive($uid);
+        if ($tokenRecsPostCreate1[0] === 0) {
+            $this->assertTrue(false, "Second call of CreateApiToken did not result in record being added to api_token with userId "
+                                        .$uid.PHP_EOL.$tokenRecsPostCreate1[1]);
+            }
+        $activeFlag = $tokenRecsPostCreate1[1]['active'];
+        $this->assertSame(0, $activeFlag, "Calling CreateApiToken with old token in table doesn't result in it's active field being set to zero");    
+    }
+
+    public function updateTokenExpiryTime($token, $expiry) {
+        $conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);
+        $sql = "update api_token set expiryDate = ? where token = ?";
+        if($stmt = $conn->prepare($sql)) {
+            $expiryStr = $expiry->format('Y-m-d H:i:s');
+            $stmt->bind_param("ss", $expiryStr, $token);
+            $stmt->execute();
+            if ($stmt->affected_rows != 1) {
+                $stmt->close();
+                $conn->close();
+                return array(false, "updateTokenExpiryTime did not change any rows trying to set expiryDate to "
+                                    .$token->format('Y-m-d H:i:s')." for token ".$token.PHP_EOL
+                                    ."This may cause the calling test function to fail.");
+            }
+        $stmt->close();
+        $conn->close();
+        return array(true,"");
+        } else {
+            $errorMessage = $conn->errno . ' ' . $conn->error;
+            $conn->close();
+            return array(false, "updateTokenExpiryTime failed to set expiryDate to ".$token->format('Y-m-d H:i:s')." for token ".$token
+                    .PHP_EOL."This may cause the calling test function to fail.".PHP_EOL.$errorMessage);
+        }
+    }
+
+    public function getTokenDatetimeActive($userId) {
+        //get datetime and active for token for passed-in userId
+        $conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);
+        $sql = "select active, expiryDate, token from api_token where userId = ?";
+        if($stmt = $conn->prepare($sql)) {
+            $stmt->bind_param("i", $userId);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            //var_dump($result);
+            //var_dump($stmt);
+            if ($result->num_rows == 0) {
+                return array(0, "No results from helper function getTokenDatetimeActive looking for records with userId ".$userId." - this may cause the calling test to fail");
+            }
+            $row = $result->fetch_array();
+            //var_dump($row);
+            $conn->close();
+            return array(true, array('expiryDate' => $row['expiryDate'], 'active' => $row['active'], 'token' => $row['token']));
+        } else {
+            $errorMessage = $conn->errno . ' ' . $conn->error;
+            $conn->close();
+            return array(false, "Error checking details of token in helper function getTokenDatetimeActive - calling test will probably fail".PHP_EOL.$errorMessage);
+        }
+    }
+
+
+    //pass invalid token value (i.e. null, a string of length 2 etc) to GetUserByApiToken
+    //and check it returns null
+    public function testGetUserByApiTokenFailure() {
+        $this->assertSame(null, \Classes\User::GetUserByApiToken(null));
+        $this->assertSame(null, \Classes\User::GetUserByApiToken("9a"));
+    }
+
+
+
+
     //setUp function no longer needed as all records created in this class use the same emails
     protected function setUp(): void {
         parent::setUp();
@@ -325,18 +453,19 @@ final class UserTest extends TestCase {
     public static function staticTearDown($testEmails) {
         $conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);
         foreach ($testEmails as $testEmail) {
-            $sql = "delete from user where email = ?";
-            if ($stmt = $conn->prepare($sql)) {
-                //var_dump($stmt);
-                $stmt->bind_param("s", $testEmail);
-                //var_dump("Cleaning up - deleting user with id ".$oid);
-                $stmt->execute();
-                $result = mysqli_stmt_get_result($stmt);
-                $stmt->close();
-            } else {
-                //var_dump
-                var_dump($errorMessage = $conn->errno . ' ' . $conn->error);
-                return array(false, "Error in database query in tearDown function");
+            foreach (array("delete from api_token where userId in (select userId from user where email = ?)",
+                            "delete from user where email = ?") as $sql) {
+                if ($stmt = $conn->prepare($sql)) {
+                    //var_dump($stmt);
+                    $stmt->bind_param("s", $testEmail);
+                    //var_dump("Cleaning up - deleting user with id ".$oid);
+                    $stmt->execute();
+                    $result = mysqli_stmt_get_result($stmt);
+                    $stmt->close();
+                } else {
+                    $errorMessage = $conn->errno . ' ' . $conn->error;
+                    return array(false, "Error in database query in tearDown function:".PHP_EOL.$errorMessage);
+                }
             }
         }
         $conn->close();
