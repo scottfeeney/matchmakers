@@ -66,7 +66,7 @@
 				if ($job->active) {
 				
 	
-					$jobSeekerMatches = \Classes\JobSeeker::GetJobSeekerMatchesByJob(22);
+					$jobSeekerMatches = \Classes\JobSeeker::GetJobSeekerMatchesByJob($job->jobId);
 		
 					if(!empty($jobSeekerMatches)){
 						foreach ($jobSeekerMatches as $jobSeekerMatch) {
