@@ -66,11 +66,15 @@
 				if ($job->active) {
 				
 	
-					$jobSeekerMatches = \Classes\JobSeeker::GetJobSeekerMatchesByJob($job->jobId);
-
+					$jobSeekerMatches = \Classes\JobSeeker::GetJobSeekerMatchesByJob(22);
 		
-					foreach ($jobSeekerMatches as $jobSeekerMatch) {
-						echo GetJobSeekerMatchCard($jobSeekerMatch, $jobId);
+					if(!empty($jobSeekerMatches)){
+						foreach ($jobSeekerMatches as $jobSeekerMatch) {
+							echo GetJobSeekerMatchCard($jobSeekerMatch, $jobId);
+						}	
+					}
+					else{
+						echo '<div class="alert alert-warning mt-3" role="alert">There are no job seeker matches for this job. Please check back later.</div>';
 					}
 				
 				}

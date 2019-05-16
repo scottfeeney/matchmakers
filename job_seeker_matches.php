@@ -53,10 +53,15 @@
 			
 					$jobMatches = \Classes\Job::GetJobMatchesByJobSeeker($jobSeeker->jobSeekerId);
 					
-				
-					foreach ($jobMatches as $jobMatch) {
-						echo GetJobMatchCard($jobMatch);
+					if(!empty($jobMatches)){
+						foreach ($jobMatches as $jobMatch) {
+							echo GetJobMatchCard($jobMatch);
+						}
 					}
+					else{
+						echo '<div class="alert alert-warning mt-3" role="alert">There are no job matches for your profile. Please check back later.</div>';
+					}
+					
 					
 				}
 				else {
