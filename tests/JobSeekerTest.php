@@ -215,7 +215,7 @@ final class JobSeekerTest extends TestCase {
     //algorithm will require only adjusting this function to bring testing in line, rather than adjusting each test function
     public static function matchingFormula($job, $jobSeeker, $returnType) {
         $matchPercent = 0;
-        $cutoffPercent = 50; //Minimum value that will register as a match
+        $cutoffPercent = 51; //Minimum value that will register as a match
         
         //get job type from both - if a match add 25
         $matchPercent += $job->jobTypeId == $jobSeeker->jobTypeId ? 25 : 0;
@@ -285,7 +285,9 @@ final class JobSeekerTest extends TestCase {
 
     public function testDummy() {
         var_dump("This dummy test serves no purpose other than to warn that the next test to execute is expected to take quite a while to run "
-                ."(takes around 10min on our testing platform (AWS free tier instance))".PHP_EOL."Starting test at ".date("H:i:s"));
+                ."(takes around 10min on our testing platform (AWS free tier instance))".PHP_EOL
+                ."It is highly recommended that you do NOT stop this test (or any other test) during execution as that may leave the database in an inconsistent state (with test data having not been removed) which will interfere with subsequent attempted runs of the unit tests until manually resolved."
+                .PHP_EOL."Starting test at ".date("H:i:s")." (UTC)");
         $this->assertTrue(true);
     }
 
