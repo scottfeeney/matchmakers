@@ -1,8 +1,12 @@
 <?php
 	
+	//----------------------------------------------------------------
+	// Location class - performs operations for Location object
+	//----------------------------------------------------------------
+	
 	namespace Classes;
 	
-	
+	// include required php file, for website and PHPUnit
 	if ($_SERVER['DOCUMENT_ROOT'] != '') {
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/config.php';
 	} else {
@@ -14,7 +18,10 @@
 		public $locationId;
 		public $name;
 
-		
+		/*
+		* Constructor: initialise data members based on supplied Id
+		* 0: initialise empty object
+		*/	
 		public function __construct($locationId = 0) {
         
 			if ($locationId != 0) {
@@ -46,8 +53,9 @@
 		}
 	
 		
-		// Get All locations
-		
+		/*
+		* GetLocations returns an array of all locations
+		*/	
 		public static function GetLocations() {
 			
 			$locations = Array();
@@ -73,7 +81,7 @@
 			
 		}
 
-		
+		// populate object from database row
 		private static function LoadObject($object, $row) {
 			$object->locationId = $row['LocationId'];
 			$object->name = $row['Name'];

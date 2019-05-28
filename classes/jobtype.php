@@ -1,8 +1,12 @@
 <?php
 	
+	//----------------------------------------------------------------
+	// JobType class - performs operations for JobType object
+	//----------------------------------------------------------------
+	
 	namespace Classes;
 	
-	
+	// include required php file, for website and PHPUnit
 	if ($_SERVER['DOCUMENT_ROOT'] != '') {
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/config.php';
 	} else {
@@ -14,7 +18,10 @@
 		public $jobTypeId;
 		public $jobTypeName;
 
-		
+		/*
+		* Constructor: initialise data members based on supplied Id
+		* 0: initialise empty object
+		*/				
 		public function __construct($jobTypeId = 0) {
         
 			if ($jobTypeId != 0) {
@@ -46,8 +53,9 @@
 		}
 	
 		
-		// Get All jobTypes
-		
+		/*
+		* GetJobTypes returns an array of all job types
+		*/	
 		public static function GetJobTypes() {
 			
 			$jobTypes = Array();
@@ -74,10 +82,12 @@
 		}
 
 		
+		// populate object from database row
 		private static function LoadObject($object, $row) {
 			$object->jobTypeId = $row['JobTypeId'];
 			$object->jobTypeName = $row['JobTypeName'];
 		}
+		
 	
 	}
 	

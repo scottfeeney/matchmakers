@@ -1,5 +1,9 @@
 <?php
 	
+	//----------------------------------------------------------------
+	// Common class - Common utility functions used throughout the website
+	//----------------------------------------------------------------
+	
 	namespace Utilities;
 	
 	if ($_SERVER['DOCUMENT_ROOT'] != '') {
@@ -8,12 +12,19 @@
 		require_once './classes/user.php';
 	}
 	
+
 	class Common {
 
+		/*
+		* GetRequest - returns HTTP Request variable value
+		*/	
 		public static function GetRequest($Value) {
 			return (isset($_REQUEST[$Value]) ? trim($_REQUEST[$Value]) : "");
 		}
 
+		/*
+		* IsSubmitForm - checks if form was submitted
+		*/	
 		public static function IsSubmitForm() {
 			if (Common::GetRequest("SubmitForm") == "1") {
 				return true;
@@ -23,6 +34,11 @@
 			}
 		}
 		
+		/*
+		* GetSessionUser - returns user based session
+		* If user has not entered details, redirects them to appropriate page
+		* If user not found, redirects to login form
+		*/	
 		public static function GetSessionUser() {
 			
 			session_start();
@@ -54,7 +70,10 @@
 				exit;
 			}
 		}
-		
+
+		/*
+		* IsValidEmail - checks for a valid email
+		*/			
 		public static function IsValidEmail($emailAddress) {
 		
 			if (strlen($emailAddress) <= 6) {
@@ -124,8 +143,10 @@
 			return true;
 		}
 		
-		
-		// http://php.net/manual/en/function.com-create-guid.php
+		/*
+		* GetGuid - creates a guid value
+		* From: http://php.net/manual/en/function.com-create-guid.php
+		*/	
 		public static function GetGuid()
 		{
 			if (function_exists('com_create_guid') === true)
@@ -136,7 +157,9 @@
 			return sprintf('%04X%04X-%04X-%04X-%04X-%04X%04X%04X', mt_rand(0, 65535), mt_rand(0, 65535), mt_rand(0, 65535), mt_rand(16384, 20479), mt_rand(32768, 49151), mt_rand(0, 65535), mt_rand(0, 65535), mt_rand(0, 65535));
 		}
 		
-		
+		/*
+		* SendEmail - sends a plain text email
+		*/			
 		public static function SendEmail($to, $subject, $message)
 		{
 			
@@ -159,7 +182,9 @@
 			mail($toEmail, $subject, $message, $headers);
 		}
 		
-		
+		/*
+		* GetSkillsControl - generates a skill control. Used on job and job seeker forms
+		*/			
 		public static function GetSkillsControl($skills, $selectedSkills) {
 		
 			$html = '<div class="dropdown skills-control-dropdown">
@@ -192,7 +217,9 @@
 			
 		}
 		
-		
+		/*
+		* DisplayDate - displays a formated date
+		*/	
 		public static function DisplayDate($value) {
 			
 			if (empty($value)) {
@@ -202,6 +229,31 @@
 				return date('d-M-Y', strtotime($value));
 			}
 			
+		}
+		
+		/*
+		* GetCheckedSelectedSkills - checks supplied skill ids are vaild
+		* and return a string of vaild skill ids
+		*/	
+		public static function GetCheckedSelectedSkills($selectedSkills) {
+			
+			$checkedSelectedSkills = Array();
+			
+			foreach (explode(",", $selectedSkills) as $selectedSkill) {
+				if (Common::IsInteger($selectedSkill)) {
+					$checkedSelectedSkills[] = $selectedSkill;
+				}
+			}
+			
+			return join(",", $checkedSelectedSkills);
+			
+		}
+		
+		/*
+		* IsInteger - checks if the value is an int
+		*/	
+		public static function IsInteger($value){
+			return (ctype_digit(strval($value)));
 		}
 		
 	}

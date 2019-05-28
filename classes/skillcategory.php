@@ -1,8 +1,13 @@
 <?php
 	
+	//----------------------------------------------------------------
+	// SkillCategory class - performs operations for Skill category 
+	// object
+	//----------------------------------------------------------------
+	
 	namespace Classes;
 	
-	
+	// include required php file, for website and PHPUnit
 	if ($_SERVER['DOCUMENT_ROOT'] != '') {
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/config.php';
 	} else {
@@ -14,7 +19,10 @@
 		public $skillCategoryId;
 		public $skillCategoryName;
 
-		
+		/*
+		* Constructor: initialise data members based on supplied Id
+		* 0: initialise empty object
+		*/			
 		public function __construct($skillCategoryId = 0) {
         
 			if ($skillCategoryId != 0) {
@@ -46,8 +54,9 @@
 		}
 	
 		
-		// Get All skillCategorys
-		
+		/*
+		* GetSkillCategories returns an array of all skill categories
+		*/	
 		public static function GetSkillCategories() {
 			
 			$skillCategories = Array();
@@ -77,7 +86,7 @@
 			
 		}
 
-		
+		// populate object from database row
 		private static function LoadObject($object, $row) {
 			$object->skillCategoryId = $row['SkillCategoryId'];
 			$object->skillCategoryName = $row['SkillCategoryName'];

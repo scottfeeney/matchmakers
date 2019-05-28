@@ -1,8 +1,13 @@
 <?php
 	
+	//----------------------------------------------------------------
+	// JobSeeker class - performs operations for JobSeeker object
+	// and job seeker related functionality
+	//----------------------------------------------------------------
+	
 	namespace Classes;
 	
-	
+	// include required php file, for website and PHPUnit
 	if ($_SERVER['DOCUMENT_ROOT'] != '') {
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/config.php';
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/object_save.php';
@@ -15,21 +20,17 @@
 	
 		public $jobSeekerId;
 		public $userId;
-		
 		public $title;
 		public $firstName;
 		public $lastName;
-		
 		public $phoneAreaCode;
 		public $phoneNumber;
 		public $mobileNumber;
-		
 		public $address1;
 		public $address2;
 		public $city;
 		public $state;
 		public $postcode;
-		
 		public $skillCategoryId;
 		public $ageGroup;
 		public $highestLevelCompleted;
@@ -41,12 +42,14 @@
 		public $active;
 		public $locationId;
 
-				
+		/*
+		* Constructor: initialise data members based on supplied Id
+		* 0: initialise empty object
+		*/					
 		public function __construct($jobSeekerId = 0) {
         
 			if ($jobSeekerId != 0) {
 			    
-			    // TODO: Update query
 				$sql = "select * from job_seeker where JobSeekerId = ?";
 				
 				$conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);
@@ -74,24 +77,21 @@
 			}
 		}
 		
+		// populate object from database row
 		private static function LoadObject($object, $row) {
 			$object->jobSeekerId = $row['JobSeekerId'];
 			$object->userId = $row['UserId'];
-			
 			$object->title = $row['Title'];
 			$object->firstName = $row['FirstName'];
 			$object->lastName = $row['LastName'];
-			
 			$object->phoneAreaCode = $row['PhoneAreaCode'];
 			$object->phoneNumber = $row['PhoneNumber'];
 			$object->mobileNumber = $row['MobileNumber'];
-			
 			$object->address1 = $row['Address1'];
 			$object->address2 = $row['Address2'];
 			$object->city = $row['City'];
 			$object->state = $row['State'];
 			$object->postcode = $row['Postcode'];
-			
 			$object->skillCategoryId = $row['SkillCategoryId'];
 			$object->ageGroup = $row['AgeGroup'];
 			$object->highestLevelCompleted = $row['HighestLevelCompleted'];
@@ -102,13 +102,10 @@
 			$object->jobTypeId = $row['JobTypeId'];
 			$object->active = $row['Active'];
 			$object->locationId = $row['LocationId'];
-			
 		}
 		
-	
+		// Save Object	
 		public function Save() {
-			
-
 		
 			$errorMessage = "";
 			$objectId = $this->jobSeekerId;
@@ -117,7 +114,6 @@
 			if ($this->jobSeekerId == 0) {
 				
 				// Insert jobseeker
-						
 				if ($errorMessage == "") {
 
 					$sql = "insert into job_seeker";
@@ -154,8 +150,6 @@
 			else {
 
 				// Edit job seeker
-				
-				
 				$sql = "update job_seeker";
 				$sql .= " set";
 				$sql .= " UserId = ?,";
@@ -201,28 +195,25 @@
 
 			}
 			
-			//return object
+			//return helper object with errors and Id
 			return new \Classes\ObjectSave($errorMessage, $objectId);
 		
 		}
 		
-		
+		/*
+		* SaveJobSeekerSkills save skills selected by job seeker
+		*/		
 		public static function SaveJobSeekerSkills($jobSeekerId, $selectedSkills) {
 			
 			$jobSeeker = new JobSeeker($jobSeekerId);
-			
-			// TODO check $selectedSkills is an integer/string rep of an integer, or a string of comma-joined integers
-			// Also checking whether attempted execution of the query caused an error would be good
 			
 			$conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);	
 			
 			$sql = " delete from job_seeker_skill where JobSeekerId = ? and SkillId not in";
 			$sql .= " (";
 			$sql .= " 	select SkillId from Skill where SkillCategoryId = ?";
-			$sql .= " 	and SkillId in (" . $selectedSkills . ")";
+			$sql .= " 	and SkillId in (" . \Utilities\Common::GetCheckedSelectedSkills($selectedSkills) . ")";
 			$sql .= " )";
-
-			//var_dump($sql);
 
 			$stmt = $conn->prepare($sql);
 			$stmt->bind_param("ii", $jobSeeker->jobSeekerId,  $jobSeeker->skillCategoryId);
@@ -231,11 +222,9 @@
 			
 			$sql = " insert into job_seeker_skill (JobSeekerId, SkillId)";
 			$sql .= " select ?, SkillId from Skill where SkillCategoryId = ?";
-			$sql .= " and SkillId in (" . $selectedSkills . ")";
+			$sql .= " and SkillId in (" . \Utilities\Common::GetCheckedSelectedSkills($selectedSkills) . ")";
 			$sql .= " and SkillId not in (select SkillId from job_seeker_skill where JobSeekerId = ?)";
 
-			//var_dump($sql);
-			
 			$stmt = $conn->prepare($sql);
 			$stmt->bind_param("iii", $jobSeeker->jobSeekerId,  $jobSeeker->skillCategoryId, $jobSeeker->jobSeekerId);
 			$stmt->execute();
@@ -246,10 +235,12 @@
 		}
 	
 		
-		// get job seeker by user id
+		/*
+		* GetJobSeekerByUserId returns an job seeker object based on supplied UserId
+		* returns null if not found
+		*/			
 		public static function GetJobSeekerByUserId($userId) 
 		{
-			// TODO: Update query
 			$sql = "select JobSeekerId from job_seeker where UserId = ?";
 				
 			$conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);
@@ -271,7 +262,9 @@
 			
 		}
 		
-		
+		/*
+		* GetSkillsByJobSeekerString returns a comma string of skill Ids
+		*/		
 		public static function GetSkillsByJobSeekerString($jobSeekerId) {
 			
 			$skills = \Classes\Skill::GetSkillsByJobSeeker($jobSeekerId);
@@ -287,64 +280,9 @@
 		}
 		
 		
-		public static function GetTitles() 
-		{
-			return array("Mr", "Ms", "Miss", "Mrs", "Dr");
-		}
-		
-		public static function GetStates() 
-		{
-			return array("ACT", "NSW", "NT", "QLD", "SA", "TAS", "VIC", "WA");
-		}
-
-		/*public static function GetExpertiseFields() 
-		{
-			return array("Finance", "Health", "Information Technology", "Marketing", "Sales");
-		}*/
-		
-		public static function GetAgeGroups() 
-		{
-			return array("18-24", "25-34", "35-49", "50-65", "65+", "Rather Not Say");
-		}
-		
-		public static function GetEducationLevels() 
-		{
-			return array("High School", 
-				"T.A.F.E. or Trade Certificate", 
-				"Diploma", 
-				"Advanced Diploma",
-				"Undergraduate Degree", 
-				"Postgraduate Degree", 
-				"Master's Degree",
-				"Doctorate Degree");
-		}
-		
-		/*public static function GetYesNo() {
-			return array("Yes", "No"); 
-			
-		}*/
-		
-		public static function GetSignupReasons() 
-		{
-			return array("Currently without employment",
-				"Considering a change in the near future", 
-				"Seeing what may be out there");
-	
-		}
-		
-		public static function GetJobChangeSpeeds() 
-		{
-			return array("Immediate",
-				"Within 2 weeks", 
-				"2-4 weeks", 
-				"1-2 months", 
-				"2-6 months",
-				"Other");
-	
-		}
-		
-		
-		// Get Job Seeker Matches By Job
+		/*
+		* GetJobSeekerMatchesByJob returns Job Seeker Matches for a Job
+		*/	
 		public static function GetJobSeekerMatchesByJob($jobId) {
 			
 			$jobMatches = Array();
@@ -378,8 +316,9 @@
 			
 		}
 		
-		
-		// Get Job Seeker Matche By Job
+		/*
+		* GetJobMatch returns Job match score for a job seeker and job
+		*/			
 		public function GetJobMatch($jobId) {
 			
 			$sql = "call Job_JobSeekerMatches(?, ?)";
@@ -398,9 +337,58 @@
 				return round($row['Score']);
 			}
 			
-			
 			return null;
 			
+		}
+		
+		/*
+		* The following arrays are used in job seeker form
+		*/
+		public static function GetTitles() 
+		{
+			return array("Mr", "Ms", "Miss", "Mrs", "Dr");
+		}
+		
+		public static function GetStates() 
+		{
+			return array("ACT", "NSW", "NT", "QLD", "SA", "TAS", "VIC", "WA");
+		}
+
+		
+		public static function GetAgeGroups() 
+		{
+			return array("18-24", "25-34", "35-49", "50-65", "65+", "Rather Not Say");
+		}
+		
+		public static function GetEducationLevels() 
+		{
+			return array("High School", 
+				"T.A.F.E. or Trade Certificate", 
+				"Diploma", 
+				"Advanced Diploma",
+				"Undergraduate Degree", 
+				"Postgraduate Degree", 
+				"Master's Degree",
+				"Doctorate Degree");
+		}
+		
+		public static function GetSignupReasons() 
+		{
+			return array("Currently without employment",
+				"Considering a change in the near future", 
+				"Seeing what may be out there");
+	
+		}
+		
+		public static function GetJobChangeSpeeds() 
+		{
+			return array("Immediate",
+				"Within 2 weeks", 
+				"2-4 weeks", 
+				"1-2 months", 
+				"2-6 months",
+				"Other");
+	
 		}
 		
 	

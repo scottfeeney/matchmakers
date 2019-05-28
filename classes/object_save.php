@@ -1,5 +1,10 @@
 <?php
 	
+	//----------------------------------------------------------------
+	// ObjectSave class - helper class to return errors and created Id
+	// back to client when saving
+	//----------------------------------------------------------------
+	
 	namespace Classes;
 
 	class ObjectSave {
@@ -8,7 +13,6 @@
 		public $errorMessage;
 		public $objectId;
 
-		
 		public function __construct($errorMessage, $objectId) {
 			
 			if ($errorMessage == "") {

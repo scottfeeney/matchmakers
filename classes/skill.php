@@ -1,8 +1,13 @@
 <?php
 	
+	//----------------------------------------------------------------
+	// Skill class - performs operations for Skill object
+	// and skill related functionality
+	//----------------------------------------------------------------
+	
 	namespace Classes;
 	
-	
+	// include required php file, for website and PHPUnit
 	if ($_SERVER['DOCUMENT_ROOT'] != '') {
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/config.php';
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/object_save.php';
@@ -17,7 +22,10 @@
 		public $skillCategoryId;
 		public $skillName;
 
-		
+		/*
+		* Constructor: initialise data members based on supplied Id
+		* 0: initialise empty object
+		*/			
 		public function __construct($skillId = 0) {
         
 			if ($skillId != 0) {
@@ -48,20 +56,17 @@
 			}
 		}
 		
-		
+		// Save Object
 		public function Save($user) {
 		
 			$errorMessage = "";
 			$objectId = $this->skillId;
 			
 
-			
-
+			// check for errors
 			if ($this->skillName == "") {
-
 				$errorMessage = "Please enter a Skill Name";
 			}
-			
 			
 			if ($errorMessage == "" && Skill::GetSkillExists($this)) {
 				$errorMessage = "A skill with the same name already exists in this category";
@@ -73,11 +78,8 @@
 
 			if ($errorMessage == "") {
 		
+				// Insert skill
 				if ($this->skillId == 0) {
-					
-					// Insert skill
-					
-					
 						
 					$sql = "insert into skill";
 					$sql .= " (SkillCategoryId, SkillName,";
@@ -92,10 +94,9 @@
 						$stmt->bind_param("isi", $this->skillCategoryId, $this->skillName, $user->userId);
 						$stmt->execute();
 						$objectId = $stmt->insert_id;
-						//If foreign key constraint fails we seem end up here with objectId zero
-						//obviously this should be an error case
+
 						if ($objectId === 0) {
-							$errorMessage = "Insert appears to have failed - did you fail to satisfy a foreign key constraint?";
+							$errorMessage = "Error saving object";
 						}
 					} 
 					else {
@@ -143,22 +144,23 @@
 		}
 		
 
-		//Delete a skill
+		/*
+		* DeleteSkill deletes a skill
+		*/	
 		public static function DeleteSkill($skillId, $deleteReferencedSkill = false) {
 
 			$skills = Array();
 			
-			//Only delete skill that is in use currently if user indicates that they are
-			//aware skill is in use and still want to delete it
+			/*
+			* Only delete skill that is in use currently if user indicates that they are
+			* aware skill is in use and still want to delete it
+			*/
 			if ($deleteReferencedSkill) {
 
-				//Will need to delete any children
-				//(assuming you mean entries in job_skill or job_seeker_skill referencing this skill)
-				//....although - do we want to do that without warning the user?
-				//adding required optional flag to be set in order to do this (if skill is in use
-				//obviously the below (delete skill from table) will fail if the flag isn't set
-				//and these cleanup queries aren't run first)
-
+				/*
+				 * Will need to delete any children
+				 */
+				 
 				$sql = "delete from job_skill where skillId = ?";
 
 				$conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);
@@ -206,8 +208,9 @@
 			}
 		}
 	
-		
-		// Get All skills by Category
+		/*
+		* GetSkillsBySkillCategory returns an array of skills by category
+		*/	
 		public static function GetSkillsBySkillCategory($skillCategoryId) {
 			
 			$skills = Array();
@@ -235,7 +238,9 @@
 		}
 		
 
-		// Get skills by Job
+		/*
+		* GetSkillsByJob returns an array of skills by job
+		*/
 		public static function GetSkillsByJob($jobId) {
 			
 			$skills = Array();
@@ -267,7 +272,9 @@
 		}
 		
 
-		// Get skills by JobSeeker
+		/*
+		* GetSkillsByJobSeeker returns an array of skills by job seeker
+		*/
 		public static function GetSkillsByJobSeeker($jobSeekerId) {
 			
 			$skills = Array();
@@ -298,8 +305,9 @@
 			
 		}
 		
-
-		//Check if skill already exists
+		/*
+		* GetSkillExists - checks if skill already exists
+		*/
 		public static function GetSkillExists($object) {
 			
 			$sql = "select * from skill where SkillCategoryId = ? and SkillName = ? and SkillId <> ?";
@@ -322,7 +330,7 @@
 			
 		}
 
-		
+		// populate object from database row
 		private static function LoadObject($object, $row) {
 			$object->skillId = $row['SkillId'];
 			$object->skillCategoryId = $row['SkillCategoryId'];

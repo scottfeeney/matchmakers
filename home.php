@@ -1,4 +1,10 @@
 <?php
+
+	//----------------------------------------------------------------
+	// Home - Dashboard page
+	//----------------------------------------------------------------
+	
+	// include required php file, for website and PHPUnit	
 	if ($_SERVER['DOCUMENT_ROOT'] != '') {
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/utilities/common.php';
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/header.php';
@@ -18,20 +24,23 @@
 	}
 	
 	
+	// get user
 	$user = \Utilities\Common::GetSessionUser();
 	
-	
+	// page header
 	$header = new \Template\Header();
 	$header->isSignedIn = true;
 	echo $header->Bind();
 	
 ?>	
 
+
         <section>
 		
 			<h2>Welcome to Job Matcher</h2>
 		
 			<?php
+			
 				if ($user->userType == 1) {
 					
 					//employer
@@ -88,10 +97,11 @@
     
 <?php
 	
+	// page footer
 	$footer = new \Template\Footer();
 	echo $footer->Bind();
 	
-	
+	// main cards displayed on page
 	function GetCard($icon, $text, $url) {
 		
 		$html = '<div class="card dashboard-card" onclick="window.location.href=\'' . $url .'\';">
@@ -111,6 +121,7 @@
 		
 	}
 	
+	// user detail card
 	function GetCardDetail($text) {
 		
 		$html = '<div class="card dashboard-detail-card">
@@ -121,6 +132,7 @@
 		
 	}
 	
+	// inactive alert
 	function GetInactiveAlert() {
 		
 		$html = '<div class="alert alert-warning mt-3" role="alert">

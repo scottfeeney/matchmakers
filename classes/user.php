@@ -1,8 +1,13 @@
 <?php
 	
+	//----------------------------------------------------------------
+	// User class - performs operations for User object
+	// and user related functionality
+	//----------------------------------------------------------------
+	
 	namespace Classes;
 	
-	
+	// include required php file, for website and PHPUnit
 	if ($_SERVER['DOCUMENT_ROOT'] != '') {
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/config.php';
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/object_save.php';
@@ -23,10 +28,12 @@
 		public $password;
 		public $resetCode;
 		
+		/*
+		* Constructor: initialise data members based on supplied Id
+		* 0: initialise empty object
+		*/		
 		public function __construct($userId = 0) {
 		
-			//changed from != to > - probably would never come up but still
-			//assuming we agree a negative number is an invalid userid
 			if ($userId > 0) {
 			
 				$sql = "select * from user where UserId = ?";
@@ -50,7 +57,6 @@
 					$this->password = $row['Password'];
 					$this->resetCode = $row['ResetCode'];
 					
-					//print_r($result);
 				} 
 				else {
 					$errorMessage = $conn->errno . ' ' . $conn->error;
@@ -65,6 +71,7 @@
 			}
 		}
 	
+		// Save Object	
 		public function Save() {
 		
 		
@@ -145,14 +152,15 @@
 
 			}
 			
-			//return object
+			//return helper object with errors and Id
 			return new \Classes\ObjectSave($errorMessage, $objectId);
 		
 		}
 	
 		
-		// check if email address exists in users table
-		
+		/*
+		* GetEmailExists - checks if email address exists in users table
+		*/			
 		public function GetEmailExists($email, $userId) {
 			
 			$sql = "select * from user where email = ? and UserId <> ?";
@@ -175,8 +183,10 @@
 			
 		}
 		
-		
-		// get user by verify Code
+		/*
+		* GetUserByVerifyCode - returns user by verify Code
+		* null is return if not found
+		*/		
 		public static function GetUserByVerifyCode($verifyCode) {
 			
 			$sql = "select UserId from user where VerifyCode = ? and Verified = 0 and Active = 1";
@@ -200,7 +210,10 @@
 			
 		}
 		
-		// get user by email
+		/*
+		* GetUserByEmailAddress - returns user by email address
+		* null is return if not found
+		*/				
 		public static function GetUserByEmailAddress($email) 
 		{
 			if ($email != "")
@@ -226,10 +239,12 @@
 			
 		}
 
-		// As per above, but doesn't require verified or active to be set
-		// necessary where a user has lost or deleted the verification email
-		// and then tries the forgot password function to reset their account.
-
+		/*
+		* GetUnverifiedUserByEmailAddress - returns user by email address
+		* As per above, but doesn't require verified or active to be set
+		* necessary where a user has lost or deleted the verification email
+		* and then tries the forgot password function to reset their account.
+		*/
 		public static function GetUnverifiedUserByEmailAddress($email) 
 		{
 			if ($email != "")
@@ -255,7 +270,11 @@
 			
 		}
 		
-		// get user by reset Code
+
+		/*
+		* GetUserByResetCode - returns user by reset Code
+		* null is return if not found
+		*/	
 		public static function GetUserByResetCode($resetCode) 
 		{
 			if (strlen($resetCode) == 36)
@@ -282,7 +301,10 @@
 		}
 		
 
-		// get user for login
+		/*
+		* GetUserLogin - gets user for login
+		* null is return if not found
+		*/	
 		public static function GetUserLogin($email, $password) {
 			
 			if (strlen($email) > 3 and strlen($password) > 3)
@@ -312,7 +334,9 @@
 			
 		}
 		
-		// get user api token
+		/*
+		* CreateApiToken - creates an API token for the user
+		*/	
 		public function CreateApiToken() {
 			
 			$token = password_hash(\Utilities\Common::GetGuid(), PASSWORD_BCRYPT);
@@ -339,7 +363,10 @@
 			
 		}
 		
-		// get user by API token
+		/*
+		* GetUserByApiToken - gets user by API token
+		* null is return if not found
+		*/	
 		public static function GetUserByApiToken($token) {
 			
 			if (strlen($token) == 60)

@@ -1,8 +1,12 @@
 <?php
 	
+	//----------------------------------------------------------------
+	// AdminStaff class - performs operations for staff member object
+	//----------------------------------------------------------------
+
 	namespace Classes;
 	
-	
+	// include required php file, for website and PHPUnit
 	if ($_SERVER['DOCUMENT_ROOT'] != '') {
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/config.php';
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/object_save.php';
@@ -15,10 +19,13 @@
 
         public $adminStaffId;
         public $userId;
-        
         public $firstName;
         public $lastName;
     
+		/*
+		* Constructor: initialise data members based on supplied Id
+		* 0: initialise empty object
+		*/
         public function __construct($adminStaffId = 0) {
             
             if ($adminStaffId != 0) {
@@ -45,8 +52,10 @@
             } else {
                 $this->adminStaffId = 0;
             }
+			
         }
 
+		// populate object from database row
         private static function LoadObject($object, $row) {
 
             $object->adminStaffId = $row['AdminStaffId'];
@@ -56,7 +65,10 @@
 
         }
 		
-		// get admin staff by user id
+		/*
+		* GetAdminStaffByUserId returns an AdminStaff object based on supplied UserId
+		* returns null if not found
+		*/
 		public static function GetAdminStaffByUserId($userId) 
 		{
 			
@@ -76,83 +88,11 @@
 				return new AdminStaff($row['AdminStaffId']);
 			}
 			
-			
 			return null;
 			
 		}
-
-		/**
-		 * 
-		 * Commenting out rather than deleting in case there is ever cause to add
-		 * an admin panel allowing management of the adminStaff records
-
-        public function Save() {
 		
-			$errorMessage = "";
-			$objectId = $this->adminStaffId;
-			
-		
-			if ($this->adminStaffId == 0) {
-				
-				// Insert adminStaff
-						
-				if ($errorMessage == "") {
-					$sql = "insert into adminStaff";
-					$sql .= " (adminStaffId, UserId, firstName, lastName, created, modified)";
-					$sql .= " values";
-					$sql .= " (?, ?, ?, ?, UTC_TIMESTAMP(), UTC_TIMESTAMP())";
-	
-					$conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);	
-					
-					if($stmt = $conn->prepare($sql)) {
-						$stmt->bind_param("iiss", $this->adminStaffId, $this->userId, $this->firstName, $this->lastName);
-						$stmt->execute();
-						$objectId = $stmt->insert_id;
-					} 
-					else {
-						$errorMessage = $conn->errno . ' ' . $conn->error;
-					}
-					
-					$stmt->close();
-					$conn->close();
-				
-				}
-			
-			}
-			else {
-
-				// Edit existing adminStaff record
-							
-				$sql = "update adminStaff";
-                $sql .= " set";
-				$sql .= " UserId = ?,";
-				$sql .= " FirstName = ?,";
-				$sql .= " LastName = ?,";
-				$sql .= " Modified = UTC_TIMESTAMP()";
-				$sql .= " where adminStaffId = ?";
-
-				$conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);	
-				
-				if($stmt = $conn->prepare($sql)) {
-					$stmt->bind_param("issi", $this->userId, $this->firstName, $this->lastName, $this->adminStaffId);
-					$stmt->execute();
-				} 
-				else {
-					$errorMessage = $conn->errno . ' ' . $conn->error;
-				}
-				
-				$stmt->close();
-				$conn->close();
-
-			}
-			
-			//return object
-			return new \Classes\ObjectSave($errorMessage, $objectId);
-		
-		}
-		
-		*/
 
     } 
     
-    ?>
+?>

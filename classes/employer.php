@@ -1,8 +1,12 @@
 <?php
+
+	//----------------------------------------------------------------
+	// Employer class - performs operations for employer object
+	//----------------------------------------------------------------
 	
 	namespace Classes;
 	
-	
+	// include required php file, for website and PHPUnit
 	if ($_SERVER['DOCUMENT_ROOT'] != '') {
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/config.php';
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/object_save.php';
@@ -36,7 +40,11 @@
 		public $companyType;
 		public $companySize;
 		public $expectedGrowth;
-				
+			
+		/*
+		* Constructor: initialise data members based on supplied Id
+		* 0: initialise empty object
+		*/			
 		public function __construct($employerId = 0) {
         
 			if ($employerId != 0) {
@@ -67,6 +75,7 @@
 			}
 		}
 		
+		// populate object from database row
 		private static function LoadObject($object, $row) {
 			$object->employerId = $row['EmployerId'];
 			$object->userId = $row['UserId'];
@@ -93,7 +102,7 @@
 			$object->expectedGrowth = $row['ExpectedGrowth'];
 		}
 		
-	
+		// Save Object
 		public function Save() {
 		
 			$errorMessage = "";
@@ -103,8 +112,6 @@
 			if ($this->employerId == 0) {
 				
 				// Insert employer
-				
-						
 				if ($errorMessage == "") {
 					
 					$sql = "insert into employer";
@@ -146,7 +153,6 @@
 			else {
 
 				// Edit employer
-				
 				$sql = "update employer";
 				$sql .= " set";
 				$sql .= " UserId = ?,";
@@ -194,13 +200,16 @@
 
 			}
 			
-			//return object
+			//return helper object with errors and Id
 			return new \Classes\ObjectSave($errorMessage, $objectId);
 		
 		}
 	
 		
-		// get employer by user id
+		/*
+		* GetEmployerByUserId returns an employer object based on supplied UserId
+		* returns null if not found
+		*/
 		public static function GetEmployerByUserId($userId) 
 		{
 			
@@ -225,7 +234,9 @@
 			
 		}
 		
-		
+		/*
+		* The following arrays are used in employer form
+		*/
 		public static function GetTitles() 
 		{
 			return array("Mr", "Ms", "Miss", "Mrs", "Dr");

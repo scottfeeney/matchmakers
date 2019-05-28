@@ -1,8 +1,13 @@
 <?php
 	
+	//----------------------------------------------------------------
+	// Job class - performs operations for job object
+	// and job related functionality
+	//----------------------------------------------------------------
+	
 	namespace Classes;
 	
-	
+	// include required php file, for website and PHPUnit
 	if ($_SERVER['DOCUMENT_ROOT'] != '') {
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/config.php';
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/object_save.php';
@@ -26,11 +31,14 @@
 		public $active;
 		public $created;
 				
+		/*
+		* Constructor: initialise data members based on supplied Id
+		* 0: initialise empty object
+		*/					
 		public function __construct($jobId = 0) {
         
 			if ($jobId != 0) {
 			    
-			    // TODO: Update query
 				$sql = "select * from job where JobId = ?";
 				
 				$conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);
@@ -58,6 +66,7 @@
 			}
 		}
 		
+		// populate object from database row
 		private static function LoadObject($object, $row) {
 			$object->jobId = $row['JobId'];
 			$object->employerId = $row['EmployerId'];
@@ -71,10 +80,9 @@
 			$object->jobDescription = $row['JobDescription'];
 			$object->active = $row['Active'];
 			$object->created = $row['Created'];
-			
 		}
 		
-	
+		// Save Object
 		public function Save() {
 			
 			
@@ -85,8 +93,6 @@
 			if ($this->jobId == 0) {
 				
 				// Insert job
-				
-						
 				if ($errorMessage == "") {
 
 					$sql = "insert into job";
@@ -119,8 +125,6 @@
 			else {
 
 				// Edit job
-				
-				
 				$sql = "update job";
 				$sql .= " set";
 				$sql .= " EmployerId = ?,";
@@ -153,24 +157,24 @@
 
 			}
 			
-			//return object
+			//return helper object with errors and Id
 			return new \Classes\ObjectSave($errorMessage, $objectId);
 		
 		}
 	
-	
+		/*
+		* SaveJobSkills saves job skills selected by employer
+		*/
 		public static function SaveJobSkills($jobId, $selectedSkills) {
 			
 			$job = new Job($jobId);
-			
-			// TODO check $selectedSkills contains integers
 			
 			$conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);	
 			
 			$sql = " delete from job_skill where JobId = ? and SkillId not in";
 			$sql .= " (";
 			$sql .= " 	select SkillId from Skill where SkillCategoryId = ?";
-			$sql .= " 	and SkillId in (" . $selectedSkills . ")";
+			$sql .= " 	and SkillId in (" . \Utilities\Common::GetCheckedSelectedSkills($selectedSkills) . ")";
 			$sql .= " )";
 
 			$stmt = $conn->prepare($sql);
@@ -180,7 +184,7 @@
 			
 			$sql = " insert into job_skill (JobId, SkillId)";
 			$sql .= " select ?, SkillId from Skill where SkillCategoryId = ?";
-			$sql .= " and SkillId in (" . $selectedSkills . ")";
+			$sql .= " and SkillId in (" . \Utilities\Common::GetCheckedSelectedSkills($selectedSkills) . ")";
 			$sql .= " and SkillId not in (select SkillId from job_skill where JobId = ?)";
 			
 			$stmt = $conn->prepare($sql);
@@ -190,11 +194,11 @@
 			$stmt->close();
 			$conn->close();
 
-			//TODO Should return DB error message on failure?
-
 		}
 		
-		// Get Jobs By Employer
+		/*
+		* GetJobsByEmployer returns jobs by employer
+		*/
 		public static function GetJobsByEmployer($employerId) {
 			
 			$jobs = Array();
@@ -222,6 +226,9 @@
 			
 		}
 		
+		/*
+		* GetSkillsByJobString returns a comma string of skill Ids
+		*/		
 		public static function GetSkillsByJobString($jobId) {
 			
 			$skills = \Classes\Skill::GetSkillsByJob($jobId);
@@ -236,24 +243,10 @@
 			
 		}
 		
-		public static function GetPositionAvailabilities() 
-		{
-			return array("Immediate",
-				"Within 2 weeks", 
-				"2-4 weeks", 
-				"1-2 months", 
-				"2-6 months",
-				"Other");
-		}
 		
-		public static function GetNumberAvailables() 
-		{
-			return array("1", "2", "3", "4", "5", "6", "7", "8", "9", "10+");
-	
-		}
-		
-		
-		// Get Job Matches By Job Seeker
+		/*
+		* GetJobMatchesByJobSeeker returns Job Matches for a Job Seeker
+		*/		
 		public static function GetJobMatchesByJobSeeker($jobSeekerId) {
 			
 			$jobMatches = Array();
@@ -287,7 +280,9 @@
 		}
 		
 		
-		// Get Job Matche By Job Seeker
+		/*
+		* GetJobSeekerMatch returns Job match score for a job seeker and job
+		*/	
 		public function GetJobSeekerMatch($jobSeekerId) {
 			
 			$sql = "call JobSeeker_JobMatches(?, ?)";
@@ -309,6 +304,25 @@
 			
 			return null;
 			
+		}
+		
+		/*
+		* The following arrays are used in job form
+		*/		
+		public static function GetPositionAvailabilities() 
+		{
+			return array("Immediate",
+				"Within 2 weeks", 
+				"2-4 weeks", 
+				"1-2 months", 
+				"2-6 months",
+				"Other");
+		}
+		
+		public static function GetNumberAvailables() 
+		{
+			return array("1", "2", "3", "4", "5", "6", "7", "8", "9", "10+");
+	
 		}
 		
 	}
