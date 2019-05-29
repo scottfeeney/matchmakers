@@ -7,7 +7,7 @@ $(document).ready(function () {
 	});
 	
 
-	// bootstrap validation
+	// bootstrap form validation
 	var forms = document.getElementsByClassName('needs-validation');
 
 	var validation = Array.prototype.filter.call(forms, function(form) {
@@ -24,6 +24,7 @@ $(document).ready(function () {
 				event.stopPropagation();
 			}
 			
+			// make skills control work with bootstrap validation
 			if ($(form).find('#SkillsControlSelectedSkills').length > 0) {
 				if ($(form).find('#SkillsControlSelectedSkills').val() == '') {
 					event.preventDefault();
@@ -38,15 +39,13 @@ $(document).ready(function () {
 	$('.jobseeker-currently-studying-field').change(function() {
 		if ($('.jobseeker-currently-studying-field:checked').val() == 'YES') {
 			$('.job-seeker-current-study-level-group').show();
-			//$('.job-seeker-current-study-level-group select').prop('required',true);
 		}
 		else {
 			$('.job-seeker-current-study-level-group').hide();
-			//$('.job-seeker-current-study-level-group select').prop('required',false);
 		}
 	});
 	
-
+	//limit length on textarea
 	$('.textarea-limit').keyup(function() {
 		var textlimit = $(this).attr('data-limit');
 		var tlength = $(this).val().length;
@@ -58,6 +57,7 @@ $(document).ready(function () {
 
 });	
 
+
 function resizePage() {
 	
 	$('.main-container').css({'height' : 'auto'})
@@ -65,7 +65,6 @@ function resizePage() {
 		$('.home-page .jumbotron').css({'height' : 'auto'})
 	}
 	
-	//console.log($(window).height(), $('.main-container').height());
 	var screenHeight = $(window).height();
 	var mainContainerHeight = $('.main-container').height();
 	
@@ -88,7 +87,7 @@ $(document).ready(function () {
 	
 	if ($(".skill-manage").length > 0) {
 		
-		
+		//skill category changed
 		$('#SkillCategoryId').on('change', function() {
 			if ($(this).val() == '') {
 				$(".main-form").hide();
@@ -101,6 +100,7 @@ $(document).ready(function () {
 			}
 		});
 		
+		//save a skill
 		$('.save-skill').click(function(){
 			
 			$('.manage-skill-spinner').show();
@@ -112,8 +112,6 @@ $(document).ready(function () {
 			data['SkillName'] = $("#SkillName").val();
 
 
-			//console.log(data);
-			
 			$.ajax({
 				type: 'POST',
 				url: '/api/skills_manage.php',
@@ -138,7 +136,7 @@ $(document).ready(function () {
 			
 		});
 		
-		
+		//delete skill
 		$('.delete-skill').click(function(){
 			
 			$('.delete-skill-spinner').show();
@@ -172,6 +170,7 @@ $(document).ready(function () {
 			
 		});
 		
+		//skill edit modal
 		$("#skillManageModel").on('show.bs.modal', function () {
 			$('.skill-manage-add-error').hide();
 			$('.manage-skill-spinner').hide();
@@ -182,7 +181,7 @@ $(document).ready(function () {
 			skillManage($(this).attr('data-id'), $(this).attr('data-name'))
 		});		
 		
-		
+		//delete skill modal
 		$("#skillDeleteModel").on('show.bs.modal', function () {
 			$('.skill-delete-error').hide();
 			$('.delete-skill-spinner').hide();
@@ -194,17 +193,19 @@ $(document).ready(function () {
 	
 });	
 
+//load hidden fields based on element clicked
 function skillManage(skillId, skillName) {
 	$('#hidSkillId').val(skillId);
 	$('#hidSkillName').val(skillName);
-	//console.log($('#hidSkillId').val(), $('#hidSkillName').val());
 }
 
+//load hidden fields based on element clicked
 function skillDelete(skillId, skillName) {
 	$('#hidSkillId').val(skillId);
 	$('#hidSkillName').val(skillName);
 }
 
+//display skills in manage page
 function getSkillsByCategory($skillCategoryId) {
 	
 	$('.skill-manage-skills-list').hide();
@@ -214,8 +215,6 @@ function getSkillsByCategory($skillCategoryId) {
 	data['Mode'] = "list";
 	data['SkillCategoryId'] = $skillCategoryId;
 
-
-	//console.log(data);
 	
 	$.ajax({
 		type: 'POST',
@@ -251,6 +250,7 @@ function getSkillsByCategory($skillCategoryId) {
 
 
 $(document).ready(function () {
+	//setup skills control
 	if ($(".skills-control").length > 0) {
 		
 		skillsControlUpdate();
@@ -262,7 +262,7 @@ $(document).ready(function () {
 	}
 });
 
-
+//Add a skill selected from dropdown list, then reopen dropdown
 function skillsControlSelectSkill(item) {
 	var selectedItemId = $(item).attr('data-id');
 	selected = skillsControlGetSelectedSkills();
@@ -272,12 +272,14 @@ function skillsControlSelectSkill(item) {
     setTimeout("$('.dropdown').find('[data-toggle=dropdown]').dropdown('toggle');", 1);
 }
 
+//remove a selected skill
 function skillsControlRemoveSkill(item) {
 	var selected = removeFromArrayByValue(skillsControlGetSelectedSkills(), $(item).attr('data-id'));
 	$('#SkillsControlSelectedSkills').val(selected.join(","));
 	skillsControlUpdate();
 }
 
+//returns an array of selected skills
 function skillsControlGetSelectedSkills() {
 	
 	if ($('#SkillsControlSelectedSkills').val() == '') {
@@ -288,35 +290,39 @@ function skillsControlGetSelectedSkills() {
 	}
 }
 
-
-
+//display a selected skill control
 function skillsControlUpdate() {
 	
 	var selectedCount = 0;
 	
 	if (typeof skills != "undefined") {
 	
+		//get string of selected skills
 		var selectedSkills = "," + $('#SkillsControlSelectedSkills').val() + ",";
 		var dropdownHtml = '';
 		var badgeHtml = '';
 		
 		var dropdownMessage = '';
 
+		//loop skills for selected category
 		for (var i = 0; i < skills.length; i++){
-			
 			if (selectedSkills.indexOf("," + skills[i].skillId + ",") == -1) {
+				// if skill is not already selected, insert into dropdown
 				dropdownHtml += '<a class="dropdown-item" href="#" data-id="' + skills[i].skillId + '" onclick="skillsControlSelectSkill(this);">' + skills[i].skillName + '</a>';
 			}
 			else {
+				//skill is selected. Add as a badge
 				selectedCount++;
 				badgeHtml += '<span class="badge badge-pill badge-success">' + skills[i].skillName + '&nbsp;&nbsp;<span class="skill-remove" data-id="' + skills[i].skillId + '" onclick="skillsControlRemoveSkill(this);"><i class="fas fa-times"></i></span></span>';
 			}
 			
 		}
 		
+		// display dropdown and badges
 		$(".skills-control-dropdown-menu").html(dropdownHtml);
 		$(".skills-control-selected-skills").html(badgeHtml);
 		
+		//message in dropdown control
 		if (selectedCount == 1) {
 			dropdownMessage = '1 skill selected';
 		}
@@ -329,8 +335,8 @@ function skillsControlUpdate() {
 	}
 	
 
+	//classes for bootstrap validation
 	var wrapper = $('.skills-control-wrapper');
-		
 		
 	if (selectedCount == 0) {
 		wrapper.removeClass('has-selected');
@@ -343,7 +349,7 @@ function skillsControlUpdate() {
 	
 }
 
-
+//get skills based on selected categoryt
 function skillsControlLoadCategory(id) {
 	
 	$('.skills-control').hide();
@@ -352,8 +358,6 @@ function skillsControlLoadCategory(id) {
 	var data = {}
 	data['Mode'] = "control";
 	data['SkillCategoryId'] = id;
-
-	//console.log(data);
 	
 	$.ajax({
 		type: 'POST',
@@ -376,7 +380,7 @@ function skillsControlLoadCategory(id) {
 }
 
 
-
+//helper function to remove a item from an array
 function removeFromArrayByValue(array, value) {
 	var out = Array();
 	for (var i = 0; i < array.length; i++){

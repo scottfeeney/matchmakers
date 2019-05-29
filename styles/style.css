@@ -1,3 +1,5 @@
+/* main styles */
+
 h1,h2,h3,h4,h5,h6{
     font-family: 'Amiko', sans-serif;
 }
@@ -12,10 +14,24 @@ html, body {
   overflow-x: hidden;
 }
 
+
+/* header */
+
 header {
 	background-color: #0a1933;
 	height: 60px;
 }
+
+.logo {
+	margin-top: 12px;
+	margin-left: 15px;
+}
+
+
+
+/* footer */
+
+
 footer {
 	background-color: #0a1933;
 	height: 100px;
@@ -33,10 +49,10 @@ footer a:hover{
 	color: #fff;
 }
 
-.logo {
-	margin-top: 12px;
-	margin-left: 15px;
-}
+
+
+
+
 
 .jumbotron{
 	margin-bottom: 0px;
@@ -51,7 +67,7 @@ footer a:hover{
 	
 }
 
-
+/* page */
 
 .page-container {
 	max-width: 1000px;
@@ -83,6 +99,8 @@ footer a:hover{
 	}
 }
 
+/* buttons */
+
 .btn-primary {
 	background-color: #0a1933;
     border-color: #0a1933;	
@@ -98,16 +116,32 @@ footer a:hover{
     border-color: #070923;	
 }
 
+
+
+.signin-button {
+	width: 100%;
+}
+
+.btn-signup {
+	border: 1px solid #ffffff;
+	border-radius: 5px;
+	color: #ffffff;
+	margin-top: 10px;
+	margin-right: 20px;
+}
+
+.btn-signup:hover{
+	color: #ffffff;
+}
+
+
 .form-section {
 	font-weight: bold;
 	margin: 30px 0 10px 0;
 	color: #0a1933;
 }
 
-.signin-button {
-	width: 100%;
-}
-
+/* home page */
 
 .home-text-spacer {
 	flex: 0 0 5%;
@@ -115,7 +149,6 @@ footer a:hover{
 }
 
 .home-text-content {
-	/*background:rgba(0,0,0,0.5);*/
 	border-radius: 5px;
 	padding: 20px;
 	flex: 0 0 42.5%;
@@ -238,6 +271,8 @@ footer a:hover{
 	}
 }
 
+/* internal pages */
+
 /*
 	Image source: https://www.pexels.com/photo/photo-of-group-of-people-in-a-meeting-1661004/
 */
@@ -285,17 +320,6 @@ footer a:hover{
 }
 
 
-.btn-signup {
-	border: 1px solid #ffffff;
-	border-radius: 5px;
-	color: #ffffff;
-	margin-top: 10px;
-	margin-right: 20px;
-}
-
-.btn-signup:hover{
-	color: #ffffff;
-}
 
 
 
@@ -331,6 +355,7 @@ footer a:hover{
 }
 
 
+/* skills */
 
 #manageSkillSelector{
 	border-color: #0a1933;
@@ -425,6 +450,9 @@ footer a:hover{
 .was-validated .skills-control-wrapper.none-selected .invalid-skills-control-feedback {
 	display: block;
 }
+
+
+/* dashboard */
 
 
 .dashboard-detail-card {
@@ -541,6 +569,7 @@ footer a:hover{
 	
 }
 
+/* api */
 
 .api-documentation h1 {
 	color: #333;
@@ -589,9 +618,6 @@ footer a:hover{
 	color: #333;
 }
 
-
-
-
 @media (max-width: 767px)
 {
 	
@@ -638,7 +664,6 @@ footer a:hover{
 		text-align: left;
 	}
 }
-
 
 @media (max-width: 767px)
 {
