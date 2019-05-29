@@ -1,4 +1,10 @@
 <?php
+
+	//-------------------------------------------------------------------
+	// Skill Manage Page - Staff members can add, edit and delete skills
+	//-------------------------------------------------------------------
+	
+	// include required php files, for website and PHPUnit
 	if ($_SERVER['DOCUMENT_ROOT'] != '') {
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/utilities/common.php';
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/header.php';
@@ -13,7 +19,7 @@
 		require_once './classes/skillcategory.php';
 	}
 	
-	
+	// get user from session
 	$user = \Utilities\Common::GetSessionUser();
 	
 	if ($user->userType != 3) {
@@ -22,14 +28,13 @@
 		die();				
 	}
 	
-	
+	// website page header
 	$header = new \Template\Header();
 	$header->isSignedIn = true;
 	echo $header->Bind();
 	
 	
-	//skill categories
-	
+	//get skill categories list for dropdown
 	$skillCategories = \Classes\SkillCategory::GetSkillCategories();
 	
 ?>	
@@ -125,6 +130,7 @@
 	</div>	
     
 <?php
+	// website page footer
 	$footer = new \Template\Footer();
 	echo $footer->Bind();
 ?>

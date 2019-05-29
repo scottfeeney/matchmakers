@@ -1,4 +1,10 @@
 <?php
+
+	//----------------------------------------------------------------
+	// Verify Account Page - Includes form to set password
+	//----------------------------------------------------------------
+	
+	// include required php files, for website and PHPUnit
 	if ($_SERVER['DOCUMENT_ROOT'] != '') {
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/utilities/common.php';
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/user.php';
@@ -14,12 +20,14 @@
 	}
 	
 	
-	
-	
+	//get verify code
 	$verifyCode = \Utilities\Common::GetRequest("v");
-	//now trim the 'v' at the start of the verify code, placed there to prevent issues with email clients interpreting
-	//a sequence starting with = then hexadecimal characters as a unicode char
-	//(check not already done as this page will be loaded more than once during password setting process)
+
+	/*
+	 * now trim the 'v' at the start of the verify code, placed there to prevent issues with email clients interpreting
+	 * a sequence starting with = then hexadecimal characters as a unicode char
+	 * (check not already done as this page will be loaded more than once during password setting process)
+	 */
 	if (substr($verifyCode,0,1) == 'v') {
 		$verifyCode = substr($verifyCode,1);
 	}
@@ -28,21 +36,25 @@
     // get user based on Verify Code where not already verified
 	$user = \Classes\User::GetUserByVerifyCode($verifyCode);
 	
-	// found user
+	// found user based on verify code
 	if ($user != null) {
+		
+		// functionality to process password form
 	
+		// default field values
 		$errorMessage = "";
 		$password = "";
 		$confirmPassword = "";
 		
 		
-		// form submitted
 		if (\Utilities\Common::IsSubmitForm())
 		{
 			
+			//form submitted, get form data
 			$password = \Utilities\Common::GetRequest("Password");
 			$confirmPassword = \Utilities\Common::GetRequest("ConfirmPassword");
 			
+			//validate data
 			if ($password != $confirmPassword) {
 				$errorMessage = "Passwords do not match";
 			}
@@ -51,10 +63,9 @@
 				$errorMessage = "Password length must be at least 6 charcaters";
 			}
 			
-			//save user
 			if ($errorMessage == "")
 			{
-				
+				//update user password
 				$user->password = password_hash($password, PASSWORD_BCRYPT);
 				$user->verified = true;
 				$objectSave = $user->Save();
@@ -70,9 +81,9 @@
 			
 		}
 		
-		
 	}
 
+	// website page header
 	$header = new \Template\Header();
 	$header->isHomePage = true;
 	$header->showMainBanner = false;
@@ -91,7 +102,17 @@
 						
 					<h2>Verify Account</h2>
 
-					<?php if ($user == null) { ?>
+					<?php
+					
+						if ($user == null) { 
+						
+							/* 
+							 * Verify code is not vaild. Display message if verify code supplied was not empty.
+							 * Also, display a form to allow user to enter the verify code in case
+							 * there is an issue using the link in the email
+							 */
+						
+					?>
 
 						<?php if ($verifyCode != "") { ?>
 							<div class="alert alert-danger" role="alert">Invalid code supplied.</div>
@@ -105,7 +126,14 @@
 							<button type="submit" class="btn btn-success">Submit</button>
 						</form>
 
-					<?php } else { ?>
+					<?php 
+					
+						} else { 
+						
+						// Verify code is vaild. Display password form
+						
+						
+					?>
 
 						<p>Your account has been verified, please create your password below.</p>
 						
@@ -143,6 +171,7 @@
 </section>
 	
 <?php
+	// website page footer
 	$footer = new \Template\Footer();
 	echo $footer->Bind();
 ?>

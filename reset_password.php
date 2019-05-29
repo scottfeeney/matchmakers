@@ -1,4 +1,10 @@
 <?php
+
+	//----------------------------------------------------------------
+	// Reset Password - Form to reset password
+	//----------------------------------------------------------------
+	
+	// include required php files, for website and PHPUnit
 	if ($_SERVER['DOCUMENT_ROOT'] != '') {
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/utilities/common.php';
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/user.php';
@@ -13,10 +19,14 @@
 		require_once './classes/footer.php';
 	}
 	
+	// request reset code
 	$resetCode = \Utilities\Common::GetRequest("r");
-	//now trim the 'r' at the start of the reset code, placed there to prevent issues with email clients interpreting
-	//a sequence starting with = then hexadecimal characters as a unicode char
-	//(check not already done as this page will be loaded more than once during password setting process)
+	
+	/*
+	 * now trim the 'r' at the start of the reset code, placed there to prevent issues with email clients interpreting
+	 * a sequence starting with = then hexadecimal characters as a unicode char
+	 * (check not already done as this page will be loaded more than once during password setting process)
+	 */
 	if (substr($resetCode,0,1) == 'r') {
 		$resetCode = substr($resetCode,1);
 	}
@@ -24,21 +34,25 @@
     // get user based on Verify Code where not already verified
 	$user = \Classes\User::GetUserByResetCode($resetCode);
 	
-	// found user
+	// found user based on reset code
 	if ($user != null) {
 	
+		// functionality to process reset form
+	
+		// default field values
 		$errorMessage = "";
 		$password = "";
 		$confirmPassword = "";
 		
 		
-		// form submitted
 		if (\Utilities\Common::IsSubmitForm())
 		{
 			
+			//form submitted, get form data
 			$password = \Utilities\Common::GetRequest("Password");
 			$confirmPassword = \Utilities\Common::GetRequest("ConfirmPassword");
 			
+			//validate data
 			if ($password != $confirmPassword) {
 				$errorMessage = "Passwords do not match";
 			}
@@ -47,10 +61,10 @@
 				$errorMessage = "Password length must be at least 6 characters";
 			}
 			
-			//save user
+			
 			if ($errorMessage == "")
 			{
-				
+				//update user password
 				$user->password = password_hash($password, PASSWORD_BCRYPT);
 				$user->resetCode = "";
 				$objectSave = $user->Save();
@@ -66,9 +80,9 @@
 			
 		}
 		
-		
 	}
 
+	// website page header
 	$header = new \Template\Header();
 	$header->isHomePage = true;
 	$header->showMainBanner = false;
@@ -87,7 +101,17 @@
 
 						<h2>Reset Password</h2>
 
-						<?php if ($user == null) { ?>
+						<?php 
+						
+							if ($user == null) { 
+							
+								/* 
+								 * Reset code is not vaild. Display message if reset code supplied was not empty.
+								 * Also, display a form to allow user to enter the reset code in case
+								 * there is an issue using the link in the email
+								 */
+						
+						?>
 
 							
 						<?php if ($resetCode != "") { ?>
@@ -103,7 +127,13 @@
 						</form>
 						
 
-						<?php } else { ?>
+						<?php 
+							
+							} else { 
+						
+							// Reset code is vaild. Display password reset form
+						
+						?>
 
 							<p>Reset your password below.</p>
 							
@@ -142,6 +172,7 @@
 	<section>	
 
 <?php
+	// website page footer
 	$footer = new \Template\Footer();
 	echo $footer->Bind();
 ?>	

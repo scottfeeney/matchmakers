@@ -1,4 +1,10 @@
 <?php
+
+	//----------------------------------------------------------------
+	// User Sign Up - Initial sign up form
+	//----------------------------------------------------------------
+	
+	// include required php files, for website and PHPUnit
 	if ($_SERVER['DOCUMENT_ROOT'] != '') {
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/utilities/common.php';
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/user.php';
@@ -13,6 +19,7 @@
 		require_once './classes/footer.php';
 	}
 	
+	// default field values for form
 	$errorMessage = "";
 	$email = "";
 	$userType = "";
@@ -22,7 +29,7 @@
 		$email = \Utilities\Common::GetRequest("Email");
 		$userType = \Utilities\Common::GetRequest("UserType");
 		
-		// form submitted
+		///form submitted, get form data
 		if (\Utilities\Common::IsValidEmail($email)) {
 			
 			// save user
@@ -36,10 +43,10 @@
 			}
 			else {
 				
-				//get updated user and send email
+				//get updated user, send email and redirect to sign up message page
 				$user = new \Classes\User($objectSave->objectId);
+
 				//Blair - v added to start of link to avoid issues with email clients interpreting start of sequence as unicode char
-				
 				$message = "Thank you for signing up with Job Matcher.\n\n";
 				$message .= "Before you can continue, please verify your email address by clicking on the following link: ".SITE_URL."/verify_account.php?v=v".$user->verifyCode."\n\n";
 				$message .= "\n\nIf for some reason the link does not work for you, please visit on the following link ".SITE_URL."/verify_account.php and enter the following verification code: ".$user->verifyCode;
@@ -58,13 +65,13 @@
 		
 	}
 		
+	// website page header
 	$header = new \Template\Header();
 	$header->isHomePage = true;
 	$header->showMainBanner = false;
 	echo $header->Bind();
 	
 ?>	
-
 
         <section>
             <div class="jumbotron jumbotron-fluid">
@@ -111,6 +118,7 @@
 		</section>
 
 <?php
+	// website page footer
 	$footer = new \Template\Footer();
 	echo $footer->Bind();
 ?>

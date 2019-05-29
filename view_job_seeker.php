@@ -1,4 +1,11 @@
 <?php
+
+	//-----------------------------------------------------------------
+	// View Job Seeker - page to display job seeker details
+	// Will also show job info if being viewed in Job mode
+	//-----------------------------------------------------------------
+	
+	// include required php files, for website and PHPUnit
 	if ($_SERVER['DOCUMENT_ROOT'] != '') {
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/utilities/common.php';
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/header.php';
@@ -21,6 +28,7 @@
 		require_once './classes/location.php';
 	}
 	
+	// get user from session
 	$user = \Utilities\Common::GetSessionUser();
 	
 	// Get job seeker id from get reqeuest and load job details
@@ -30,7 +38,6 @@
 	// Load Job seeker details
 	$firstName = $jobseeker->firstName;
 	$lastName = $jobseeker->lastName;
-	//$email = (new \Classes\User($jobSeeker->userid))->email;
 	$phoneAreaCode = $jobseeker->phoneAreaCode;
 	$phoneNumber = $jobseeker->phoneNumber;
 	$mobileNumber = $jobseeker->mobileNumber;
@@ -46,12 +53,14 @@
 	$selectedSkills = \Classes\Skill::GetSkillsByJobSeeker($jobseekerId);
 	$desiredJobLocation = (new \Classes\Location($jobseeker->locationId))->name;
 
+	// format address
 	$address = $jobseeker->address1;
 	if ($jobseeker->address2 != "") {
 		$address .= "\n" . $jobseeker->address2;
 	}
 	$address .= "\n" . $jobseeker->city . " " . $jobseeker->state . " " . $jobseeker->postcode;
 	
+	// These variables will be populated in job view mode
 	$matchScore = null;
 	$jobDetail = "";
 
@@ -61,6 +70,7 @@
 		$jobRequiredSkills = array();
 		$missingSkills = array();
 		
+		// ger employer object
 		$employer = \Classes\Employer::GetEmployerByUserId($user->userId);
 		
 		if ($jobId != 0) {
@@ -86,8 +96,10 @@
 					}
 				}
 			
+				// get job seekers job match score
 				$matchScore = $job->GetJobSeekerMatch($jobseeker->jobSeekerId);
 				
+				// display the matched jobs employer details
 				$jobDetail = GetCardDetail("<strong>Employer: </strong>" . htmlspecialchars($employer->companyName) . "<br /><strong>Job: </strong>" . htmlspecialchars($job->jobName));
 			
 			}
@@ -266,7 +278,7 @@
 										echo "<span class='badge badge-success jobSkillDisplay'>$skill->skillName</span>";
 									}
 									else {
-										// Show skill as blue if it's not
+										// Show skill as grey if it's not
 										echo "<span class='badge badge-info jobSkillDisplay unmatched'>$skill->skillName</span>";
 									}
 								}
@@ -315,10 +327,11 @@
 	</section>
     
 <?php
+	// website page footer
 	$footer = new \Template\Footer();
 	echo $footer->Bind();
 	
-	
+	// card to display details
 	function GetCardDetail($text) {
 		
 		$html = '<div class="card dashboard-detail-card">

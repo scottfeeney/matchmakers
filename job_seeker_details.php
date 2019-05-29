@@ -1,4 +1,10 @@
 <?php
+
+	//----------------------------------------------------------------
+	// Job Seeker Form
+	//----------------------------------------------------------------
+	
+	// include required php files, for website and PHPUnit
 	if ($_SERVER['DOCUMENT_ROOT'] != '') {
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/utilities/common.php';
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/header.php';
@@ -19,6 +25,7 @@
 		require_once './classes/skill.php';
 	}
 	
+	// get user from session
 	$user = \Utilities\Common::GetSessionUser();
 	
 	if ($user->userType != 2) {
@@ -27,27 +34,23 @@
 		die();				
 	}
 	
+	// get job seeker object
 	$jobSeeker = \Classes\JobSeeker::GetJobSeekerByUserId($user->userId);
 	
 
-	// empty fields
+	// default field values
 	$errorMessages = [];
-	
 	$title = "";
 	$firstName = "";
 	$lastName = "";
-	
 	$phoneAreaCode = "";
 	$phoneNumber = "";
 	$mobileNumber = "";
-	
 	$address1 = "";
 	$address2 = "";
 	$city = "";
 	$state = "";
 	$postcode = "";
-	
-	//$fieldOfExpertise = "";
 	$skillCategoryId = 0;
 	$ageGroup = "";
 	$highestLevelCompleted = "";
@@ -59,28 +62,23 @@
 	$selectedSkills = "";
 	$active = "1";
 	$locationId = "";
-	
 	$cancelBtn = false;
 	
 	
 	if (\Utilities\Common::IsSubmitForm())
 	{
-		//form submitted
+		//form submitted, get form data
 		$title = \Utilities\Common::GetRequest("Title");
 		$firstName = \Utilities\Common::GetRequest("FirstName");
 		$lastName = \Utilities\Common::GetRequest("LastName");
-		
 		$phoneAreaCode = \Utilities\Common::GetRequest("PhoneAreaCode");
 		$phoneNumber = \Utilities\Common::GetRequest("PhoneNumber");
 		$mobileNumber = \Utilities\Common::GetRequest("MobileNumber");
-		
 		$address1 = \Utilities\Common::GetRequest("Address1");
 		$address2 = \Utilities\Common::GetRequest("Address2");
 		$city = \Utilities\Common::GetRequest("City");
 		$state = \Utilities\Common::GetRequest("State");
 		$postcode = \Utilities\Common::GetRequest("Postcode");
-		
-		//$fieldOfExpertise = \Utilities\Common::GetRequest("FieldOfExpertise");
 		$skillCategoryId = \Utilities\Common::GetRequest("SkillCategoryId");
 		$ageGroup = \Utilities\Common::GetRequest("AgeGroup");
 		$highestLevelCompleted = \Utilities\Common::GetRequest("HighestLevelCompleted");
@@ -93,7 +91,7 @@
 		$active = (\Utilities\Common::GetRequest("Active") == "1" ? "1" : "0");
 		$locationId = \Utilities\Common::GetRequest("LocationId");
 
-		// Name/Title validation
+		//validate data
 		if ($title == "") {
 			$errorMessages[] = "Please select your Title";
 		}
@@ -213,7 +211,7 @@
 			// save job seeker
 			
 			if ($jobSeeker == null) {
-				// job seeker not saved previously
+				// job seeker not saved previously, load object
 				$jobSeeker = new \Classes\JobSeeker();
 			}
 			
@@ -250,7 +248,7 @@
 				\Classes\JobSeeker::SaveJobSeekerSkills($jobSeekerId, $selectedSkills);
 				
 				
-				//update user object enteredDetails fields
+				//update user object enteredDetails flag
 				if ($user->enteredDetails == false) {
 					$user->enteredDetails = true;
 					$objectSave = $user->Save();
@@ -271,7 +269,7 @@
 		}
 	}
 	else {
-		//first load - load data if employer already saved
+		//first load - load data if job seeker already saved
 	
 		if ($jobSeeker != null) {
 			$title = $jobSeeker->title;
@@ -304,7 +302,6 @@
 	
 
 	//get arrys list for dropdown
-
 	$titles = \Classes\JobSeeker::GetTitles() ;
 	$states = \Classes\JobSeeker::GetStates() ;
 	$skillCategories = \Classes\SkillCategory::GetSkillCategories();
@@ -315,6 +312,7 @@
 	$jobTypes = \Classes\JobType::GetJobTypes();
 	$locations = \Classes\Location::GetLocations();
 
+	// website page header
 	$header = new \Template\Header();
 	$header->isSignedIn = true;
 	echo $header->Bind();
@@ -600,6 +598,7 @@
 			</form>
 		</section>
 <?php
+	// website page footer
 	$footer = new \Template\Footer();
 	echo $footer->Bind();
 ?>

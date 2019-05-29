@@ -1,4 +1,10 @@
 <?php
+
+	//----------------------------------------------------------------
+	// Employer Jobs - lists an employers jobs
+	//----------------------------------------------------------------
+	
+	// include required php files, for website and PHPUnit
 	if ($_SERVER['DOCUMENT_ROOT'] != '') {
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/utilities/common.php';
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/header.php';
@@ -13,7 +19,7 @@
 		require_once './classes/job.php';
 	}
 	
-	
+	// get user from session
 	$user = \Utilities\Common::GetSessionUser();
 	
 	if ($user->userType != 1) {
@@ -22,12 +28,15 @@
 		die();				
 	}
 	
+	// get the employer object
 	$employer = \Classes\Employer::GetEmployerByUserId($user->userId);
 	
+	// website page header
 	$header = new \Template\Header();
 	$header->isSignedIn = true;
 	echo $header->Bind();
 	
+	// get employers jobs
 	$jobs = \Classes\Job::GetJobsByEmployer($employer->employerId);
 ?>	
         <section>
@@ -43,8 +52,10 @@
 			</div>
 			<?php
 			
+				// display employer details
 				echo GetCardDetail("<strong>Employer: </strong>" . htmlspecialchars($employer->companyName));
 			
+				// display employer jobs
 				foreach ($jobs as $job) {
 					echo GetJobCard($job);
 				} 
@@ -52,11 +63,12 @@
 		</section>
     
 <?php
-	
+
+	// website page footer
 	$footer = new \Template\Footer();
 	echo $footer->Bind();
 	
-	
+	// employer job listing. Includes Edit, View job and View matches links
 	function GetJobCard($job) {
 				
 		$active = "";
@@ -85,9 +97,9 @@
 		
 		return $html;
 		
-		
 	}
 	
+	// employer details card
 	function GetCardDetail($text) {
 		
 		$html = '<div class="card dashboard-detail-card">

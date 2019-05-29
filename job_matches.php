@@ -1,4 +1,10 @@
 <?php
+
+	//----------------------------------------------------------------
+	// Job Matches - Displays job seeker matches to a job
+	//----------------------------------------------------------------
+	
+	// include required php files, for website and PHPUnit
 	if ($_SERVER['DOCUMENT_ROOT'] != '') {
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/utilities/common.php';
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/header.php';
@@ -15,6 +21,7 @@
 		require_once './classes/jobseeker.php';	
 	}
 
+	// get user from session
 	$user = \Utilities\Common::GetSessionUser();
 	
 	if ($user->userType != 1) {
@@ -23,22 +30,23 @@
 		die();				
 	}
 	
+	// get the employer object
 	$employer = \Classes\Employer::GetEmployerByUserId($user->userId);
-	
 	
 	$jobId = \Utilities\Common::GetRequest("j");
 	
+	// get job based on job id
 	$job = new \Classes\Job($jobId);
 	
 	if ($job->jobId != 0) {
-		//check employer
+		//check job belongs to employer
 		if ($job->employerId != $employer->employerId) {
 			header("Location: home.php");
 			die();		
 		}
 	}
 	
-	
+	// website page header
 	$header = new \Template\Header();
 	$header->isSignedIn = true;
 	echo $header->Bind();
@@ -59,13 +67,12 @@
 		
 			<?php
 			
+				// display employer details
 				echo GetCardDetail("<strong>Employer: </strong>" . htmlspecialchars($employer->companyName) . "<br /><strong>Job: </strong>" . htmlspecialchars($job->jobName));
-				//Loop through top matches
-				
 				
 				if ($job->active) {
 				
-	
+					//Get and display job matches if job is active
 					$jobSeekerMatches = \Classes\JobSeeker::GetJobSeekerMatchesByJob($job->jobId);
 		
 					if(!empty($jobSeekerMatches)){
@@ -79,7 +86,7 @@
 				
 				}
 				else {
-					
+					// job inactive message
 					echo '<div class="alert alert-warning mt-3" role="alert">This job is currently inactive. <a class="alert-link" href="create_job.php?j='  . $job->jobId . '">Edit Job</a> to reactivate it.</div>';
 				}
 				
@@ -89,10 +96,11 @@
 		</section>
 <?php
 	
+	// website page footer
 	$footer = new \Template\Footer();
 	echo $footer->Bind();
 	
-	
+	//card to display job seeker matched to a job
 	function GetJobSeekerMatchCard($jobSeekerMatch, $jobId) {
 		
 		$html = '<div class="card listing-card">
@@ -130,8 +138,7 @@
 		
 	}
 	
-	
-	
+	// employer details card
 	function GetCardDetail($text) {
 		
 		$html = '<div class="card dashboard-detail-card">

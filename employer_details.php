@@ -1,4 +1,10 @@
 <?php
+
+	//----------------------------------------------------------------
+	// Employer Details Form
+	//----------------------------------------------------------------
+	
+	// include required php files, for website and PHPUnit
 	if ($_SERVER['DOCUMENT_ROOT'] != '') {
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/utilities/common.php';
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/header.php';
@@ -13,6 +19,7 @@
 		require_once './classes/employer.php';
 	}
 	
+	// get user from session
 	$user = \Utilities\Common::GetSessionUser();
 	
 	if ($user->userType != 1) {
@@ -21,10 +28,11 @@
 		die();				
 	}
 	
+	// get the employer object
 	$employer = \Classes\Employer::GetEmployerByUserId($user->userId);
 	
 
-	// empty fields
+	// default field values
 	$errorMessages = [];
 	$companyName = "";
 	$locationId = 0;
@@ -51,7 +59,7 @@
 	
 	if (\Utilities\Common::IsSubmitForm())
 	{
-		//form submitted
+		//form submitted, get form data
 		$companyName = \Utilities\Common::GetRequest("CompanyName");
 		$locationId = \Utilities\Common::GetRequest("LocationId");
 		$title = \Utilities\Common::GetRequest("Title");
@@ -75,7 +83,7 @@
 		$expectedGrowth = \Utilities\Common::GetRequest("ExpectedGrowth");
 
 		
-		
+		//validate data
 		if ($title == "") {
 			$errorMessages[] = "Please select your Title";
 		}
@@ -101,7 +109,6 @@
 		}else{$errorMessages[] = "Your area code can only be numbers";
 			$phoneAreaCode = "";
 		}
-		
 		
 		if ($phoneNumber == "") {
 			$errorMessages[] = "Please enter your Phone Number";
@@ -130,7 +137,6 @@
 			$errorMessages[] = "Your mobile number must be 8 digits long";
 			$mobileNumber = "";
 		}
-		
 				
 		if ($companyName == "") {
 			$errorMessages[] = "Please enter a Company Name";
@@ -208,7 +214,7 @@
 			// save employer
 			
 			if ($employer == null) {
-				// employer not saved previously
+				// employer not saved previously, get object
 				$employer = new \Classes\Employer();
 			}
 			
@@ -241,7 +247,7 @@
 			}
 			else {
 				
-				//update user object enteredDetails fields
+				//update user object enteredDetails flag if not set
 
 				if ($user->enteredDetails == false) {
 					$user->enteredDetails = true;
@@ -250,7 +256,6 @@
 						$errorMessages[] = $objectSave->errorMessage;
 					}
 				}
-				
 				
 			}
 			
@@ -304,7 +309,7 @@
 	$companySizes = \Classes\Employer::GetCompanySizes() ;
 	$expectedGrowths = \Classes\Employer::GetExpectedGrowths() ;
 	
-	
+	// website page header
 	$header = new \Template\Header();
 	$header->isSignedIn = true;
 	echo $header->Bind();
@@ -543,6 +548,8 @@
 		</section>
     
 <?php
+
+	// website page footer
 	$footer = new \Template\Footer();
 	echo $footer->Bind();
 ?>

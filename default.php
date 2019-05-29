@@ -1,4 +1,10 @@
 <?php
+
+	//----------------------------------------------------------------
+	// Website home page
+	//----------------------------------------------------------------
+
+	// include required php files, for website and PHPUnit
 	if ($_SERVER['DOCUMENT_ROOT'] != '') {
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/utilities/common.php';
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/user.php';
@@ -11,6 +17,7 @@
 		require_once './classes/footer.php';
 	}
 
+	// default field values for form
 	$errorMessage = "";
 	$email = "";
 	$password = "";
@@ -18,10 +25,12 @@
     if (\Utilities\Common::IsSubmitForm())
 	{
 		
+		// login form submitted
+		
 		$email = \Utilities\Common::GetRequest("Email");
 		$password = \Utilities\Common::GetRequest("Password");
 		
-		
+		// get user based on login info
 		$user = \Classes\User::GetUserLogin($email, $password);
 		
 		
@@ -29,7 +38,7 @@
 			$errorMessage = "Invalid Login";
 		}
 		else {
-			
+			// login successful, create session and redirect to dashboard
 			session_start();
 			session_unset();
 			$_SESSION["UserId"] = $user->userId;
@@ -39,6 +48,7 @@
 		
 	}
 	
+	// website page header
 	$header = new \Template\Header();
 	$header->isHomePage = true;
 	$header->showMainBanner = false;
@@ -47,10 +57,8 @@
 ?>
 
 <section>
+
 	<div class="jumbotron jumbotron-fluid jumbotron-main-home">
-	
-		
-		
 			
 			<div class="home-top">
 			
@@ -109,8 +117,6 @@
 			
 			<div class="container home-text-content-panel-container">
 			
-			
-			
 				<div id="about" class="home-text-content-panel">
 				
 					<div class="row">
@@ -161,13 +167,13 @@
 					
 				</div>
 			
-			
-				
 		</div>
 	</div>
 </section>		
 
 <?php
+
+	// website page footer
 	$footer = new \Template\Footer();
 	echo $footer->Bind();
 ?>

@@ -1,4 +1,11 @@
 <?php
+
+	//-----------------------------------------------------------------
+	// View Job - page to display job details
+	// Will also show job seeker info if being viewed in Job Seeker mode
+	//-----------------------------------------------------------------
+	
+	// include required php files, for website and PHPUnit
 	if ($_SERVER['DOCUMENT_ROOT'] != '') {
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/utilities/common.php';
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/header.php';
@@ -21,6 +28,7 @@
 		require_once './classes/jobseeker.php';
 	}
 	
+	// get user from session
 	$user = \Utilities\Common::GetSessionUser();
 	
 	// Get job id from get reqeuest and load job details
@@ -40,6 +48,8 @@
 	$locationName = (new \Classes\Location($job->locationId))->name;
 	$active = $job->active;
 	
+	// used to store job seekers match score to job
+	// will stay null if job is being viewed without matched job seeker 
 	$matchScore = null;
 
 	// Load job seeker information (for Job Seeker view only)
@@ -56,6 +66,7 @@
 			}
 		}
 		
+		// get job seekers match score to job
 		$matchScore = $jobseeker->GetJobMatch($job->jobId);
 		
 	}
@@ -184,7 +195,7 @@
 										echo "<span class='badge badge-success jobSkillDisplay'>$skill->skillName</span>";
 									}
 									else {
-										// Show skill as blue if it's not
+										// Show skill as grey if it's not
 										echo "<span class='badge badge-info jobSkillDisplay unmatched'>$skill->skillName</span>";
 									}
 								}
@@ -269,6 +280,7 @@
 		</section>
     
 <?php
+	// website page footer
 	$footer = new \Template\Footer();
 	echo $footer->Bind();
 ?>

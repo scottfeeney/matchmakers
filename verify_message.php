@@ -1,4 +1,10 @@
 <?php
+
+	//----------------------------------------------------------------
+	// Verify Account Message
+	//----------------------------------------------------------------
+	
+	// include required php files, for website and PHPUnit
 	if ($_SERVER['DOCUMENT_ROOT'] != '') {
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/header.php';
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/footer.php';
@@ -7,6 +13,7 @@
 		require_once './classes/footer.php';
 	}
 	
+	// website page header
 	$header = new \Template\Header();
 	$header->isHomePage = true;
 	$header->showMainBanner = false;
@@ -47,6 +54,7 @@
 		</section>
     
 <?php
+	// website page footer
 	$footer = new \Template\Footer();
 	echo $footer->Bind();
 ?>

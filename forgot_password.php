@@ -1,4 +1,10 @@
 <?php
+
+	//----------------------------------------------------------------
+	// Forgot Password - Form to request password reset
+	//----------------------------------------------------------------
+	
+	// include required php files, for website and PHPUnit
 	if ($_SERVER['DOCUMENT_ROOT'] != '') {
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/utilities/common.php';
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/user.php';
@@ -11,12 +17,14 @@
 		require_once './classes/footer.php';
 	}
 
+	// default field values
 	$errorMessage = "";
 	$email = "";
 	
     if (\Utilities\Common::IsSubmitForm())
 	{
 		
+		//form submitted, get form data
 		$email = \Utilities\Common::GetRequest("Email");
 		
 		if ($email == "")
@@ -24,10 +32,11 @@
 			$errorMessage = "Please enter your email address";
 		}
 		else {
+			// check for email in users table
 			$user = \Classes\User::GetUserByEmailAddress($email);
 			
 			if ($user != null) {
-				// save user
+				// verified user found, create reset code and send reset email
 				
 				$resetCode = \Utilities\Common::GetGuid();
 				
@@ -45,8 +54,12 @@
 				
 				\Utilities\Common::SendEmail($user->email, "Reset Password", $message);
 			} else {
+				// verified user not found. check if email exists for unverified user
 				$user = \Classes\User::GetUnverifiedUserByEmailAddress($email);
 				if ($user != null) {
+					
+					//mail exists for unverified user, resend verify email
+					
 					$message = "Thank you for signing up with Job Matcher.\n\n";
 					$message .= "It appears the link in your original verification email was not activated.\n\n";
 					$message .= "Before you can continue, please verify your email address by clicking on the following link: ".SITE_URL."/verify_account.php?v=v".$user->verifyCode."\n\n";
@@ -58,6 +71,7 @@
 				}
 			}
 			
+			// redirect to password sent message
 			header("Location: forgot_password_message.php");
 			die();
 			
@@ -67,6 +81,7 @@
 		
 	}
 
+	// website page header
 	$header = new \Template\Header();
 	$header->isHomePage = true;
 	$header->showMainBanner = false;
@@ -111,6 +126,8 @@
 	</section>
 
 <?php
+
+	// website page footer
 	$footer = new \Template\Footer();
 	echo $footer->Bind();
 ?>

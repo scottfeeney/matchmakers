@@ -1,4 +1,10 @@
 <?php
+
+	//----------------------------------------------------------------
+	// Job Form
+	//----------------------------------------------------------------
+	
+	// include required php files, for website and PHPUnit
 	if ($_SERVER['DOCUMENT_ROOT'] != '') {
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/utilities/common.php';
 		require_once $_SERVER['DOCUMENT_ROOT'] . '/classes/header.php';
@@ -23,6 +29,7 @@
 		require_once './classes/job.php';
 	}
 	
+	// get user from session
 	$user = \Utilities\Common::GetSessionUser();
 	
 	if ($user->userType != 1) {
@@ -31,14 +38,16 @@
 		die();				
 	}
 	
+	// get the employer object
 	$employer = \Classes\Employer::GetEmployerByUserId($user->userId);
 	
 	$jobId = \Utilities\Common::GetRequest("j");
 	
+	// get job based on job id
 	$job = new \Classes\Job($jobId);
 	
 	if ($job->jobId != 0) {
-		//check employer
+		//check employer matches job
 		if ($job->employerId != $employer->employerId) {
 			header("Location: home.php");
 			die();		
@@ -46,9 +55,10 @@
 	}
 	
 
-	// empty fields
+	
 	$errorMessages = [];
 	
+	// default field values
 	$jobName = "";
 	$referenceNumber = "";
 	$locationId = "";
@@ -63,7 +73,7 @@
 	
 	if (\Utilities\Common::IsSubmitForm())
 	{
-		//form submitted
+		//form submitted, get form data
 		$jobName = \Utilities\Common::GetRequest("JobName");
 		$referenceNumber = \Utilities\Common::GetRequest("ReferenceNumber");
 		$locationId = \Utilities\Common::GetRequest("LocationId");
@@ -75,6 +85,7 @@
 		$selectedSkills = \Utilities\Common::GetRequest("SkillsControlSelectedSkills");
 		$active = (\Utilities\Common::GetRequest("Active") == "1" ? "1" : "0");
 		
+		//validate data
 		if ($jobName == "") {
 			$errorMessages[] = "Please enter the Position Title";
 		}
@@ -133,8 +144,10 @@
 			}
 			else {
 			
+				// get job id, needed if new job saved
 				$jobId = $objectSave->objectId;
 				
+				// save job skills
 				\Classes\Job::SaveJobSkills($jobId, $selectedSkills);
 			}
 			
@@ -148,7 +161,7 @@
 	}
 	else {
 	
-		//first load - load job information
+		//first load - load fields from object
 		
 		$jobName = $job->jobName;
 		$referenceNumber = $job->referenceNumber;
@@ -162,13 +175,14 @@
 		$active = $job->active;
 	}
 	
-	//get arrys list for dropdown
+	//get arrays for dropdowns
 	$locations = \Classes\Location::GetLocations();
 	$jobTypes = \Classes\JobType::GetJobTypes();
 	$skillCategories = \Classes\SkillCategory::GetSkillCategories();
 	$positionAvailabilities = \Classes\Job::GetPositionAvailabilities();
 	$numberAvailables = \Classes\Job::GetNumberAvailables();
 	
+	// website page header
 	$header = new \Template\Header();
 	$header->isSignedIn = true;
 	echo $header->Bind();
@@ -346,6 +360,7 @@
 		</section>
     
 <?php
+	// website page footer
 	$footer = new \Template\Footer();
 	echo $footer->Bind();
 ?>
