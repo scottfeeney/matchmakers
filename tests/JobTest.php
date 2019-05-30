@@ -18,38 +18,6 @@ final class JobTest extends TestCase {
     private $checkEmployerDeleted;
     private $checkUserDeleted;
 
-    /**
-     * 
-     * No longer necessary - no longer planning to do any testing of the matching algorithm from this class
-     * All such testing now done in JobSeekerTest
-     * 
-    //For matching algorithm testing
-    private $testEmployerEmail = "algoTestingEmployerPerson@unitTests.com";
-    private $testJSEmail = "algoTestingJSPerson@unitTests.com";
-    private $jobName = "Statue Impersonator";
-    private $skillCategoryName = "algoTestSkillCat";
-    private $skillNames = array("Standing Upright", "Walking a straight line" , "Mixing Cocktails", "Sleeping through construction noise",
-                                "Faking interest in foreign films", "Keeping it real", "Believing in yourself", "Mouthing mindless platitudes",
-                                "Getting through a Tolstoy novel", "Growing a beard like Tolstoy", "Drinking craft beer", "Cooking charcoal");
-    private $testAdminEmail = "algoTestingAdminPerson@unitTests.com";
-    private $location1Name = "Colombia";
-    private $location2Name = "Cuba";
-    private $jobType1Name = "Dodgy";
-    private $jobType2Name = "Legit";
-    
-    private $testJobSeeker;
-    private $testSkillCategory;
-    private $testEmployer;
-    private $testJob;
-    private $testSkills;
-    private $testAdmin;
-    private $location1Id;
-    private $location2Id;
-    private $jobType1Id;
-    private $jobType2Id;
-    */
-
-
 
     //Simplest test there could be
     public function testConstructorNoInput() {
@@ -248,25 +216,6 @@ final class JobTest extends TestCase {
         $this->checkJobDeleted = 1;
         $this->checkEmployerDeleted = 1;
         $this->checkUserDeleted = 1;
-
-        
-        //For algorithm matching unit tests - UPDATE: No longer necessary. Now doing all matching algorithm testing in JobSeekerTest
-
-        //$matchingAlgoSetupRes = JobSeekerTest::setUpForMatchingAlgoTest($this->testJSEmail, $this->testEmployerEmail, $this->jobName, 
-        //                                                                $this->skillCategoryName, $this->skillNames, $this->testAdminEmail,
-        //                                                                $this->location1Name, $this->location2Name, $this->jobType1Name, $this->jobType2Name);
-        
-        //if ($matchingAlgoSetupRes[0] == false) {
-        //    $this->assertTrue(false, $matchingAlgoSetupRes[1]);
-        //}
-
-        //list($this->testJobSeeker, $this->testEmployer, $this->testJob, $this->testSkillCategory, $this->testSkills,
-        //        $this->testAdmin, $locIds, $jobTypeIds) = $matchingAlgoSetupRes;
-        //$this->location1Id = $locIds[0];
-        //$this->location2Id = $locIds[1];
-
-        //$this->jobType1Id = $jobTypeIds[0];
-        //$this->jobType2Id = $jobTypeIds[1];
     }
 
     //helper function for the below
@@ -334,16 +283,6 @@ final class JobTest extends TestCase {
         if ($result[0] == false) {
             $this->assertTrue(false, $result[1]);
         }
-
-
-        //No longer necessary - no longer planning to do any matching algorithm testing from this class
-
-        //$algoTearDownRes = JobSeekerTest::tearDownAfterMatchingAlgoTest($this->testJSEmail, $this->testEmployerEmail, $this->skillCategoryName, 
-        //                                                                $this->testAdminEmail, $this->location1Id, $this->jobType1Id,
-        //                                                                $this->location2Id, $this->jobType2Id);
-        //if ($algoTearDownRes[0] == false) {
-        //    $this->assertTrue(false, $algoTearDownRes[1]);
-        //}
 
         parent::tearDown();
     }

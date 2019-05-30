@@ -475,81 +475,8 @@ final class UserTest extends TestCase {
     //tearDown function. Original contents deleted as 
     protected function tearDown(): void {
         $this->staticTearDown($this->testEmails);
-
-        /**
-        $conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);
-        //var_dump($conn);
-        //var_dump("In cleanup with oid ".$oid);
-        foreach ($this->idsToDelete as $idd) {
-            $sql = 'delete from user where UserId = ?';
-            if ($stmt = $conn->prepare($sql)) {
-                //var_dump($stmt);
-                $stmt->bind_param("i", $idd);
-                //var_dump("Cleaning up - deleting user with id ".$oid);
-                $stmt->execute();
-                $result = mysqli_stmt_get_result($stmt);
-                $stmt->close();
-            } else {
-                //var_dump
-                var_dump($errorMessage = $conn->errno . ' ' . $conn->error);
-                $this->assertTrue(false, "Error in database query in tearDown function");
-            }
-        }
-        foreach ($this->testEmails as $testEmail) {
-            $sql = 'delete from user where email = ?';
-            if ($stmt = $conn->prepare($sql)) {
-                //var_dump($stmt);
-                $stmt->bind_param("s", $testEmail);
-                //var_dump("Cleaning up - deleting user with id ".$oid);
-                $stmt->execute();
-                $result = mysqli_stmt_get_result($stmt);
-                $stmt->close();
-            } else {
-                //var_dump
-                var_dump($errorMessage = $conn->errno . ' ' . $conn->error);
-                $this->assertTrue(false, "Error in database query in tearDown function");
-            }
-        }
-        $sql = 'delete from user where email is null';
-        if ($stmt = $conn->prepare($sql)) {
-            $stmt->execute();
-            $result = mysqli_stmt_get_result($stmt);
-            $stmt->close();
-        } else {
-            //var_dump
-            var_dump($errorMessage = $conn->errno . ' ' . $conn->error);
-            $this->assertTrue(false, "Error in database query in tearDown function");
-        }
-        $conn->close();
-        */
         parent::tearDown();
     }
-
-
-    /**
-    private function cleanup($oid) {
-        
-        //delete record created by test process
-        //Started out life as a tearDown() process - before I read the manual properly
-
-        $conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);
-        //var_dump($conn);
-        //var_dump("In cleanup with oid ".$oid);
-        $sql = 'delete from user where UserId = ?';
-        if ($stmt = $conn->prepare($sql)) {
-            //var_dump($stmt);
-            $stmt->bind_param("i", $oid);
-            //var_dump("Cleaning up - deleting user with id ".$oid);
-            $stmt->execute();
-            $result = mysqli_stmt_get_result($stmt);
-            $stmt->close();
-        } else {
-            var_dump($errorMessage = $conn->errno . ' ' . $conn->error);
-        }
-        $conn->close();
-    }
-
-    */
 
 }
 

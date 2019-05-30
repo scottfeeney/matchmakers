@@ -38,42 +38,6 @@ final class AdminStaffTest extends TestCase {
         $this->assertTrue((new \Classes\AdminStaff($this->adminStaffAdminStaffRecord->adminStaffId))->userId != null);
     }
 
-    /** save method is commented out in adminstaff class, as we currently have no facility for 
-     * adding new adminstaff records except via direct database query
-     * So nothing to test
-     
-    public function testSaveUser() {
-        extract($this->createUserAndAdminStaff());
-        $this->assertEquals($adminStaff, new \Classes\AdminStaff($asid));
-    }
-*/
-    /**
-     * Helper function as multiple tests will want to work on a record already in the database
-     *  UPDATE: commenting out as we have commented out the save method in adminstaff
-     * While the functionality to manage adminstaff records via the site may be added later,
-     * currently adminstaff records can be added/edited/removed by database query only
-
-    private function createUserAndAdminStaff() {
-        $oid = UserTest::saveNewUser();
-        $this->uidsToDelete[] = $oid;
-        $adminStaff = new \Classes\AdminStaff(0);
-        $adminStaff->userId = $oid;
-        $oSave = $adminStaff->save();
-        $asid = $oSave->objectId;
-        $adminStaff->adminStaffId = $asid;
-        return array('oid' => $oid, 'asid' => $asid, 'adminStaff' => $adminStaff);
-    }
-
-
-    public function testEditUser() {
-        extract($this->createUserAndAdminStaff());
-        $adminStaff->firstName = "Bob";
-        $oSave2 = $adminStaff->save();
-        $asid = $oSave2->objectId;
-        $this->assertSame($adminStaff->firstName, (new \Classes\AdminStaff($asid))->firstName);
-    }
-
-    */
 
     //Test of indicated method for failure and success
     public function testGetAdminStaffByUserIdFailure() {

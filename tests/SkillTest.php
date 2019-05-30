@@ -188,12 +188,6 @@ final class SkillTest extends TestCase {
         //check array of 2
         $res2 = \Classes\Skill::GetSkillsByJobSeeker($jid);
 
-        //remove both skills - **TEST REMOVED**
-        //As per comment in JobSeekerTest - can't remove skills this way (but site won't
-        //allow jobseeker to remove all their skills anyhow)
-        //\Classes\JobSeeker::SaveJobSeekerSkills($jid, "");
-        //check empty array
-        //$finalRes = \Classes\Skill::GetSkillsByJobSeeker($jid);
 
         $this->assertSame(array(), $initRes);
         //$this->assertSame(array(), $finalRes);

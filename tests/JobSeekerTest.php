@@ -50,17 +50,6 @@ final class JobSeekerTest extends TestCase {
     }
 
     /**
-    public function testSaveUser() {
-        $createUserJSRes = $this->createUserAndJobSeeker($this->testEmail);
-        if ($createUserJSRes == null) {
-            $this->assertTrue(false);
-        }
-        extract($createUserJSRes);
-        //yields oid, jid and jobSeeker
-        $this->assertEquals($jobSeeker, new \Classes\JobSeeker($jid));
-    } */
-
-    /**
      * Helper function as multiple tests will want to work on a record already in the database
      */
 
@@ -172,17 +161,8 @@ final class JobSeekerTest extends TestCase {
         //var_dump($jid);
         //var_dump($jobSeeker);
 
-        
-        //remove both skills - **TEST REMOVED**
-        //Cannot use the below to remove skills - this is actually ok as the frontend always requires the user
-        //to select at least one skill, so this function is never run with a blank string
-        //\Classes\JobSeeker::SaveJobSeekerSkills($jid, "");
-        //verify get returns blank string
-        //$post3String = \Classes\JobSeeker::GetSkillsByJobSeekerString($jid);
-        //$this->assertEquals($post3String, "");
 
-        //BUT - now that this test is removed we need separate cleanup code to remove the entries in job_seeker_skill
-
+        //We need separate cleanup code to remove the entries in job_seeker_skill
         $tearDownJSSRes = $this->tearDownJobSeekerSkill(array($skill1Id, $skill2Id));
         if ($tearDownJSSRes[0] == false) {
             $this->assertTrue(false, $tearDownJSSRes[1]);
@@ -437,113 +417,6 @@ final class JobSeekerTest extends TestCase {
         $this->assertTrue(true);
     }
 
-
-    //Section containing one-off tests. Pretty much redundant now that the exhaustive testing above has been implemented
-    
-    /**
-    //Only location matches - not listed, 25%
-    //add one skill to job and jobseeker to avoid divide by zero error
-    public function testMatchingLocOnly() {
-
-        $this->testJob->locationId = $this->location1Id;
-        $this->testJob->jobTypeId = $this->jobType1Id;
-        $this->testJob->skillCategoryId = $this->testSkillCategory->skillCategoryId;
-        $this->testJob->Save();
-        \Classes\Job::SaveJobSkills($this->testJob->jobId, ($this->testSkills[0])->skillId);
-
-        $this->testJobSeeker->locationId = $this->location1Id;
-        $this->testJobSeeker->jobTypeId = $this->jobType2Id;
-        $this->testJobSeeker->skillCategoryId = $this->testSkillCategory->skillCategoryId;
-        $this->testJobSeeker->Save();
-        \Classes\JobSeeker::SaveJobSeekerSkills($this->testJobSeeker->jobSeekerId, ($this->testSkills[1])->skillId);
-
-        $expectedMatches = $this->matchingFormula($this->testJob, $this->testJobSeeker, "seekers");
-        $actualMatches = \Classes\JobSeeker::GetJobSeekerMatchesByJob($this->testJob->jobId);
-
-        $this->assertEquals($this->checkMatchScore($this->testJobSeeker->jobSeekerId, $expectedMatches),
-                            $this->checkMatchScore($this->testJobSeeker->jobSeekerId, $actualMatches));
-    }
-    
-    //only jobtype matches - not listed, 25%
-    public function testMatchingJobTypeOnly() {
-
-        $this->testJob->locationId = $this->location1Id;
-        $this->testJob->jobTypeId = $this->jobType1Id;
-        $this->testJob->Save();
-        \Classes\Job::SaveJobSkills($this->testJob->jobId, ($this->testSkills[0])->skillId);
-
-        $this->testJobSeeker->locationId = $this->location2Id;
-        $this->testJobSeeker->jobTypeId = $this->jobType1Id;
-        $this->testJobSeeker->Save();
-        \Classes\JobSeeker::SaveJobSeekerSkills($this->testJobSeeker->jobSeekerId, ($this->testSkills[1])->skillId);
-
-        $expectedMatches = $this->matchingFormula($this->testJob, $this->testJobSeeker, "seekers");
-        $actualMatches = \Classes\JobSeeker::GetJobSeekerMatchesByJob($this->testJob->jobId);
-
-        $this->assertEquals($this->checkMatchScore($this->testJobSeeker->jobSeekerId, $expectedMatches),
-                            $this->checkMatchScore($this->testJobSeeker->jobSeekerId, $actualMatches));        
-    }
-    
-    //Both jobtype and location match, no skills match
-    //listed, 50%
-    public function testMatchingJobTypeLocOnly() {
-
-        $this->testJob->locationId = $this->location1Id;
-        $this->testJob->jobTypeId = $this->jobType1Id;
-        $this->testJob->skillCategoryId = $this->testSkillCategory->skillCategoryId;
-        $this->testJob->Save();
-        \Classes\Job::SaveJobSkills($this->testJob->jobId, ($this->testSkills[0])->skillId);
-
-        $this->testJobSeeker->locationId = $this->location1Id;
-        $this->testJobSeeker->jobTypeId = $this->jobType1Id;
-        $this->testJobSeeker->skillCategoryId = $this->testSkillCategory->skillCategoryId;
-        $this->testJobSeeker->Save();
-        \Classes\JobSeeker::SaveJobSeekerSkills($this->testJobSeeker->jobSeekerId, ($this->testSkills[1])->skillId);
-
-        $expectedMatches = $this->matchingFormula($this->testJob, $this->testJobSeeker, "seekers");
-        $actualMatches = \Classes\JobSeeker::GetJobSeekerMatchesByJob($this->testJob->jobId);
-        //var_dump($actualMatches);
-        //var_dump($expectedMatches);
-
-        $this->assertEquals($this->checkMatchScore($this->testJobSeeker->jobSeekerId, $expectedMatches),
-                            $this->checkMatchScore($this->testJobSeeker->jobSeekerId, $actualMatches));        
-    }
-
-    //Both jobtype and location match, seeker has 5 skills, 4 of them match, job has 4 skills
-    //listed, 97.72 repeating %
-
-    public function testJobLoc544() {
-        $testParams = array(5,4,4,true,true);
-        $testVars = array($this->testJob, $this->testJobSeeker, $this->testSkills, $this->testSkillCategory, 
-                        $this->location1Id, $this->location2Id, $this->jobType1Id, $this->jobType2Id);
-        //var_dump($testParams);
-        //var_dump($testVars);
-        $testRes = JobSeekerTest::matchingTest($testParams, $testVars, "seekers");
-        $this->assertEquals($testRes[0], $testRes[1], "Expected ".$testRes[0].", got ".$testRes[1]);
-    }
-
-    public function testJobLoc445() {
-        $testParams = array(4,4,5,true,true);
-        $testVars = array($this->testJob, $this->testJobSeeker, $this->testSkills, $this->testSkillCategory, 
-                        $this->location1Id, $this->location2Id, $this->jobType1Id, $this->jobType2Id);
-        //var_dump($testParams);
-        //var_dump($testVars);
-        $testRes = JobSeekerTest::matchingTest($testParams, $testVars, "seekers");
-        $this->assertEquals($testRes[0], $testRes[1], "Expected ".$testRes[0].", got ".$testRes[1]);
-    }
-
-    public function testJobLoc1111() {
-        $testParams = array(1,1,11,true,true);
-        $testVars = array($this->testJob, $this->testJobSeeker, $this->testSkills, $this->testSkillCategory, 
-                        $this->location1Id, $this->location2Id, $this->jobType1Id, $this->jobType2Id);
-        //var_dump($testParams);
-        //var_dump($testVars);
-        $testRes = JobSeekerTest::matchingTest($testParams, $testVars, "seekers");
-        $this->assertEquals($testRes[0], $testRes[1], "Expected ".$testRes[0].", got ".$testRes[1]);
-    }
-
-    */
-    
 
     /**
      * Helper function to allow testing of the matching algorithm to be initiated from another class
@@ -866,40 +739,6 @@ final class JobSeekerTest extends TestCase {
         if ($algoTearDownRes[0] == false) {
             $this->assertTrue(false, $algoTearDownRes[1]);
         }
-
-        /**
-        $conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);
-        foreach ($this->uidsToDelete as $idd) {
-            foreach (array('delete from job_seeker where userid = ?', 'delete from user where UserId = ?') as $sql) {
-                if ($stmt = $conn->prepare($sql)) {
-                    $stmt->bind_param("i", $idd);
-                    $stmt->execute();
-                    $stmt->close();
-                } else {
-                    var_dump($errorMessage = $conn->errno . ' ' . $conn->error);
-                    $this->assertTrue(false, "Error in database query in tearDown function");
-                }
-            }
-            $sql = 'delete from job_seeker where userid in (Select userid from user where email = ?)';
-            if ($stmt = $conn->prepare($sql)) {
-                $stmt->bind_param("s", $this->testEmail);
-                $stmt->execute();
-                $stmt->close();
-            } else {
-                var_dump($errorMessage = $conn->errno . ' ' . $conn->error);
-                $this->assertTrue(false, "Error in database query in tearDown function");
-            }
-            $sql = 'delete from job_seeker where userid is null';
-            if ($stmt = $conn->prepare($sql)) {
-                $stmt->execute();
-                $stmt->close();
-            } else {
-                var_dump($errorMessage = $conn->errno . ' ' . $conn->error);
-                $this->assertTrue(false, "Error in database query in tearDown function");
-            }
-        }
-        $conn->close();
-        */
 
         parent::tearDown();
     }
