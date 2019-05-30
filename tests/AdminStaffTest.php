@@ -54,12 +54,14 @@ final class AdminStaffTest extends TestCase {
 
 
     //setUp and tearDown functions utilizing setUp and tearDown functionality from other classes
-    //as the setUp and tearDown functionality for this class was not properly completed before
-    //the same functionality was implemented elsewhere
+    //(APITest and SkillTest) as the setUp and tearDown functionality for this class was not properly 
+    //completed before the same functionality was implemented elsewhere
     protected function setUp(): void {
         parent::setUp();
+        
         //create record in user table
         $this->adminStaffUserRecord = SkillTest::staticSetupAdminUser($this->testEmail)[1]['adminUser'];
+
         //create record in adminStaff table
         $adminStaffSetupRes = APITest::setupAdminStaffRecord($this->adminStaffUserRecord->userId);
         if ($adminStaffSetupRes[0] != false) {

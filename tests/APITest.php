@@ -9,8 +9,24 @@
  * As such, this class will focus on testing the authentication process, and making sure that the correct error messages
  * are returned in the case of invalid input
  * 
- * Further, as there isn't expected to be that much to test for each class, I'll be putting all the API tests in this
- * testing class rather than creating separate ones for each endpoint
+ * Further, as there isn't expected to be that much to test for each endpoint, I'll be putting all the API tests in this
+ * testing class rather than creating a separate testing class for each endpoint
+ * 
+ * The bulk of the workload below is carried out by the helper functions checkNoToken, checkIncorrectToken and checkCurrentToken
+ * which determine whether the output given matches that expected in those three cases respectively. checkCurrentToken is by far
+ * the most complex helper function given the number of cases it needs to check, and it takes input via parameters to help it
+ * determine what the expected output is for any given case.
+ * 
+ * Throughout this class many helper functions follow the convention of returning an array, with the first element indicating success or
+ * failure, and the second element containing details/data (especially where the function is expected to take an action but not required
+ * to return data subsequently needed by the calling function, other than whether or not the action succeeded). This means we can do i.e.
+ * 
+ * $someFunctionRes = someFunction(someParameters);
+ * $this->assertTrue($someFunctionRes[0], $someFunctionRes[1]);
+ * 
+ * i.e. if someFunction returns false as the first array element, the second array element is displayed to the user as the test
+ * error message. If it returns true as the first array element the assertion passes and nothing is displayed to the user
+ * 
  * 
  * 
  * Author(s): Blair
@@ -46,12 +62,19 @@ final class APITest extends TestCase {
     private $skill2cat1Id;
     private $skill1cat2Id;
 
+    //To support the same test case being able to be run on multiple instances, and test the
+    //API under the correct baseURL, as determined based on the working directory that this test
+    //is being run from (i.e. what is reported by getcwd())
+    private $baseURLPerDir = array('c:\\inetpub\\wwwroot' => "http://localhost/api/external/",
+                                    'c:\\inetpub\\wwwroot-dev' => "http://localhost:8080/api/external/",);
+
     //lookup for userTypes
     private $userTypes = array(1 => "employer", 2 => "jobseeker", 3 => "admin");
     
 
     /**
-     * authenticate.php
+     * authenticate.php test cases
+     * 
      */
     
     public function testAuthenticateNoHeadersFailure() {
@@ -189,7 +212,6 @@ final class APITest extends TestCase {
         $this->assertTrue($currentTokenRes[0], $currentTokenRes[1]);
     }
 
-    //$checkPOSTVars = false, $POSTVarsTypeGiven = "", $POSTVars = array(), $POSTErrorMsgExpected = "") {
     public function testEmployerMatchesNoJobId() {
         $currentTokenRes = $this->checkCurrentToken($this->baseURL.'employerMatches.php', $this->curlObj, $this->baseProdURL, 
                 $this->testEmployer->userId, $this->testEmployerEmail, $this->baseURL, true, "employer", $this->userTypes,
@@ -208,6 +230,7 @@ final class APITest extends TestCase {
         //create job using employer2
         //assuming 1 is a valid skill categoryId
         extract(JobTest::createJob($this->testEmployer2->employerId, 1, "SomeJob"));
+
         //gives jid, objSave
         if ($objSave->hasError) {
             $this->assertTrue(false, "Failed to create test job");
@@ -231,7 +254,8 @@ final class APITest extends TestCase {
         //create job using employer
         //assuming 1 is a valid skill categoryId
         extract(JobTest::createJob($this->testEmployer->employerId, 1, "SomeJob"));
-        //gives jid, objSave
+        //extract gives jid, objSave
+
         if ($objSave->hasError) {
             $this->assertTrue(false, "Failed to create test job");
         }
@@ -570,21 +594,17 @@ final class APITest extends TestCase {
     public static function isAPIResult($data, $baseURL) {
         $dataArr = (array)json_decode($data);
         $keys = array_keys($dataArr);
-        //var_dump($dataArr);
-        //var_dump(strtolower($dataArr['documentation']));
-        //var_dump(strtolower($baseURL).'index.php');
         return (in_array('result', $keys) && in_array('details', $keys) && in_array('documentation', $keys) 
                 && in_array($dataArr['result'], array('success','failure'))
                 && strtolower($dataArr['documentation']) == strtolower($baseURL).'index.php');
     }
 
-
+    //Helper function to check results when no token passed for authentication
     public static function checkNoToken($endpointURL, $curlObj, $baseProdURL) {
         curl_setopt($curlObj, CURLOPT_URL, $endpointURL);
         $data = curl_exec($curlObj);
         $returnCode = curl_getinfo($curlObj, CURLINFO_HTTP_CODE);
         $dataArr = (array)json_decode($data);
-        //var_dump($data);
         if (!APITest::isAPIResult($data, $baseProdURL)) {
             return array(false, 'Response not in APIResult form');
         }
@@ -600,6 +620,8 @@ final class APITest extends TestCase {
         return array(true, "");
     }
 
+    //Helper function to check results when a token is provided but the token contents
+    //(in this case, "123") do not match a valid generated API token
     public static function checkIncorrectToken($endpointURL, $curlObj, $baseProdURL) {
         curl_setopt($curlObj, CURLOPT_URL, $endpointURL);
         $sendHeaders = array("TOKEN: 123");
@@ -607,7 +629,6 @@ final class APITest extends TestCase {
         $data = curl_exec($curlObj);
         $returnCode = curl_getinfo($curlObj, CURLINFO_HTTP_CODE);
         $dataArr = (array)json_decode($data);
-        //var_dump($data);
         if (!APITest::isAPIResult($data, $baseProdURL)) {
             return array(false, 'Response not in APIResult form');
         }
@@ -623,7 +644,8 @@ final class APITest extends TestCase {
         return array(true, "");
     }
 
-    //
+    //Helper function to check results where a legitimate token has been used. Includes paths for endpoints where
+    //input (via POST variables), or the user being logged in as a specific type, is required.
     public static function checkCurrentToken($endpointURL, $curlObj, $baseProdURL, $uid, $email, $baseURL, 
                                                 $checkType = false, $typeExpected = "", $userTypes = array(),
                                                 $checkPOSTVars = false, $POSTVarsTypeGiven = "", $POSTVars = array(), $POSTErrorMsgExpected = "") {
@@ -642,14 +664,6 @@ final class APITest extends TestCase {
         //For endpoints that require POST vars be passed
         if ($checkPOSTVars) {
             $POSTVarString = "";
-            /**
-            foreach ($POSTVars as $key => $value) {
-                if ($POSTVarString == "") {
-                    $POSTVarString = $key."=".$value;
-                } else {
-                    $POSTVarString .= "&".$key."=".$value;
-                }
-            } */
             curl_setopt($curlObj, CURLOPT_POST,1);
             curl_setopt($curlObj, CURLOPT_POSTFIELDS, http_build_query($POSTVars));
         }
@@ -657,8 +671,6 @@ final class APITest extends TestCase {
         $data = curl_exec($curlObj);
         $returnCode = curl_getinfo($curlObj, CURLINFO_HTTP_CODE);
         $dataArr = (array)json_decode($data);
-        //var_dump($data);
-        //var_dump($token);
         if (!APITest::isAPIResult($data, $baseProdURL)) {
             return array(false, 'Response not in APIResult form');
         }
@@ -697,7 +709,7 @@ final class APITest extends TestCase {
             }
             return array(true,"");
         }
-        //For endpoints that don't require user type checks but do require POST var passing (probably should be refactored)
+        //For endpoints that don't require user type checks but do require POST var passing
         if ($checkPOSTVars) {
             if ($POSTVarsTypeGiven != "correct") {
                 if ($dataArr['result'] == 'success') {
@@ -736,25 +748,25 @@ final class APITest extends TestCase {
         $user->password = password_hash($email, PASSWORD_BCRYPT);
         $user->verified = 1;
         $objSave = $user->Save();
-        //var_dump($objSave);
         if ($objSave->hasError) {
             return array(false, 'Attempt to save user with password set to same as email failed: '.$objSave->errorMessage);
         }
 
+        $user = new \Classes\User($uid);
+
         //set cURL opts and make request
         curl_setopt($curlObj, CURLOPT_HEADER, 1);
-        //curl_setopt($curlObj, CURLINFO_HEADER_OUT, 1);
         curl_setopt($curlObj, CURLOPT_URL, $baseURL. 'authenticate.php');
         $sendHeaders = array("EMAIL: ".$email, "PASSWORD: ".$email);
 
         curl_setopt($curlObj, CURLOPT_HTTPHEADER, $sendHeaders);
         $data = curl_exec($curlObj);
-        //var_dump(curl_getinfo($this->curlObj));
-        //var_dump($data);
 
         //check response
-        if (curl_getinfo($curlObj, CURLINFO_HTTP_CODE) != 200) {
-            return array(false, "Failed to return 200 code when authenticate called with correct username and password");
+        $curlReturnCode = curl_getinfo($curlObj, CURLINFO_HTTP_CODE);
+        if ($curlReturnCode != 200) {
+            var_dump($data);
+            return array(false, "Failed to return 200 code when authenticate called with correct username and password. Code returned was ".$curlReturnCode.PHP_EOL."If you receive a large number of these errors you may have set up the system at a new location and forgotten to set the \$baseURLPerDir variable in this class (APITest)");
         }
 
         $gotToken = false;
@@ -791,7 +803,7 @@ final class APITest extends TestCase {
 
     public static function setupAdminStaffRecord($uid) {
         //In most cases would use relevant class to create record, however
-        //as our frontend isn't designed to facilitate creation of admin accounts
+        //as our code isn't designed to facilitate *creation* of admin accounts
         //we need to create these records directly
         $conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);
         $sql =  "insert into admin_staff (userid, firstname, lastname, created) "
@@ -815,7 +827,6 @@ final class APITest extends TestCase {
             return array('false', "Could not create record in adminStaff table for userId ".$uid.":".PHP_EOL.$errMsg);
         }
         $conn->close();
-        //var_dump("Looks to have successfully set up adminStaff record for ".$uid);
         return array(true, array('adminStaff' => new \Classes\AdminStaff($insertedId)));
     }
 
@@ -841,28 +852,37 @@ final class APITest extends TestCase {
         return array(true, '');
     }
 
+
+    //Main setUp method, creates records required by tests. Not all records created are required by all tests, but while
+    //it appears to be possible (according to stackOverflow) to determine which test is about to be run while within the
+    //setUp method via $this->getName() (I did not realise then when originally writing the setUp method, and have not
+    //actually tested this), the time taken to run setUp is relatively negligable so it isn't really worth rewriting it
+    //to have testmethod-specific setUp code. 
+    
+    //If one was planning on expanding this test class however to contain a very large number of test methods that 
+    //required only some of the below setup each, it may be worth going down that path
+
     protected function setUp(): void {
         parent::setUp();
         $this->curlObj = curl_init();
         curl_setopt($this->curlObj, CURLOPT_RETURNTRANSFER, 1);
-        $this->baseURL = "http://localhost:8080/api/external/";
+
+        //set baseURL depending on what directory we are being run from
+        $this->baseURL = $this->baseURLPerDir[strtolower(getcwd())];
         $this->baseProdURL = "http://localhost/api/external/";
-        $employerRes = EmployerTest::createUserAndEmployer($this->testEmployerEmail);
+
+        //setup test user records
+        $employerRes = EmployerTest::createUserAndEmployer($this->testEmployerEmail, 1);
         $this->testEmployer = new \Classes\Employer($employerRes['eid']);
-        $employerRes2 = EmployerTest::createUserAndEmployer($this->testEmployer2Email);
+        $employerRes2 = EmployerTest::createUserAndEmployer($this->testEmployer2Email, 1);
         $this->testEmployer2 = new \Classes\Employer($employerRes2['eid']);
-        $jsRes = JobSeekerTest::createUserAndJobSeeker($this->testJobSeekerEmail);
+        $jsRes = JobSeekerTest::createUserAndJobSeeker($this->testJobSeekerEmail, 1);
         $this->testJobSeeker = new \Classes\JobSeeker($jsRes['jid']);
+
+        //setup categories (and test admin record)
         $skillCatRes = SkillTest::staticSetup('SomeRandomTestSkillCategory', $this->testAdminEmail);
         $skillCat2Res = SkillTest::staticSetupSkillCat('SomeOtherTestSkillCategory');
-        //var_dump($skillCatRes);
-        //$adminUser, $skillCatId
         $adminUser = $skillCatRes[1]['adminUser'];
-        //need to set password and verified
-        //$adminUser->password = password_hash($adminUser->email, PASSWORD_BCRYPT);
-        //$adminUser->verified = 1;
-        //$objSave = $adminUser->Save();
-        //var_dump($objSave);
         $this->testSkillCatId = $skillCatRes[1]['skillCatId'];
         $this->testSkillCat2Id = $skillCat2Res[1]['skillCatId'];
         $this->testAdminStaff = $adminUser;
@@ -870,13 +890,15 @@ final class APITest extends TestCase {
         //The above does not actually create a record in the admin_staff table, which is fine for
         //testing the Skill class, but not ok for testing the admin API functions
         $this->setupAdminStaffRecord($this->testAdminStaff->userId);
+
+        //Setup test skills
         $this->skill1cat1Id = (SkillTest::createSkill("Skill To Conflict With", $this->testSkillCatId, $this->testAdminStaff))->objectId;
         $this->skill2cat1Id = (SkillTest::createSkill("Skill To Rename", $this->testSkillCatId, $this->testAdminStaff))->objectId;
         $this->skill1cat2Id = (SkillTest::createSkill("Skill In Other Category", $this->testSkillCat2Id, $this->testAdminStaff))->objectId;
-        //var_dump($this->testAdminStaff);
 
     }
 
+    //Remove temporary API tokens created for testing
     private function tearDownAPITokens() {
         $conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);
         $sql = "delete from api_token where userid in (Select userid from user where email = ?)";
@@ -884,7 +906,6 @@ final class APITest extends TestCase {
             if($stmt = $conn->prepare($sql)) {
                 $stmt->bind_param("s", $email);
                 $stmt->execute();
-                //var_dump("In tearDownAPITokens, ".$stmt->affected_rows." rows deleted");
             } 
             else {
                 $errMsg = $conn->errno . ' ' . $conn->error;
@@ -897,6 +918,8 @@ final class APITest extends TestCase {
         return array(true, "");
         $conn->close();
     }
+
+    //Main tearDown method
 
     protected function tearDown(): void {
         curl_close($this->curlObj);

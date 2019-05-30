@@ -43,7 +43,7 @@ final class JobTest extends TestCase {
         //Assumes there are 5 legitimate skillcategories with ids 1-5
         $categoryId = mt_rand(1,5);
         
-        //$jid, $objSave
+        //extract yields $jid, $objSave
         extract(JobTest::createJob($eid, $categoryId, $testJobName));
         
         return array('oid' => $oid, 'jid' => $jid, 'objSave' => $objSave,
@@ -57,11 +57,11 @@ final class JobTest extends TestCase {
         if ($result == null) {
             return null;
         }
-        extract($result); //$oid, $eid, $employer (employer obj)
+        extract($result); //extract yields $oid, $eid, $employer (employer obj)
 
         $job = new \Classes\Job();
         
-        //$jid, $objSave
+        //extract yields $jid, $objSave
         extract(JobTest::createJob($eid, $categoryId, $testJobName));
         
         return array('job' => new \Classes\Job($jid), 'employer' => new \Classes\Employer($eid));
@@ -74,8 +74,7 @@ final class JobTest extends TestCase {
         if ($result == null) {
             $this->assertTrue(false, "createEmployerAndJob failed (returned null)");
         }
-        //var_dump($result);
-        extract($result); //$oid, $jid, $objSave, $categoryId, $eid
+        extract($result); //extract yields $oid, $jid, $objSave, $categoryId, $eid
         $this->assertFalse($objSave->hasError);
         $this->assertNotEquals(0, $jid);
         $this->assertEquals($jid, (new \Classes\Job($jid))->jobId);
@@ -88,9 +87,7 @@ final class JobTest extends TestCase {
         $job->employerId = $eid;
         $job->skillCategoryId = $catid;
         $job->jobName = $name;
-        //var_dump($job);
         $objSave = $job->Save();
-        //var_dump($objSave);
         return array("jid" => $objSave->objectId, "objSave" => $objSave);
     }
 
@@ -113,21 +110,17 @@ final class JobTest extends TestCase {
         if ($result == null) {
             $this->assertTrue(false, "createEmployerAndJob failed (returned null)");
         }
-        extract($result); //$oid, $jid, $objSave, $categoryId, $eid
+        extract($result); //extract yields $oid, $jid, $objSave, $categoryId, $eid
         $allSkills = $this->GetAllSkills();
 
         //Pick some random skills, save, get, make sure they match
-        $numSkills = 9; //mt_rand(4,9);
+        $numSkills = 9;
         $skillsStrings = array();
         $skillsStrings['initSave'] = "";
         $skillsStrings['initGot'] = "";
         $skillsStrings['secondSave'] = "";
         $skillsStrings['secondGot'] = "";
         $origSkillsArr = array();
-
-        //var_dump($allSkills[$categoryId][mt_rand(0, count($allSkills[$categoryId]))]);
-        //$this->tearDown();
-        //die;
 
         for ($i = 0; $i < $numSkills; $i++) {
             do {
@@ -151,7 +144,6 @@ final class JobTest extends TestCase {
         //Repeat (ensuring that at least one new skill is added and one old skill
         //removed)
         do {
-            //var_dump("Iteration");
             $newSkillsArr = array();
             $skillsStrings['secondSave'] = "";
             for ($i = 0; $i < $numSkills; $i++) {
@@ -180,7 +172,6 @@ final class JobTest extends TestCase {
         
         $jobsByEmp = \Classes\Job::GetJobsByEmployer($eid);
 
-        //var_dump(explode(",",$skillsStrings['initSave']));
         $skillsArr['initSave'] = explode(",",$skillsStrings['initSave']);
         $skillsArr['initGot'] = explode(",",$skillsStrings['initGot']);
         $skillsArr['secondSave'] = explode(",",$skillsStrings['secondSave']);
@@ -225,7 +216,6 @@ final class JobTest extends TestCase {
         //delete skills
         if ($stmt = $conn->prepare($query)) {
             $stmt->bind_param("s", $testEmail);
-            //var_dump("Cleaning up - deleting user with id ".$oid);
             $stmt->execute();
             if ($checkAffected > 0) {
                 $affected = $stmt->affected_rows;
@@ -279,7 +269,6 @@ final class JobTest extends TestCase {
 
     protected function tearDown(): void {
         $result = JobTest::deleteJobTestTempRecords($this->testEmail, $this->checkJobDeleted, $this->checkEmployerDeleted, $this->checkUserDeleted);
-        //var_dump($result);
         if ($result[0] == false) {
             $this->assertTrue(false, $result[1]);
         }

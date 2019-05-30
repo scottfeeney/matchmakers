@@ -29,17 +29,15 @@ final class EmployerTest extends TestCase {
         if ($result == null) {
             $this->assertTrue(false,"Result of trying to save user was null");
         }
-        //var_dump($result);
         extract($result);
         $this->uidsToDelete[] = $oid;
-        //$this->eidsToDelete[] = $eid;
         $this->assertEquals($employer, new \Classes\Employer($eid));
     }
 
 
     //Helper class called from a number of other test classes (as well as this one)
-    public static function createUserAndEmployer($email) {
-        $oid = UserTest::saveNewUser($email);
+    public static function createUserAndEmployer($email, $verified = 0) {
+        $oid = UserTest::saveNewUser($email, 1, false, $verified);
         if ($oid == null) {
             var_dump("ERROR: failure to create new user record with email ".$email);
             return null; //better for stuff to fail here than make a mess
@@ -102,7 +100,6 @@ final class EmployerTest extends TestCase {
     protected function setUp(): void {
         parent::setUp();
         $this->uidsToDelete = array();
-       // $this->eidsToDelete = array();
     }
 
     //created to provide teardown functionality to other classes
@@ -111,9 +108,7 @@ final class EmployerTest extends TestCase {
         foreach (array( "delete from employer where userid in (select userId from user where email = ?)",
                         "delete from user where email = ?") as $sql) {
             if ($stmt = $conn->prepare($sql)) {
-                //var_dump($stmt);
                 $stmt->bind_param("s", $email);
-                //var_dump("Cleaning up - deleting user with id ".$oid);
                 $stmt->execute();
                 $result = mysqli_stmt_get_result($stmt);
                 $stmt->close();
@@ -130,24 +125,8 @@ final class EmployerTest extends TestCase {
     //function to remove temporary test data from database
     protected function tearDown(): void {
         $conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);
-        //var_dump($conn);
-        //var_dump("In cleanup with oid ".$oid);
-        foreach ($this->uidsToDelete as $idd) {
-            foreach (array('delete from employer where userid = ?', 'delete from user where UserId = ?') as $sql) {
-            //$sql = 'delete from employer where userid = ?';
-                if ($stmt = $conn->prepare($sql)) {
-                    //var_dump($stmt);
-                    $stmt->bind_param("i", $idd);
-                    //var_dump("Cleaning up - deleting user with id ".$oid);
-                    $stmt->execute();
-                    $result = mysqli_stmt_get_result($stmt);
-                    $stmt->close();
-                } else {
-                    var_dump($errorMessage = $conn->errno . ' ' . $conn->error);
-                    $this->assertTrue(false, "Error in database query in tearDown function");
-                }
-            }
-            $sql = 'delete from employer where userid in (Select userid from user where email = ?)';
+
+        foreach (array('delete from employer where userid in (select userid from user where email = ?)', 'delete from user where email = ?') as $sql) {
             if ($stmt = $conn->prepare($sql)) {
                 $stmt->bind_param("s", $this->testEmail);
                 $stmt->execute();
@@ -155,24 +134,12 @@ final class EmployerTest extends TestCase {
                 $stmt->close();
             } else {
                 var_dump($errorMessage = $conn->errno . ' ' . $conn->error);
-                $this->assertTrue(false, "Error in database query in tearDown function");
-            }
-            $sql = 'delete from employer where userid is null';
-            if ($stmt = $conn->prepare($sql)) {
-                $stmt->execute();
-                $result = mysqli_stmt_get_result($stmt);
-                $stmt->close();
-            } else {
-                //var_dump
-                var_dump($errorMessage = $conn->errno . ' ' . $conn->error);
-                $this->assertTrue(false, "Error in database query in tearDown function");
+                $this->assertTrue(false, "Error in database query in tearDown function:".PHP_EOL.$sql);
             }
         }
         $conn->close();
         parent::tearDown();
     }
-
-
 }
 
 ?>

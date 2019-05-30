@@ -75,7 +75,6 @@ use PHPUnit\Framework\TestCase;
 
 final class UserTest extends TestCase {
 
-    private $idsToDelete = array();
     private $testEmails = array(1 => "unit@tester.com", 2 => "reallyunittesting@test.com");
     private $testPassword = "notavery1good+password";
 
@@ -93,7 +92,6 @@ final class UserTest extends TestCase {
     //Make sure attempt to save record with email that already belongs to another record fails
     public function testSaveEmailExists() {
         $oid = $this->saveNewUser($this->testEmails[1]);
-        $this->idsToDelete[] = $oid;
         $user = new \Classes\User($oid);
         $newUser = new \Classes\User();
         $newUser->email = $user->email;
@@ -106,23 +104,32 @@ final class UserTest extends TestCase {
     //UPDATE: Expanded to allow userType to be indicated also (so as to allow creation of
     //admin-type records in user table - creation of skills requires this (but does not
     //actually require a record in the admin_staff table))
-    public static function saveNewUser($email, $userType = 1, $errorExpected = false) {
+    public static function saveNewUser($email, $userType = 1, $errorExpected = false, $verified = 0) {
         $user = new \Classes\User(0);
         $user->userType = $userType;
         $user->email = $email;
         $user->active = 1;
         $user->password = NULL;
-        $user->verified = 0;
+        $user->verified = 0; //when userId is zero, verified will always be inserted as zero/false
         $user->enteredDetails = 0;
         $user->resetCode = NULL;
         $objSave = $user->Save();
-        //var_dump($objSave);
+
         if ($objSave->hasError) {
             var_dump($objSave->errorMessage);
-//            $existingUser = \Classes\User::GetUserByEmailAddress($email);
-//            var_dump("Existing user with id: ".$existingUser->userId);
         }
-        return $objSave->objectId;
+
+        $oid = $objSave->objectId;
+
+        if ($verified) {
+            $user = new \Classes\User($oid);
+            $user->verified = $verified;
+            $objSave = $user->Save();
+            if ($objSave->hasError) {
+                var_dump($objSave->errorMessage);
+            }
+        }
+        return $oid;
     }
 
     
@@ -134,8 +141,6 @@ final class UserTest extends TestCase {
         $objSave = $user->Save();
         $oid2 = $objSave->objectId;
         $user2 = new \Classes\User($oid2);
-        $this->idsToDelete[] = $oid;
-        $this->idsToDelete[] = $oid2;
 
         $this->assertEquals($oid, $oid2);
         $this->assertEquals($this->testEmails[2], $user2->email);
@@ -146,8 +151,7 @@ final class UserTest extends TestCase {
     public function testSaveGetUser() {
         $oid = $this->saveNewUser($this->testEmails[1]);
         $user = new \Classes\User($oid);
-        //var_dump("Testing with oid ".$oid);
-        $this->idsToDelete[] = $oid;
+
         $this->assertEquals($this->testEmails[1], $user->email);
         $this->assertEquals(NULL, $user->password);
         $this->assertEquals(1, $user->userType);
@@ -162,7 +166,6 @@ final class UserTest extends TestCase {
     public function testGetEmailExists() {
         $oid = $this->saveNewUser($this->testEmails[1]);
         $user = new \Classes\User($oid);
-        $this->idsToDelete[] = $oid;
         $this->assertTrue($user->GetEmailExists($user->email, 0));
     }
 
@@ -171,7 +174,6 @@ final class UserTest extends TestCase {
     public function testGetEmailExistsFalse() {
         $oid = $this->saveNewUser($this->testEmails[1]);
         $user = new \Classes\User($oid);
-        $this->idsToDelete[] = $oid;
         $this->assertFalse($user->GetEmailExists(NULL, 0));
     }
 
@@ -179,7 +181,6 @@ final class UserTest extends TestCase {
     public function testGetEmailExistsFalseSameUser() {
         $oid = $this->saveNewUser($this->testEmails[1]);
         $user = new \Classes\User($oid);
-        $this->idsToDelete[] = $oid;
         $this->assertFalse($user->GetEmailExists($user->email, $user->userId));
     }
 
@@ -188,7 +189,6 @@ final class UserTest extends TestCase {
     public function testGetUserByVerifyCode() {
         $oid = $this->saveNewUser($this->testEmails[1]);
         $user = new \Classes\User($oid);
-        $this->idsToDelete[] = $oid;
         $user->Save();
         $this->assertEquals($user, \Classes\User::GetUserByVerifyCode($user->verifyCode));
     }
@@ -200,7 +200,6 @@ final class UserTest extends TestCase {
         $user = new \Classes\User($oid);
         $user->verified = true;
         $user->Save();
-        $this->idsToDelete[] = $oid;
         $this->assertEquals(null, \Classes\User::GetUserByVerifyCode($user->verifyCode));
     }
 
@@ -209,7 +208,6 @@ final class UserTest extends TestCase {
         $oid = $this->saveNewUser($this->testEmails[1]);
         $user = new \Classes\User($oid);
         $user->Save();
-        $this->idsToDelete[] = $oid;
         $this->assertEquals(null, \Classes\User::GetUserByVerifyCode(null));
     }
 
@@ -218,7 +216,6 @@ final class UserTest extends TestCase {
     public function testGetUserByEmailAddress() {
         $oid = $this->saveNewUser($this->testEmails[1]);
         $user = new \Classes\User($oid);
-        $this->idsToDelete[] = $oid;
         $user->verified = true;
         $user->active = true;
         $user->Save();
@@ -230,7 +227,6 @@ final class UserTest extends TestCase {
     public function testGetUserByEmailAddressFailure() {
         $oid = $this->saveNewUser($this->testEmails[1]);
         $user = new \Classes\User($oid);
-        $this->idsToDelete[] = $oid;
         $this->assertEquals(null, \Classes\User::GetUserByEmailAddress($user->email));
     }
 
@@ -239,7 +235,6 @@ final class UserTest extends TestCase {
         $oid = $this->saveNewUser($this->testEmails[1]);
         $user = new \Classes\User($oid);
         $user->Save();
-        $this->idsToDelete[] = $oid;
         $this->assertEquals(null, \Classes\User::GetUserByEmailAddress(null));
     }
 
@@ -247,7 +242,6 @@ final class UserTest extends TestCase {
     public function testGetUnverifiedUserByEmail() {
         $oid = $this->saveNewUser($this->testEmails[1]);
         $user = new \Classes\User($oid);
-        $this->idsToDelete[] = $oid;
         $this->assertEquals($user, \Classes\User::GetUnverifiedUserByEmailAddress($user->email));
     }
 
@@ -255,7 +249,6 @@ final class UserTest extends TestCase {
     public function testGetUserByResetCode() {
         $oid = $this->saveNewUser($this->testEmails[1]);
         $user = new \Classes\User($oid);
-        $this->idsToDelete[] = $oid;
         $user->verified = true;
         $user->active = true;
         $user->resetCode = \Utilities\Common::GetGuid();
@@ -267,7 +260,6 @@ final class UserTest extends TestCase {
     public function testGetUserByResetCodeFailureNoMatch() {
         $oid = $this->saveNewUser($this->testEmails[1]);
         $user = new \Classes\User($oid);
-        $this->idsToDelete[] = $oid;
         $this->assertEquals(null, \Classes\User::GetUserByResetCode($user->resetCode));
     }
 
@@ -277,7 +269,6 @@ final class UserTest extends TestCase {
     public function testGetUserByResetCodeFailureCodeLength() {
         $oid = $this->saveNewUser($this->testEmails[1]);
         $user = new \Classes\User($oid);
-        $this->idsToDelete[] = $oid;
         $user->verified = true;
         $user->active = true;
         $user->Save();
@@ -289,7 +280,6 @@ final class UserTest extends TestCase {
     public function testGetUserLogin() {
         $oid = $this->saveNewUser($this->testEmails[1]);
         $user = new \Classes\User($oid);
-        $this->idsToDelete[] = $oid;
         $user->verified = true;
         $user->active = true;
         $user->password = password_hash($this->testPassword, PASSWORD_BCRYPT);
@@ -302,7 +292,6 @@ final class UserTest extends TestCase {
     public function testGetUserLoginFailInvalidPassword() {
         $oid = $this->saveNewUser($this->testEmails[1]);
         $user = new \Classes\User($oid);
-        $this->idsToDelete[] = $oid;
         $user->verified = true;
         $user->active = true;
         $user->password = password_hash($this->testPassword, PASSWORD_BCRYPT);
@@ -330,7 +319,6 @@ final class UserTest extends TestCase {
         
         //verify no records in api_token
         $tokenRecsPreCreate = $this->getTokenDatetimeActive($uid);
-        //var_dump($tokenRecsPreCreate);
         $this->assertSame(0, $tokenRecsPreCreate[0]);
         
         //createApiToken
@@ -342,7 +330,6 @@ final class UserTest extends TestCase {
             $this->assertTrue(false, "First call of CreateApiToken did not result in record being added to api_token with userId "
                                         .$uid.PHP_EOL.$tokenRecsPostCreate1[1]);
         }
-        //var_dump($tokenRecsPostCreate1);
         
         //verify expiry datetime for token is more than 59min in future (may not be exactly an hour
         //  by the time the assertion runs)
@@ -383,13 +370,20 @@ final class UserTest extends TestCase {
         $this->assertSame(0, $activeFlag, "Calling CreateApiToken with old token in table doesn't result in it's active field being set to zero");    
     }
 
+
+
     public function updateTokenExpiryTime($token, $expiry) {
+        
         $conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);
+        
         $sql = "update api_token set expiryDate = ? where token = ?";
+        
         if($stmt = $conn->prepare($sql)) {
+
             $expiryStr = $expiry->format('Y-m-d H:i:s');
             $stmt->bind_param("ss", $expiryStr, $token);
             $stmt->execute();
+
             if ($stmt->affected_rows != 1) {
                 $stmt->close();
                 $conn->close();
@@ -397,38 +391,52 @@ final class UserTest extends TestCase {
                                     .$token->format('Y-m-d H:i:s')." for token ".$token.PHP_EOL
                                     ."This may cause the calling test function to fail.");
             }
-        $stmt->close();
-        $conn->close();
-        return array(true,"");
-        } else {
-            $errorMessage = $conn->errno . ' ' . $conn->error;
+
+            $stmt->close();
             $conn->close();
+
+            return array(true,"");
+
+        } else {
+
+            $errorMessage = $conn->errno . ' ' . $conn->error;
+
+            $conn->close();
+
             return array(false, "updateTokenExpiryTime failed to set expiryDate to ".$token->format('Y-m-d H:i:s')." for token ".$token
                     .PHP_EOL."This may cause the calling test function to fail.".PHP_EOL.$errorMessage);
+
         }
     }
 
     public function getTokenDatetimeActive($userId) {
         //get datetime and active for token for passed-in userId
         $conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);
+        
         $sql = "select active, expiryDate, token from api_token where userId = ?";
+
         if($stmt = $conn->prepare($sql)) {
+
             $stmt->bind_param("i", $userId);
             $stmt->execute();
             $result = $stmt->get_result();
-            //var_dump($result);
-            //var_dump($stmt);
+
             if ($result->num_rows == 0) {
                 return array(0, "No results from helper function getTokenDatetimeActive looking for records with userId ".$userId." - this may cause the calling test to fail");
             }
+
             $row = $result->fetch_array();
-            //var_dump($row);
             $conn->close();
+
             return array(true, array('expiryDate' => $row['expiryDate'], 'active' => $row['active'], 'token' => $row['token']));
+
         } else {
+
             $errorMessage = $conn->errno . ' ' . $conn->error;
             $conn->close();
+
             return array(false, "Error checking details of token in helper function getTokenDatetimeActive - calling test will probably fail".PHP_EOL.$errorMessage);
+
         }
     }
 
@@ -451,28 +459,35 @@ final class UserTest extends TestCase {
 
     //Refactored to allow use from other test classes
     public static function staticTearDown($testEmails) {
+
         $conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);
+
         foreach ($testEmails as $testEmail) {
             foreach (array("delete from api_token where userId in (select userId from user where email = ?)",
                             "delete from user where email = ?") as $sql) {
+
                 if ($stmt = $conn->prepare($sql)) {
-                    //var_dump($stmt);
+
                     $stmt->bind_param("s", $testEmail);
-                    //var_dump("Cleaning up - deleting user with id ".$oid);
                     $stmt->execute();
                     $result = mysqli_stmt_get_result($stmt);
                     $stmt->close();
+
                 } else {
+
                     $errorMessage = $conn->errno . ' ' . $conn->error;
+
                     return array(false, "Error in database query in tearDown function:".PHP_EOL.$errorMessage);
                 }
             }
         }
+
         $conn->close();
+
         return array(true, "");
     }
 
-    //tearDown function. Original contents deleted as 
+
     protected function tearDown(): void {
         $this->staticTearDown($this->testEmails);
         parent::tearDown();

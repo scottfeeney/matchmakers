@@ -23,13 +23,17 @@ final class SkillTest extends TestCase {
     private $uidsToDelete;
 
 
+    /**
+     * Tests for skill creation/renaming
+     * 
+     */
+
     public function testConstructorZero() {
         $skill = new \Classes\Skill(0);
         $this->assertSame(0, $skill->skillId);
     }
 
 
-    //Need tests for (constructor, save($user) method)
     //Attempt to insert new skill to category that doesn't exist
 
     public static function createAdminUser($testEmail) {
@@ -40,7 +44,6 @@ final class SkillTest extends TestCase {
         $skill = new \Classes\Skill(0);
         $skill->skillName = $skillName;
         $skill->skillCategoryId = $skillCatId;
-        //var_dump($skill);
         $objSave = $skill->Save($adminUser);
         return $objSave;
     }
@@ -48,7 +51,6 @@ final class SkillTest extends TestCase {
     public function testSaveInvalidCategory() {
         //assume -1 will never be a valid skillCategoryId
         $objSave = $this->createSkill("SomeSkill", -1, $this->adminUser);
-        //$this->assertFalse(true, print_r($objSave,TRUE));
         $this->assertTrue($objSave->hasError);
     }
 
@@ -64,9 +66,13 @@ final class SkillTest extends TestCase {
         $this->assertFalse($renameObjSave->hasError);
     }
 
-    //and following methods:
-    
-    //static function DeleteSkill($skillId)
+
+    /**
+     * Tests for skill deletion
+     * 
+     */
+
+
     //Attempt to delete a skill using Id that doesn't exist
 
     public function testDeleteSkillFailure() {
@@ -91,16 +97,21 @@ final class SkillTest extends TestCase {
 
     public static function createJobAddSkill($testEmail, $testJobName, $skillCatId, $adminUser) {
         $result = JobTest::createEmployerAndJob($testEmail, $testJobName);
-        extract($result); //jid
+        extract($result); //extract yields $jid
+        
         //add category
         $job = new \Classes\Job($jid);
         $job->skillCategoryId = $skillCatId;
         $job->Save();
+
+        //create skill
         $skillObjSave = SkillTest::createSkill("Looking Up",
                 $skillCatId, $adminUser);
-        //var_dump($skillObjSave);
         $skillId = $skillObjSave->objectId;
+
+        //add skill
         \Classes\Job::SaveJobSkills($jid, $skillId);
+
         return array('jid' => $jid, 'skillId' => $skillId);
         
         //anything calling this method should also call the below at the end
@@ -109,10 +120,8 @@ final class SkillTest extends TestCase {
 
     public function testDeleteUsedSkill() {
         extract(SkillTest::createJobAddSkill($this->testEmployerEmail, $this->testJobName, $this->skillCatId, $this->adminUser));
-        //$jid, $skillId
-        //var_dump("---".$jid);
-        //var_dump("---".$skillId);
-        //var_dump(\Classes\Job::GetSkillsByJobString($jid));
+        //extract yields $jid, $skillId
+
         $job = new \Classes\Job($jid);
 
         $deleteTestOneResult = \Classes\Skill::DeleteSkill($skillId);
@@ -125,9 +134,13 @@ final class SkillTest extends TestCase {
         $this->assertFalse($deleteTestTwoResult->hasError);
     }
 
-    //
 
-    //static function GetSkillsBySkillCategory($skillCategoryId)
+    /**
+     * Tests for GetSkillsBySkillCategory($skillCategoryId)
+     * 
+     */
+
+
     //Try with both legit and illegit skillCategoryIds
 
     public function testGetSkillsBySkillCategoryFailure() {
@@ -142,10 +155,16 @@ final class SkillTest extends TestCase {
     }
 
 
-    //static function GetSkillsByJob($jobId)
+
+    /**
+     * Test for GetSkillsByJob($jobId)
+     * 
+     */
+
     public function testGetSkillsByJob() {
         extract(SkillTest::createJobAddSkill($this->testEmployerEmail, $this->testJobName, $this->skillCatId, $this->adminUser));
-        //gives jid, skillId
+        //extract gives $jid, $skillId
+
         $skillsArr = \Classes\Skill::GetSkillsByJob($jid);
         $jobTestCleanupResult = JobTest::deleteJobTestTempRecords($this->testEmployerEmail);
         if ($jobTestCleanupResult[0] == false) {
@@ -156,12 +175,17 @@ final class SkillTest extends TestCase {
     }
 
 
-    //static function GetSkillsByJobSeeker($jobSeekerId)
+
+    /**
+     * Test for GetSkillsByJobSeeker($jobSeekerId)
+     * 
+     */
+
     public function testGetSkillsByJobSeeker() {
         //create jobseeker
         $jsTestEmail = "I_Seek_jobs@email.com";
         extract(JobSeekerTest::createUserAndJobSeeker($jsTestEmail));
-        //oid, jid, jobSeeker
+        //extract yields $oid, $jid, $jobSeeker
 
         //Set job seeker category
         $jobSeeker->skillCategoryId = $this->skillCatId;
@@ -190,7 +214,6 @@ final class SkillTest extends TestCase {
 
 
         $this->assertSame(array(), $initRes);
-        //$this->assertSame(array(), $finalRes);
         $this->assertEquals(1, count($res1));
         $this->assertEquals(2, count($res2));
 
@@ -201,20 +224,23 @@ final class SkillTest extends TestCase {
     }
 
 
-
-    //static function GetSkillExists($object)
+    /**
+     * Test for GetSkillExists($object)
+     * 
+     */
 
     public function testGetSkillExists() {
         $dodgySkill = new \Classes\Skill();
         $dodgySkill->skillName = "Whatever";
         $dodgySkill->skillCategoryId = "-1";
+
         $realSkillSave = $this->createSkill("Some Skill", $this->skillCatId, $this->adminUser);
         $realSkillId = $realSkillSave->objectId;
-        //var_dump($realSkillSave);
+
         $realSkillDuplicate = new \Classes\Skill();
         $realSkillDuplicate->skillName = "Some Skill";
         $realSkillDuplicate->skillCategoryId = $this->skillCatId;
-        //var_dump($realSkillDuplicate);
+
         $this->assertFalse(\Classes\Skill::GetSkillExists($dodgySkill));
         $this->assertTrue(\Classes\Skill::GetSkillExists($realSkillDuplicate));
     }
@@ -244,7 +270,6 @@ final class SkillTest extends TestCase {
             $skillCatId = $stmt->insert_id;
             $stmt->close();
         } else {
-            //var_dump($conn->errno . ' ' . $conn->error);
             $errMsg = $conn->errno . ' ' . $conn->error;
             $conn->close();
             return array(false, "Error in database query in setUp function:".PHP_EOL.$errMsg);
@@ -253,27 +278,20 @@ final class SkillTest extends TestCase {
         return array(true, array('skillCatId' => $skillCatId));
     }
 
-    public static function staticSetupAdminUser($testEmail) {
+    public static function staticSetupAdminUser($testEmail, $verified = 0) {
         //set up test admin user
-        $user = new \Classes\User(UserTest::saveNewUser($testEmail));
-        $user->userType = 3;
-        //var_dump($user);
-        $adminUserSaveRes = $user->Save();
-        if ($adminUserSaveRes->hasError) {
-            return array(false, $adminUserSaveRes->errorMessage);
-        }
-        $adminUser = new \Classes\User($adminUserSaveRes->objectId);
-        return array(true, array('adminUser' => $adminUser));
+        $user = new \Classes\User(UserTest::saveNewUser($testEmail, 3, false, 1));
+        return array(true, array('adminUser' => $user));
     }
 
-    public static function staticSetup($skillCatName, $testEmail) {
+    public static function staticSetup($skillCatName, $testEmail, $verified = 0) {
         $skillCatRes = SkillTest::staticSetupSkillCat($skillCatName);
         if ($skillCatRes[0] == false) {
             return $skillCatRes;
         }
         $skillCatId = $skillCatRes[1]['skillCatId'];
 
-        $adminSetupRes = SkillTest::staticSetupAdminUser($testEmail);
+        $adminSetupRes = SkillTest::staticSetupAdminUser($testEmail, $verified);
         if ($adminSetupRes[0] == false) {
             return $adminSetupRes;
         }
@@ -305,7 +323,6 @@ final class SkillTest extends TestCase {
 
         if ($stmt = $conn->prepare($sql)) {
             $stmt->bind_param("s", $email);
-            //var_dump("Cleaning up - deleting user with id ".$oid);
             $stmt->execute();
             $result = mysqli_stmt_get_result($stmt);
             if (mysqli_stmt_affected_rows($stmt) != 1) {
@@ -335,7 +352,6 @@ final class SkillTest extends TestCase {
                         "delete from skill_category where skillCategoryName = ?") as $sql) {
             if ($stmt = $conn->prepare($sql)) {
                 $stmt->bind_param("s", $skillCategoryName);
-                //var_dump("Cleaning up - deleting user with id ".$oid);
                 $stmt->execute();
                 $result = mysqli_stmt_get_result($stmt);
                 if (mysqli_stmt_affected_rows($stmt) != 1 && $sql == "delete from skill_category where skillCategoryName = ?") {
@@ -360,15 +376,14 @@ final class SkillTest extends TestCase {
     }
 
     public static function staticTearDown($skillCategoryName, $adminUser) {
-        //var_dump("Attempting to teardown skillcategory ".$skillCategoryName);
         $skillCatRes = SkillTest::staticTearDownSkillCat($skillCategoryName);
         if ($skillCatRes[0] == false) {
             return $skillCatRes;
         }
 
         //delete the adminUser created to create the skills
-
         $adminRes = SkillTest::tearDownAdminByEmail($adminUser->email);
+        
         return $adminRes;
     }
 

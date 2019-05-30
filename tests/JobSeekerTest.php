@@ -12,7 +12,6 @@ use PHPUnit\Framework\TestCase;
 
 final class JobSeekerTest extends TestCase {
 
-    //private $uidsToDelete;
     private $testEmail = "someJobSeekerEmail@somewhere.com";
 
     //For matching algorithm testing
@@ -40,6 +39,14 @@ final class JobSeekerTest extends TestCase {
     private $jobType1Id;
     private $jobType2Id;
 
+    //To limit time taken by algorithm test (reducing number of test cases)
+    //expected to be useful iff we still want to pick up any issues affecting
+    //all or many invokations of the algorithm implementation, without outlaying the time
+    //required to more exhaustively test it (though this should still be done periodically)
+
+    //set to a number between 1 and 11 to test that many 1/12ths of the test cases
+    //set to 0 to disable
+    private $algorithmTestLimit = 0;
 
 
 
@@ -53,8 +60,8 @@ final class JobSeekerTest extends TestCase {
      * Helper function as multiple tests will want to work on a record already in the database
      */
 
-    public static function createUserAndJobSeeker($testEmail) {
-        $oid = UserTest::saveNewUser($testEmail, 2);
+    public static function createUserAndJobSeeker($testEmail, $verified = 0) {
+        $oid = UserTest::saveNewUser($testEmail, 2, false, $verified);
         $jobSeeker = new \Classes\JobSeeker(0);
         $jobSeeker->userId = $oid;
         $oSave = $jobSeeker->Save();
@@ -112,7 +119,7 @@ final class JobSeekerTest extends TestCase {
 
         //create new jobseeker
         extract($this->createUserAndJobSeeker($this->testEmail));
-        //$oid, $jid (jobseekerid), $jobSeeker
+        //extract yields $oid (objectId), $jid (jobseekerid), $jobSeeker object
 
 
         //create new skill
@@ -148,18 +155,13 @@ final class JobSeekerTest extends TestCase {
         $skill2 = SkillTest::createSkill("SkillName2", $skillCatId, $adminUser);
         $skill2Id = $skill2->objectId;
 
-        //var_dump($skill2);
 
         //add second skill
         $skillIdArr = array($skill1Id, $skill2Id);
-        //var_dump($skillIdArr);
         \Classes\JobSeeker::SaveJobSeekerSkills($jid, join(",", $skillIdArr));
 
         //verify get returns expected string
         $post2String = \Classes\JobSeeker::GetSkillsByJobSeekerString($jid);
-        //var_dump(\Classes\Skill::GetSkillsByJobSeeker($jid));
-        //var_dump($jid);
-        //var_dump($jobSeeker);
 
 
         //We need separate cleanup code to remove the entries in job_seeker_skill
@@ -178,7 +180,6 @@ final class JobSeekerTest extends TestCase {
         $this->assertEquals(join(",", array($skill1Id, $skill2Id)), $post2String);
         $this->assertEquals($skill1Id, $post1String);
         $this->assertSame($preString, "");
-        //$this->assertTrue(false, print_r($adminUser, True));
 
         $skillTearDownRes = SkillTest::staticTearDown($skillCatName, $adminUser);
         if ($skillTearDownRes[0] == false) {
@@ -187,13 +188,16 @@ final class JobSeekerTest extends TestCase {
     }
 
 
+
     /**
      * Start of section related to matching algorithm testing
      */
 
     //Helper function to emulate the job matching algorithm. With tests using this function, any later adjustments to the 
     //algorithm will require only adjusting this function to bring testing in line, rather than adjusting each test function
+    
     public static function matchingFormula($job, $jobSeeker, $returnType) {
+
         $matchPercent = 0;
         $cutoffPercent = 51; //Minimum value that will register as a match
         
@@ -213,14 +217,12 @@ final class JobSeekerTest extends TestCase {
         $seekerNoMatch = count($seekerSkills) - $matched;
         $jobTotal = count($jobSkills);
 
-        //var_dump(array('matched' => $matched, 'seekerNoMatch' => $seekerNoMatch, 'jobTotal' => $jobTotal));
 
         //Add score for weighted skills with 'jack of all trades' penalty if applicable
         $pros = ($matched * 1.0) / $jobTotal * 50 * 11;
         $cons = ($seekerNoMatch * 1.0) / $jobTotal * 50;
         $skillsScore = ($pros - $cons) / 11.0;
 
-        //var_dump(array('pros' => $pros, 'cons' => $cons, 'skillsScore' => $skillsScore));
 
         //SkillsScore ignored if negative
         $matchPercent += $skillsScore > 0 ? $skillsScore : 0;
@@ -237,7 +239,6 @@ final class JobSeekerTest extends TestCase {
             $obj->jobId = $job->jobId;
             $obj->score = round($matchPercent);
         }
-        //var_dump($obj);
         return array($obj);
     }
 
@@ -253,7 +254,6 @@ final class JobSeekerTest extends TestCase {
                     $score = $matchObj->score;
                 }
             } else {
-                //var_dump($matchObj);
                 if ($matchObj->jobId == $jid) {
                     $score = $matchObj->score;
                 }
@@ -268,6 +268,9 @@ final class JobSeekerTest extends TestCase {
                 ."(takes around 10min on our testing platform (AWS free tier instance))".PHP_EOL
                 ."It is highly recommended that you do NOT stop this test (or any other test) during execution as that may leave the database in an inconsistent state (with test data having not been removed) which will interfere with subsequent attempted runs of the unit tests until manually resolved."
                 .PHP_EOL."Starting test at ".date("H:i:s")." (UTC)");
+        if ($this->algorithmTestLimit) {
+            var_dump(PHP_EOL.PHP_EOL."Limiting of test space enabled, ".$this->algorithmTestLimit."/12ths of all test cases will be run".PHP_EOL.PHP_EOL);
+        }
         $this->assertTrue(true);
     }
 
@@ -284,17 +287,19 @@ final class JobSeekerTest extends TestCase {
      * 
      * Testing is done exclusively in this class to allow for cross-comparison of
      * results of methods from both Job and JobSeeker classes.
+     * 
+     * Runtime can be reduced (though less cases are tested) by use of $this->algorithmTestLimit
+     * (set at the top of this file)
+     * 
      */
     public function testMatchingAlgorithmExhaustive() {
-        //$this->assertTrue(false); //temporarily disabled to speed up test suite execution
-        //$limit = 1; //to limit but not entirely disable this function
         $totalNumSkills = count($this->testSkills);
 
         //For each possible number of skills to be assigned to JobSeeker
         for ($i = 1; $i < $totalNumSkills; $i++) {
-            //if ($i > $limit) {
-            //    break;
-            //}
+            if ($this->algorithmTestLimit && $i > $this->algorithmTestLimit) {
+                break;
+            }
 
             //For each possible number of skills to be assigned to Job
             for ($j = 1; $j < $totalNumSkills; $j++) {
@@ -388,22 +393,9 @@ final class JobSeekerTest extends TestCase {
                                                         .PHP_EOL."Job SkillIDs: ".$jobSkillsIDsStr.PHP_EOL."Location match: ".($locMatch ? "true" : "false").PHP_EOL
                                                         ."Job Type Match: ".($jobTypeMatch ? "true" : "false"));
                             
-
-                            //Debugging statements
-
-                            //var_dump("Expected ".$expectedScore." got ".$actualScore);
-                            //var_dump("Expected ".$expectedScore.", got "
-                            //    .$actualScore.PHP_EOL."Parameters were: ".PHP_EOL."Jobseeker SkillIDs: ".$jobSeekerSkillsIDsStr
-                            //    .PHP_EOL."Job SkillIDs: ".$jobSkillsIDsStr.PHP_EOL."Location match: ".($locMatch ? "true" : "false").PHP_EOL
-                            //    ."Job Type Match: ".($jobTypeMatch ? "true" : "false"));
-                            //var_dump($expectedMatches);
-                            //var_dump($actualMatches);
-
-
                             
                             //sleep for 0.15sec. This is necessary to prevent windows running out of available network ports for database connections.
-                            //May not be necessary under linux or OSX
-                            
+                            //May not be necessary under linux or OSX                         
                             usleep(150000);
                         }
                     }
@@ -430,9 +422,6 @@ final class JobSeekerTest extends TestCase {
      */
 
     public static function matchingTest($testParams, $testVars, $matchType) {
-        //var_dump($testParams);
-        //var_dump($testVars);
-        //var_dump($matchType);
 
         //turn array parameters back into individual variables
         list($seekerSkills, $matchingSkills, $jobSkills, $locMatch, $jobTypeMatch) = $testParams;
@@ -450,7 +439,6 @@ final class JobSeekerTest extends TestCase {
             $jobSkillIdsStr .= $jobSkillIdsStr == "" ? "" : ",";
             $jobSkillIdsStr .= ($testSkills[$i])->skillId;
         }
-        //var_dump($jobSkillIdsStr);
         \Classes\Job::SaveJobSkills($testJob->jobId, $jobSkillIdsStr);
 
         //Prep test job seeker
@@ -467,14 +455,11 @@ final class JobSeekerTest extends TestCase {
             $seekerSkillIdsStr .= $seekerSkillIdsStr == "" ? "" : ",";
             $seekerSkillIdsStr .= ($testSkills[$i])->skillId;
         }
-        //var_dump($seekerSkillIdsStr);
         \Classes\JobSeeker::SaveJobSeekerSkills($testJobSeeker->jobSeekerId, $seekerSkillIdsStr);
 
         //Get expected and actual matching results
         $expectedMatches = JobSeekerTest::matchingFormula($testJob, $testJobSeeker, $matchType);
         $actualMatches = \Classes\JobSeeker::GetJobSeekerMatchesByJob($testJob->jobId);
-        //var_dump($actualMatches);
-        //var_dump($expectedMatches);
 
         return array(JobSeekerTest::checkMatchScore($testJobSeeker->jobSeekerId, $expectedMatches),
                             JobSeekerTest::checkMatchScore($testJobSeeker->jobSeekerId, $actualMatches));        
@@ -496,6 +481,7 @@ final class JobSeekerTest extends TestCase {
         //Create jobseeker
         extract(JobSeekerTest::createUserAndJobSeeker($jsEmail));
         //yields oid, jid and jobSeeker
+
         if ($jobSeeker == null || $jobSeeker->jobSeekerId == 0) {
             return array(false, "Failed to set up JobSeeker in ". $thisMethod);
         }
@@ -566,7 +552,6 @@ final class JobSeekerTest extends TestCase {
 
         $conn->close();
         
-        //return array(jobseeker obj, employer obj, job obj, skillcategory obj, array of skill objs, $adminUser)
         return array($jobSeeker, $employer, $job, $skillCat, $skills, $adminUser, $locIds, $jobTypeIds);
     }
 
@@ -639,15 +624,10 @@ final class JobSeekerTest extends TestCase {
         //actual teardown
         foreach ($tearDown as $tearDownCat => $paramAndQueries)
             foreach ($paramAndQueries['queries'] as $sql) {
-                //var_dump($sql);
                 if($stmt = $conn->prepare($sql)) {
-                    //var_dump($paramAndQueries['param']);
                     $stmt->bind_param($paramAndQueries['paramType'], $paramAndQueries['param']);
                     $stmt->execute();
                     $affRows = $stmt->affected_rows;
-                    
-                    //var_dump("Attempting to tear down ".$tearDownCat." in JobSeekerTest::tearDownAfterMatchingAlgoTest:"
-                    //            .PHP_EOL.$affRows." rows affected by query".PHP_EOL.$sql.PHP_EOL."With param:".PHP_EOL.$paramAndQueries['param']);
                     $stmt->close();
                 } else {
                     $errMsg = "Error attempting to tear down ".$tearDownCat." in JobSeekerTest::tearDownAfterMatchingAlgoTest:"
@@ -673,7 +653,6 @@ final class JobSeekerTest extends TestCase {
             $this->assertTrue(false, $matchingAlgoSetupRes[1]);
         }
 
-        //array($jobSeeker, $employer, $job, $skillCat, $skills, $adminUser)
         list($this->testJobSeeker, $this->testEmployer, $this->testJob, $this->testSkillCategory, $this->testSkills,
                 $this->testAdmin, $locIds, $jobTypeIds) = $matchingAlgoSetupRes;
         $this->location1Id = $locIds[0];
