@@ -41,7 +41,6 @@ final class APITest extends TestCase {
     //Basic config data and curl object
     private $curlObj;
     private $baseURL;
-    private $baseProdURL;
 
     //Emails to be used to create test user records
     private $testEmployerEmail = "JustTestingAnEmployer__123#@321.com";
@@ -67,6 +66,7 @@ final class APITest extends TestCase {
     //is being run from (i.e. what is reported by getcwd())
     private $baseURLPerDir = array('c:\\inetpub\\wwwroot' => "http://localhost/api/external/",
                                     'c:\\inetpub\\wwwroot-dev' => "http://localhost:8080/api/external/",);
+    private $baseProdURL = "http://localhost/api/external/";
 
     //lookup for userTypes
     private $userTypes = array(1 => "employer", 2 => "jobseeker", 3 => "admin");
@@ -798,59 +798,6 @@ final class APITest extends TestCase {
      * 
      */
 
-    //Functions to create adminStaff table records and delete them (i.e. to be called by setup and tearDown, as
-    //existing functions borrowed from SkillTest only deal with entries in the User table)
-
-    public static function setupAdminStaffRecord($uid) {
-        //In most cases would use relevant class to create record, however
-        //as our code isn't designed to facilitate *creation* of admin accounts
-        //we need to create these records directly
-        $conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);
-        $sql =  "insert into admin_staff (userid, firstname, lastname, created) "
-                ."values (?, 'Bob', 'Smith', UTC_TIMESTAMP())";
-
-        if($stmt = $conn->prepare($sql)) {
-            $stmt->bind_param("i", $uid);
-            $stmt->execute();
-            if ($conn->affected_rows != 1) {
-                $errMsg = $conn->errno.': '.$conn->error;
-                var_dump($errMsg);
-                $conn->close();
-                return array('false', "Could not verify creation of record in adminstaff table for userId ".$uid.":".PHP_EOL.$errMsg);
-            }
-            $insertedId = $stmt->insert_id;
-        } 
-        else {
-            $errMsg = $conn->errno.': '.$conn->error;
-            var_dump($errMsg);
-            $conn->close();
-            return array('false', "Could not create record in adminStaff table for userId ".$uid.":".PHP_EOL.$errMsg);
-        }
-        $conn->close();
-        return array(true, array('adminStaff' => new \Classes\AdminStaff($insertedId)));
-    }
-
-    public static function tearDownAdminStaffRecord($uid) {
-        $conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);
-
-        $sql =  "delete from admin_staff where userId = ?";
-
-        
-        if($stmt = $conn->prepare($sql)) {
-            $stmt->bind_param("i", $uid);
-            $stmt->execute();
-            if ($conn->affected_rows != 1) {
-                $conn->close();
-                return array('false', "Could not verify deletion of record in adminstaff table for userId ".$uid);
-            }
-        } 
-        else {
-            $conn->close();
-            return array('false', "Could not delete record in adminStaff table for userId ".$uid);
-        }
-        $conn->close();
-        return array(true, '');
-    }
 
 
     //Main setUp method, creates records required by tests. Not all records created are required by all tests, but while
@@ -869,19 +816,27 @@ final class APITest extends TestCase {
 
         //set baseURL depending on what directory we are being run from
         $this->baseURL = $this->baseURLPerDir[strtolower(getcwd())];
-        $this->baseProdURL = "http://localhost/api/external/";
 
         //setup test user records
         $employerRes = EmployerTest::createUserAndEmployer($this->testEmployerEmail, 1);
+        $this->assertNotNull($employerRes, "Could not set up employer in APITest");
         $this->testEmployer = new \Classes\Employer($employerRes['eid']);
+
         $employerRes2 = EmployerTest::createUserAndEmployer($this->testEmployer2Email, 1);
+        $this->assertNotNull($employerRes2, "Could not set up employer 2 in APITest");
         $this->testEmployer2 = new \Classes\Employer($employerRes2['eid']);
+
         $jsRes = JobSeekerTest::createUserAndJobSeeker($this->testJobSeekerEmail, 1);
         $this->testJobSeeker = new \Classes\JobSeeker($jsRes['jid']);
+        $this->assertNotNull($jsRes, "Could not set up jobSeeker in APITest");
 
         //setup categories (and test admin record)
         $skillCatRes = SkillTest::staticSetup('SomeRandomTestSkillCategory', $this->testAdminEmail);
+        $this->assertTrue($skillCatRes[0], "Could not set up Skill Category in APITest: ".PHP_EOL.print_r($skillCatRes[1], true));
+
         $skillCat2Res = SkillTest::staticSetupSkillCat('SomeOtherTestSkillCategory');
+        $this->assertTrue($skillCat2Res[0], "Could not set up Skill Category 2 in APITest: ".PHP_EOL.print_r($skillCat2Res[1], true));
+
         $adminUser = $skillCatRes[1]['adminUser'];
         $this->testSkillCatId = $skillCatRes[1]['skillCatId'];
         $this->testSkillCat2Id = $skillCat2Res[1]['skillCatId'];
@@ -889,12 +844,21 @@ final class APITest extends TestCase {
 
         //The above does not actually create a record in the admin_staff table, which is fine for
         //testing the Skill class, but not ok for testing the admin API functions
-        $this->setupAdminStaffRecord($this->testAdminStaff->userId);
+        $adminStaffRes = AdminStaffTest::setupAdminStaffRecord($this->testAdminStaff->userId);
+        $this->assertTrue($adminStaffRes[0], "Could not complete setup in APITest: ".PHP_EOL.print_r($adminStaffRes[1], true));
 
         //Setup test skills
-        $this->skill1cat1Id = (SkillTest::createSkill("Skill To Conflict With", $this->testSkillCatId, $this->testAdminStaff))->objectId;
-        $this->skill2cat1Id = (SkillTest::createSkill("Skill To Rename", $this->testSkillCatId, $this->testAdminStaff))->objectId;
-        $this->skill1cat2Id = (SkillTest::createSkill("Skill In Other Category", $this->testSkillCat2Id, $this->testAdminStaff))->objectId;
+        $skill1Res = SkillTest::createSkill("Skill To Conflict With", $this->testSkillCatId, $this->testAdminStaff);
+        $skill2Res = SkillTest::createSkill("Skill To Rename", $this->testSkillCatId, $this->testAdminStaff);
+        $skill3Res = SkillTest::createSkill("Skill In Other Category", $this->testSkillCat2Id, $this->testAdminStaff);
+
+        $this->assertFalse($skill1Res->hasError, "Error in APITest attempting to setup skills");
+        $this->assertFalse($skill2Res->hasError, "Error in APITest attempting to setup skills");
+        $this->assertFalse($skill3Res->hasError, "Error in APITest attempting to setup skills");
+
+        $this->skill1cat1Id = $skill1Res->objectId;
+        $this->skill2cat1Id = $skill2Res->objectId;
+        $this->skill1cat2Id = $skill3Res->objectId;
 
     }
 
@@ -946,7 +910,7 @@ final class APITest extends TestCase {
             $this->assertTrue(false, "Error in tearDown: ".$tearDownJobSeekerRes[1]);
         }
 
-        $tearsDownAdminRes = $this->tearDownAdminStaffRecord($this->testAdminStaff->userId);
+        $tearsDownAdminRes = AdminStaffTest::tearDownAdminStaffRecord($this->testAdminStaff->userId);
         if ($tearsDownAdminRes[0] == false) {
             $this->assertTrue(false, "Error in tearDown: ".$tearsDownAdminRes[1]);
         }

@@ -20,7 +20,6 @@ final class SkillTest extends TestCase {
     private $testEmployerEmail;
     private $skillCatId;
     private $testJobName;
-    private $uidsToDelete;
 
 
     /**
@@ -278,11 +277,6 @@ final class SkillTest extends TestCase {
         return array(true, array('skillCatId' => $skillCatId));
     }
 
-    public static function staticSetupAdminUser($testEmail, $verified = 0) {
-        //set up test admin user
-        $user = new \Classes\User(UserTest::saveNewUser($testEmail, 3, false, 1));
-        return array(true, array('adminUser' => $user));
-    }
 
     public static function staticSetup($skillCatName, $testEmail, $verified = 0) {
         $skillCatRes = SkillTest::staticSetupSkillCat($skillCatName);
@@ -291,7 +285,7 @@ final class SkillTest extends TestCase {
         }
         $skillCatId = $skillCatRes[1]['skillCatId'];
 
-        $adminSetupRes = SkillTest::staticSetupAdminUser($testEmail, $verified);
+        $adminSetupRes = AdminStaffTest::staticSetupAdminUser($testEmail, $verified);
         if ($adminSetupRes[0] == false) {
             return $adminSetupRes;
         }
@@ -310,38 +304,12 @@ final class SkillTest extends TestCase {
 
         $setupResult = $this->staticSetup($this->testSkillCategoryName, $this->testEmail);
         if ($setupResult[0] == false) {
-            $this->assertTrue(false, $setupResult[1]);
+            $this->assertTrue(false, print_r($setupResult[1], true));
         }
         $this->adminUser = $setupResult[1]['adminUser'];
         $this->skillCatId = $setupResult[1]['skillCatId'];
     }
 
-    //Refactored to static to allow use from another test class
-    public static function tearDownAdminByEmail($email) {
-        $conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);
-        $sql = "delete from user where email = ?";
-
-        if ($stmt = $conn->prepare($sql)) {
-            $stmt->bind_param("s", $email);
-            $stmt->execute();
-            $result = mysqli_stmt_get_result($stmt);
-            if (mysqli_stmt_affected_rows($stmt) != 1) {
-                $stmt->close();
-                $conn->close();
-                var_dump("Failure to delete adminUser with email '".$adminUser->email."'");
-                return array(false, "Failure to delete adminUser with email '"
-                                        .$adminUser->email."'");
-            }
-            $stmt->close();
-        } else {
-            $errorMessage = $conn->errno . ' ' . $conn->error;
-            $conn->close();
-            var_dump("Error in database query in tearDown function:".PHP_EOL.$errorMessage);
-            return array(false, "Error in database query in tearDown function:".PHP_EOL.$errorMessage);
-        }        
-        $conn->close();
-        return array(true, "");
-    }
 
     public static function staticTearDownSkillCat($skillCategoryName) {
         $conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);
@@ -382,8 +350,8 @@ final class SkillTest extends TestCase {
         }
 
         //delete the adminUser created to create the skills
-        $adminRes = SkillTest::tearDownAdminByEmail($adminUser->email);
-        
+        $adminRes = AdminStaffTest::tearDownAdminByEmail($adminUser->email);
+
         return $adminRes;
     }
 

@@ -65,6 +65,9 @@ final class JobSeekerTest extends TestCase {
         $jobSeeker = new \Classes\JobSeeker(0);
         $jobSeeker->userId = $oid;
         $oSave = $jobSeeker->Save();
+        if ($oSave->hasError) {
+            return null;
+        }
         $jid = $oSave->objectId;
         $jobSeeker = new \Classes\JobSeeker($jid);
         return array('oid' => $oid, 'jid' => $jid, 'jobSeeker' => $jobSeeker);
@@ -498,7 +501,7 @@ final class JobSeekerTest extends TestCase {
         //yields job, employer
 
         //create test admin (need admin to add skills)
-        $adminUserRes = SkillTest::staticSetupAdminUser($adminEmail);
+        $adminUserRes = AdminStaffTest::staticSetupAdminUser($adminEmail);
         if ($adminUserRes[0] == false) {
             return array (false, "Failed to set up Skill Category in ". $thisMethod.PHP_EOL.$adminUserRes[1]);
         }

@@ -58,12 +58,12 @@ final class AdminStaffTest extends TestCase {
     //completed before the same functionality was implemented elsewhere
     protected function setUp(): void {
         parent::setUp();
-        
+
         //create record in user table
-        $this->adminStaffUserRecord = SkillTest::staticSetupAdminUser($this->testEmail)[1]['adminUser'];
+        $this->adminStaffUserRecord = AdminStaffTest::staticSetupAdminUser($this->testEmail)[1]['adminUser'];
 
         //create record in adminStaff table
-        $adminStaffSetupRes = APITest::setupAdminStaffRecord($this->adminStaffUserRecord->userId);
+        $adminStaffSetupRes = AdminStaffTest::setupAdminStaffRecord($this->adminStaffUserRecord->userId);
         if ($adminStaffSetupRes[0] != false) {
             $this->adminStaffAdminStaffRecord = $adminStaffSetupRes[1]['adminStaff'];
         }
@@ -73,13 +73,97 @@ final class AdminStaffTest extends TestCase {
         }
     }
 
+    public static function staticSetupAdminUser($testEmail, $verified = 0) {
+        //set up test admin user
+        $user = new \Classes\User(UserTest::saveNewUser($testEmail, 3, false, 1));
+        return array(true, array('adminUser' => $user));
+    }
+
+    public static function setupAdminStaffRecord($uid) {
+        //In most cases would use relevant class to create record, however
+        //as our code isn't designed to facilitate *creation* of admin accounts
+        //we need to create these records directly
+        $conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);
+        $sql =  "insert into admin_staff (userid, firstname, lastname, created) "
+                ."values (?, 'Bob', 'Smith', UTC_TIMESTAMP())";
+
+        if($stmt = $conn->prepare($sql)) {
+            $stmt->bind_param("i", $uid);
+            $stmt->execute();
+            if ($conn->affected_rows != 1) {
+                $errMsg = $conn->errno.': '.$conn->error;
+                var_dump($errMsg);
+                $conn->close();
+                return array(false, "Could not verify creation of record in adminstaff table for userId ".$uid.":".PHP_EOL.$errMsg);
+            }
+            $insertedId = $stmt->insert_id;
+        } 
+        else {
+            $errMsg = $conn->errno.': '.$conn->error;
+            var_dump($errMsg);
+            $conn->close();
+            return array(false, "Could not create record in adminStaff table for userId ".$uid.":".PHP_EOL.$errMsg);
+        }
+        $conn->close();
+        return array(true, array('adminStaff' => new \Classes\AdminStaff($insertedId)));
+    }
+
     protected function tearDown(): void {
-        APITest::tearDownAdminStaffRecord($this->adminStaffUserRecord->userId);
-        SkillTest::tearDownAdminByEmail($this->adminStaffUserRecord->email);
+        AdminStaffTest::tearDownAdminStaffRecord($this->adminStaffUserRecord->userId);
+        AdminStaffTest::tearDownAdminByEmail($this->adminStaffUserRecord->email);
         UserTest::staticTearDown(array($this->testNonAdminEmail));
         parent::tearDown();
     }
 
+    //Refactored to static to allow use from another test class
+    public static function tearDownAdminByEmail($email) {
+        $conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);
+        $sql = "delete from user where email = ?";
+
+        if ($stmt = $conn->prepare($sql)) {
+            $stmt->bind_param("s", $email);
+            $stmt->execute();
+            $result = mysqli_stmt_get_result($stmt);
+            if (mysqli_stmt_affected_rows($stmt) != 1) {
+                $stmt->close();
+                $conn->close();
+                var_dump("Failure to delete adminUser with email '".$email."'");
+                return array(false, "Failure to delete adminUser with email '"
+                                        .$email."'");
+            }
+            $stmt->close();
+        } else {
+            $errorMessage = $conn->errno . ' ' . $conn->error;
+            $conn->close();
+            var_dump("Error in database query in tearDown function:".PHP_EOL.$errorMessage);
+            return array(false, "Error in database query in tearDown function:".PHP_EOL.$errorMessage);
+        }        
+        $conn->close();
+        return array(true, "");
+    }
+
+
+    public static function tearDownAdminStaffRecord($uid) {
+        $conn = mysqli_connect(DB_HOST, DB_USERNAME, DB_PASSWORD, DB_NAME) or die("Connection failed: " . $conn->connect_error);
+
+        $sql =  "delete from admin_staff where userId = ?";
+
+        
+        if($stmt = $conn->prepare($sql)) {
+            $stmt->bind_param("i", $uid);
+            $stmt->execute();
+            if ($conn->affected_rows != 1) {
+                $conn->close();
+                return array('false', "Could not verify deletion of record in adminstaff table for userId ".$uid);
+            }
+        } 
+        else {
+            $conn->close();
+            return array('false', "Could not delete record in adminStaff table for userId ".$uid);
+        }
+        $conn->close();
+        return array(true, '');
+    }
 
 }
 
