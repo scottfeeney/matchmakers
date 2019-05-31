@@ -53,9 +53,6 @@ final class AdminStaffTest extends TestCase {
     }
 
 
-    //setUp and tearDown functions utilizing setUp and tearDown functionality from other classes
-    //(APITest and SkillTest) as the setUp and tearDown functionality for this class was not properly 
-    //completed before the same functionality was implemented elsewhere
     protected function setUp(): void {
         parent::setUp();
 
